@@ -54,9 +54,11 @@ The application will start on `http://localhost:5000` (or `https://localhost:500
 ### Database Configuration
 
 #### Local Development (SQLite)
+
 The application uses SQLite by default in development mode. The database file `aquahub.db` will be created automatically in the project root when you run the application.
 
 Connection string is configured in `appsettings.Development.json`:
+
 ```json
 {
   "ConnectionStrings": {
@@ -66,6 +68,7 @@ Connection string is configured in `appsettings.Development.json`:
 ```
 
 #### Production (PostgreSQL)
+
 In production (Railway), the application reads the `DATABASE_URL` environment variable and automatically configures PostgreSQL. Railway provides this variable when you add a PostgreSQL database to your service.
 
 ### Entity Framework Core Commands
@@ -92,12 +95,14 @@ AquaHub.MVC/
 ## Deployment to Railway
 
 ### Prerequisites
+
 - [Railway CLI](https://docs.railway.app/develop/cli) (optional)
 - Railway account
 
 ### Deployment Steps
 
 1. **Initialize Railway Project** (if not already done):
+
    ```bash
    railway login
    railway init
@@ -108,10 +113,11 @@ AquaHub.MVC/
    - Railway automatically sets the `DATABASE_URL` environment variable
 
 3. **Deploy**:
+
    ```bash
    railway up
    ```
-   
+
    Or connect your GitHub repository in the Railway dashboard for automatic deployments.
 
 4. **Set Environment Variables** (if needed):
@@ -122,6 +128,7 @@ AquaHub.MVC/
 ### Railway Configuration
 
 The application is configured to:
+
 - Listen on the port specified by the `PORT` environment variable
 - Automatically parse and use the `DATABASE_URL` for PostgreSQL connections
 - Run database migrations on startup
@@ -138,11 +145,13 @@ docker build -t aquahub-mvc .
 ### Run Docker Container Locally
 
 With SQLite (development):
+
 ```bash
 docker run -p 5000:5000 -e ASPNETCORE_ENVIRONMENT=Development aquahub-mvc
 ```
 
 With PostgreSQL:
+
 ```bash
 docker run -p 5000:5000 \
   -e DATABASE_URL=postgres://user:password@host:5432/database \
@@ -167,6 +176,7 @@ This will scaffold Identity UI pages (Login, Register, etc.) into your project.
 ### appsettings.json
 
 The main configuration file contains:
+
 - Connection strings
 - Logging configuration
 - Application-specific settings
@@ -182,11 +192,13 @@ The main configuration file contains:
 ### Database Issues
 
 **Migration not applied:**
+
 ```bash
 dotnet ef database update
 ```
 
 **Reset database:**
+
 ```bash
 dotnet ef database drop
 dotnet ef database update
@@ -195,11 +207,13 @@ dotnet ef database update
 ### Railway Deployment Issues
 
 **Check logs:**
+
 ```bash
 railway logs
 ```
 
 **Restart service:**
+
 ```bash
 railway up --detach
 ```
@@ -220,6 +234,7 @@ This project is provided as-is for educational and development purposes.
 ## Support
 
 For issues and questions:
+
 - Check the [ASP.NET Core documentation](https://docs.microsoft.com/aspnet/core)
 - Visit the [Railway documentation](https://docs.railway.app/)
 - Review the [Entity Framework Core documentation](https://docs.microsoft.com/ef/core)

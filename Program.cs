@@ -22,16 +22,16 @@ if (!string.IsNullOrEmpty(databaseUrl))
     var databaseUri = new Uri(databaseUrl);
     var userInfo = databaseUri.UserInfo.Split(':');
     var connectionString = $"Host={databaseUri.Host};Port={databaseUri.Port};Database={databaseUri.LocalPath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
-    
+
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseNpgsql(connectionString));
 }
 else
 {
     // Use SQLite for development
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
         ?? "Data Source=aquahub.db";
-    
+
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseSqlite(connectionString));
 }
