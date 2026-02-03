@@ -8,7 +8,7 @@ using AquaHub.MVC.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure Railway port binding
-var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5001"; // Changed from 5000 to 5001
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(int.Parse(port));
@@ -17,7 +17,7 @@ builder.WebHost.ConfigureKestrel(options =>
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Configure Database Context - use PostgreSQL in production, SQLite in development
+// Configure Database Context - detect PostgreSQL or SQLite based on connection string
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 if (!string.IsNullOrEmpty(databaseUrl))
 {
@@ -31,16 +31,28 @@ if (!string.IsNullOrEmpty(databaseUrl))
 }
 else
 {
-    // Use SQLite for development
+    // Get connection string from configuration (User Secrets or appsettings.json)
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
         ?? "Data Source=aquahub.db";
 
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlite(connectionString));
+    // Detect if it's a PostgreSQL or SQLite connection string
+    if (connectionString.Contains("Host=", StringComparison.OrdinalIgnoreCase))
+    {
+        // Use PostgreSQL for local development with connection string in User Secrets
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseNpgsql(connectionString));
+    }
+    else
+    {
+        // Use SQLite for development
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseSqlite(connectionString));
+    }
 }
 
 // Registering Services with Dependency Injection
 // Core Services
+builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 builder.Services.AddScoped<ITankService, TankService>();
 builder.Services.AddScoped<ILivestockService, LivestockService>();
 builder.Services.AddScoped<IEquipmentService, EquipmentService>();
@@ -69,21 +81,8 @@ builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireCo
 
 var app = builder.Build();
 
-// Ensure database is created and migrations are applied
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    try
-    {
-        var context = services.GetRequiredService<ApplicationDbContext>();
-        context.Database.Migrate();
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while migrating the database.");
-    }
-}
+// Database migrations are handled by dotnet ef migrations command
+// No automatic migration on startup to avoid factory/runtime config conflicts
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

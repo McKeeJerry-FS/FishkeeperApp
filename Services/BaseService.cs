@@ -6,15 +6,10 @@ namespace AquaHub.MVC.Services;
 
 public class BaseService
 {
-    protected readonly IDbContextFactory<ApplicationDbContext> ContextFactory;
+    protected readonly ApplicationDbContext Context;
 
-    protected BaseService(IDbContextFactory<ApplicationDbContext> contextFactory)
+    protected BaseService(ApplicationDbContext context)
     {
-        ContextFactory = contextFactory;
-    }
-
-    protected async Task<ApplicationDbContext> CreateContextAsync()
-    {
-        return await ContextFactory.CreateDbContextAsync();
+        Context = context;
     }
 }

@@ -1,0 +1,155 @@
+@model Expense
+
+@{
+    ViewData["Title"] = "Add Expense";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-6">
+            <i class="bi bi-plus-circle text-success"></i> Add Expense
+        </h1>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle"></i> Cancel
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Expense Information</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="TankId" class="form-label">
+                                <i class="bi bi-droplet"></i> Tank <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="TankId" class="form-select" asp-items="ViewBag.TankList">
+                                <option value="">-- Select Tank --</option>
+                            </select>
+                            <span asp-validation-for="TankId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Category" class="form-label">
+                                    <i class="bi bi-tag"></i> Category <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="Category" class="form-select"
+                                    asp-items="Html.GetEnumSelectList<AquaHub.MVC.Models.Enums.ExpenseCategory>()">
+                                    <option value="">-- Select Category --</option>
+                                </select>
+                                <span asp-validation-for="Category" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Date" class="form-label">
+                                    <i class="bi bi-calendar-event"></i> Date <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Date" type="date" class="form-control" />
+                                <span asp-validation-for="Date" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ItemName" class="form-label">
+                                <i class="bi bi-card-text"></i> ItemName <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="ItemName" class="form-control" placeholder="e.g., 10 Neon Tetras" />
+                            <span asp-validation-for="ItemName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Amount" class="form-label">
+                                    <i class="bi bi-cash"></i> Amount <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input asp-for="Amount" type="number" step="0.01" class="form-control"
+                                        placeholder="0.00" />
+                                </div>
+                                <span asp-validation-for="Amount" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PaymentMethod" class="form-label">
+                                    <i class="bi bi-credit-card"></i> Payment Method
+                                </label>
+                                <select asp-for="PaymentMethod" class="form-select"
+                                    asp-items="Html.GetEnumSelectList<AquaHub.MVC.Models.Enums.PaymentMethod>()">
+                                    <option value="">-- Select Method --</option>
+                                </select>
+                                <span asp-validation-for="PaymentMethod" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Vendor" class="form-label">
+                                <i class="bi bi-shop"></i> Vendor/Store
+                            </label>
+                            <input asp-for="Vendor" class="form-control" placeholder="e.g., Local Fish Store" />
+                            <span asp-validation-for="Vendor" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label">
+                                <i class="bi bi-chat-left-text"></i> Notes
+                            </label>
+                            <textarea asp-for="Notes" class="form-control" rows="3"
+                                placeholder="Additional details..."></textarea>
+                            <span asp-validation-for="Notes" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-save"></i> Save Expense
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm bg-light">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-info-circle"></i> Expense Categories
+                </div>
+                <div class="card-body">
+                    <p class="small mb-2"><strong>Livestock:</strong> Fish, coral, invertebrates</p>
+                    <p class="small mb-2"><strong>Food:</strong> Fish food and supplements</p>
+                    <p class="small mb-2"><strong>Equipment:</strong> Filters, heaters, lights</p>
+                    <p class="small mb-2"><strong>Maintenance:</strong> Water conditioners, cleaning supplies</p>
+                    <p class="small mb-2"><strong>Medication:</strong> Treatments and medications</p>
+                    <p class="small mb-2"><strong>Decor:</strong> Rocks, driftwood, ornaments</p>
+                    <p class="small mb-2"><strong>Plants:</strong> Live aquatic plants</p>
+                    <p class="small mb-0"><strong>Testing:</strong> Test kits and supplies</p>
+                </div>
+            </div>
+
+            <div class="card shadow-sm bg-light mt-3">
+                <div class="card-header bg-secondary text-white">
+                    <i class="bi bi-credit-card"></i> Payment Methods
+                </div>
+                <div class="card-body">
+                    <p class="small mb-1">Cash, Credit Card, Debit Card, Check, PayPal, Other</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

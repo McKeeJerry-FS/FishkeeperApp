@@ -38,7 +38,7 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
                 ?? "Data Source=aquahub.db";
 
             // Detect if it's a PostgreSQL or SQLite connection string
-            if (connectionString.Contains("Host=") || connectionString.Contains("Server=") || connectionString.Contains("server="))
+            if (connectionString.Contains("Host=", StringComparison.OrdinalIgnoreCase))
             {
                 optionsBuilder.UseNpgsql(connectionString);
             }

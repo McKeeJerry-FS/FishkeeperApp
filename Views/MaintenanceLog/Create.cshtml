@@ -1,0 +1,132 @@
+@model MaintenanceLog
+
+@{
+    ViewData["Title"] = "Log Maintenance";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-6">
+            <i class="bi bi-plus-circle text-success"></i> Log Maintenance
+        </h1>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle"></i> Cancel
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Maintenance Information</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="TankId" class="form-label">
+                                <i class="bi bi-droplet"></i> Tank <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="TankId" class="form-select" asp-items="ViewBag.TankList">
+                                <option value="">-- Select Tank --</option>
+                            </select>
+                            <span asp-validation-for="TankId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Type" class="form-label">
+                                    <i class="bi bi-tag"></i> Maintenance Type <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<AquaHub.MVC.Models.Enums.MaintenanceType>()">
+                                    <option value="">-- Select Type --</option>
+                                </select>
+                                <span asp-validation-for="Type" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Timestamp" class="form-label">
+                                    <i class="bi bi-calendar-event"></i> Date & Time <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Timestamp" type="datetime-local" class="form-control" />
+                                <span asp-validation-for="Timestamp" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3" id="waterChangeSection" style="display: none;">
+                            <label asp-for="WaterChangePercent" class="form-label">
+                                <i class="bi bi-water"></i> Water Change Percentage
+                            </label>
+                            <div class="input-group">
+                                <input asp-for="WaterChangePercent" type="number" class="form-control" 
+                                       placeholder="e.g., 25" min="0" max="100" />
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <span asp-validation-for="WaterChangePercent" class="text-danger small"></span>
+                            <small class="form-text text-muted">Enter percentage of water changed (0-100)</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label">
+                                <i class="bi bi-chat-left-text"></i> Notes
+                            </label>
+                            <textarea asp-for="Notes" class="form-control" rows="4" 
+                                      placeholder="Details about the maintenance performed..."></textarea>
+                            <span asp-validation-for="Notes" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-save"></i> Save Log
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm bg-light">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-info-circle"></i> Maintenance Types
+                </div>
+                <div class="card-body">
+                    <h6><i class="bi bi-water text-primary"></i> Water Change</h6>
+                    <p class="small mb-3">Partial or full water changes. Specify the percentage of water changed.</p>
+
+                    <h6><i class="bi bi-funnel text-info"></i> Filter Cleaning</h6>
+                    <p class="small mb-3">Cleaning or replacing filter media.</p>
+
+                    <h6><i class="bi bi-droplet text-secondary"></i> Glass Cleaning</h6>
+                    <p class="small mb-3">Removing algae from glass surfaces.</p>
+
+                    <h6><i class="bi bi-flower1 text-success"></i> Plant Trimming</h6>
+                    <p class="small mb-3">Pruning and maintaining aquatic plants.</p>
+
+                    <h6><i class="bi bi-gear text-warning"></i> Equipment Check</h6>
+                    <p class="small mb-0">Inspecting and servicing equipment.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.getElementById('Type').addEventListener('change', function() {
+            var waterChangeSection = document.getElementById('waterChangeSection');
+            if (this.value === 'WaterChange') {
+                waterChangeSection.style.display = 'block';
+            } else {
+                waterChangeSection.style.display = 'none';
+                document.getElementById('WaterChangePercent').value = '';
+            }
+        });
+    </script>
+}

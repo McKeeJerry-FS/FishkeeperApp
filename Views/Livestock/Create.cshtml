@@ -1,0 +1,93 @@
+@model AquaHub.MVC.Models.Livestock
+
+@{
+    ViewData["Title"] = "Add Livestock";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-plus-circle"></i> Add Livestock
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post">
+                        <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Tank</label>
+                                <select name="tankId" class="form-select" required>
+                                    @if (ViewBag.Tanks != null)
+                                    {
+                                        @foreach (var tank in ViewBag.Tanks)
+                                        {
+                                            <option value="@tank.Value" selected="@(tank.Value == ViewBag.SelectedTankId?.ToString())">@tank.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Name" class="form-label fw-bold"></label>
+                                <input asp-for="Name" class="form-control" placeholder="e.g., Nemo" />
+                                <span asp-validation-for="Name" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Species" class="form-label fw-bold"></label>
+                                <input asp-for="Species" class="form-control" placeholder="e.g., Clownfish" />
+                                <span asp-validation-for="Species" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="AddedOn" class="form-label fw-bold"></label>
+                                <input asp-for="AddedOn" class="form-control" type="date" />
+                                <span asp-validation-for="AddedOn" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Species" class="form-label fw-bold"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input asp-for="Species" class="form-control" type="number" step="0.01" />
+                                </div>
+                                <span asp-validation-for="Species" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-check form-switch">
+                                    <input asp-for="AddedOn" class="form-check-input" type="checkbox" checked />
+                                    <label asp-for="AddedOn" class="form-check-label fw-bold"></label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="Notes" class="form-label fw-bold"></label>
+                                <textarea asp-for="Notes" class="form-control" rows="4" placeholder="Add any notes..."></textarea>
+                                <span asp-validation-for="Notes" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-save"></i> Save Livestock
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

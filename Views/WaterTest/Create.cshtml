@@ -1,0 +1,143 @@
+@model AquaHub.MVC.Models.WaterTest
+
+@{
+    ViewData["Title"] = "Log Water Test";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border-0 shadow">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-droplet-fill"></i> Log Water Test
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post">
+                        <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Tank</label>
+                                <select name="tankId" class="form-select" required>
+                                    @if (ViewBag.Tanks != null)
+                                    {
+                                        @foreach (var tank in ViewBag.Tanks)
+                                        {
+                                            <option value="@tank.Value" selected="@(tank.Value == ViewBag.SelectedTankId?.ToString())">@tank.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Timestamp" class="form-label fw-bold">Test Date</label>
+                                <input asp-for="Timestamp" class="form-control" type="datetime-local" />
+                                <span asp-validation-for="Timestamp" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Temperature" class="form-label fw-bold">Temperature (°F)</label>
+                                <input asp-for="Temperature" class="form-control" type="number" step="0.1" />
+                                <span asp-validation-for="Temperature" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12"><hr><h5 class="text-primary">General Parameters</h5></div>
+
+                            <div class="col-md-4">
+                                <label asp-for="PH" class="form-label fw-bold">pH</label>
+                                <input asp-for="PH" class="form-control" type="number" step="0.1" />
+                                <span asp-validation-for="PH" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="Ammonia" class="form-label fw-bold">Ammonia (ppm)</label>
+                                <input asp-for="Ammonia" class="form-control" type="number" step="0.01" />
+                                <span asp-validation-for="Ammonia" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="Nitrite" class="form-label fw-bold">Nitrite (ppm)</label>
+                                <input asp-for="Nitrite" class="form-control" type="number" step="0.01" />
+                                <span asp-validation-for="Nitrite" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="Nitrate" class="form-label fw-bold">Nitrate (ppm)</label>
+                                <input asp-for="Nitrate" class="form-control" type="number" step="0.1" />
+                                <span asp-validation-for="Nitrate" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12"><hr><h5 class="text-success">Freshwater Parameters</h5></div>
+
+                            <div class="col-md-4">
+                                <label asp-for="GH" class="form-label fw-bold">GH (°dH)</label>
+                                <input asp-for="GH" class="form-control" type="number" step="0.1" />
+                                <span asp-validation-for="GH" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="KH" class="form-label fw-bold">KH (°dH)</label>
+                                <input asp-for="KH" class="form-control" type="number" step="0.1" />
+                                <span asp-validation-for="KH" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="TDS" class="form-label fw-bold">TDS (ppm)</label>
+                                <input asp-for="TDS" class="form-control" type="number" step="1" />
+                                <span asp-validation-for="TDS" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12"><hr><h5 class="text-info">Saltwater Parameters</h5></div>
+
+                            <div class="col-md-3">
+                                <label asp-for="Salinity" class="form-label fw-bold">Salinity (ppt)</label>
+                                <input asp-for="Salinity" class="form-control" type="number" step="0.1" />
+                                <span asp-validation-for="Salinity" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label asp-for="Alkalinity" class="form-label fw-bold">Alkalinity (dKH)</label>
+                                <input asp-for="Alkalinity" class="form-control" type="number" step="0.1" />
+                                <span asp-validation-for="Alkalinity" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label asp-for="Calcium" class="form-label fw-bold">Calcium (ppm)</label>
+                                <input asp-for="Calcium" class="form-control" type="number" step="1" />
+                                <span asp-validation-for="Calcium" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label asp-for="Magnesium" class="form-label fw-bold">Magnesium (ppm)</label>
+                                <input asp-for="Magnesium" class="form-control" type="number" step="1" />
+                                <span asp-validation-for="Magnesium" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="Phosphate" class="form-label fw-bold">Phosphate (ppm)</label>
+                                <input asp-for="Phosphate" class="form-control" type="number" step="0.01" />
+                                <span asp-validation-for="Phosphate" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-info px-4 text-white">
+                                <i class="bi bi-save"></i> Save Test
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

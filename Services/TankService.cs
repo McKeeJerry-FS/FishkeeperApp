@@ -9,19 +9,18 @@ namespace AquaHub.MVC.Services;
 
 public class TankService : ITankService
 {
-    private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
+    private readonly ApplicationDbContext _context;
     private readonly IFileUploadService _fileUploadService;
 
-    public TankService(IDbContextFactory<ApplicationDbContext> contextFactory, IFileUploadService fileUploadService)
+    public TankService(ApplicationDbContext context, IFileUploadService fileUploadService)
     {
-        _contextFactory = contextFactory;
+        _context = context;
         _fileUploadService = fileUploadService;
     }
 
     public async Task<List<Tank>> GetAllTanksAsync(string userId)
     {
-        using var context = await _contextFactory.CreateDbContextAsync();
-        return await context.Tanks
+        return await _context.Tanks
             .Where(t => t.UserId == userId)
             .Include(t => t.WaterTests)
             .Include(t => t.Livestock)
@@ -35,8 +34,8 @@ public class TankService : ITankService
 
     public async Task<Tank?> GetTankByIdAsync(int id, string userId)
     {
-        using var context = await _contextFactory.CreateDbContextAsync();
-        return await context.Tanks
+
+        return await _context.Tanks
             .Where(t => t.UserId == userId)
             .Include(t => t.WaterTests)
             .Include(t => t.Livestock)
@@ -50,18 +49,18 @@ public class TankService : ITankService
 
     public async Task<Tank> CreateTankAsync(Tank tank, string userId)
     {
-        using var context = await _contextFactory.CreateDbContextAsync();
+
         tank.UserId = userId;
-        context.Tanks.Add(tank);
-        await context.SaveChangesAsync();
+        _context.Tanks.Add(tank);
+        await _context.SaveChangesAsync();
         return tank;
     }
 
     public async Task<Tank> UpdateTankAsync(Tank tank, string userId)
     {
-        using var context = await _contextFactory.CreateDbContextAsync();
+
         // Verify ownership
-        var existingTank = await context.Tanks
+        var existingTank = await _context.Tanks
             .FirstOrDefaultAsync(t => t.Id == tank.Id && t.UserId == userId);
 
         if (existingTank == null)
@@ -76,14 +75,14 @@ public class TankService : ITankService
         existingTank.Notes = tank.Notes;
         existingTank.ImagePath = tank.ImagePath;
 
-        await context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
         return existingTank;
     }
 
     public async Task<bool> DeleteTankAsync(int id, string userId)
     {
-        using var context = await _contextFactory.CreateDbContextAsync();
-        var tank = await context.Tanks
+
+        var tank = await _context.Tanks
             .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
 
         if (tank == null) return false;
@@ -94,15 +93,15 @@ public class TankService : ITankService
             await _fileUploadService.DeleteImageAsync(tank.ImagePath);
         }
 
-        context.Tanks.Remove(tank);
-        await context.SaveChangesAsync();
+        _context.Tanks.Remove(tank);
+        await _context.SaveChangesAsync();
         return true;
     }
 
     public async Task<TankDashboardViewModel> GetTankDashboardAsync(int tankId, string userId, int month, int year)
     {
-        using var context = await _contextFactory.CreateDbContextAsync();
-        var tank = await context.Tanks
+
+        var tank = await _context.Tanks
             .Where(t => t.Id == tankId && t.UserId == userId)
             .Include(t => t.WaterTests)
             .Include(t => t.Livestock)
@@ -182,26 +181,26 @@ public class TankService : ITankService
         }
 
         // Get equipment needing maintenance - query all equipment types separately
-        var sixMonthsAgo = DateTime.Now.AddMonths(-6);
+        var sixMonthsAgo = DateTime.UtcNow.AddMonths(-6);
         var equipmentNeedingMaintenance = new List<Equipment>();
 
         equipmentNeedingMaintenance.AddRange(
-            await context.Filters
+            await _context.Filters
                 .Where(e => e.TankId == tankId && e.InstalledOn < sixMonthsAgo)
                 .ToListAsync()
         );
         equipmentNeedingMaintenance.AddRange(
-            await context.Lights
+            await _context.Lights
                 .Where(e => e.TankId == tankId && e.InstalledOn < sixMonthsAgo)
                 .ToListAsync()
         );
         equipmentNeedingMaintenance.AddRange(
-            await context.Heaters
+            await _context.Heaters
                 .Where(e => e.TankId == tankId && e.InstalledOn < sixMonthsAgo)
                 .ToListAsync()
         );
         equipmentNeedingMaintenance.AddRange(
-            await context.ProteinSkimmers
+            await _context.ProteinSkimmers
                 .Where(e => e.TankId == tankId && e.InstalledOn < sixMonthsAgo)
                 .ToListAsync()
         );
@@ -216,7 +215,7 @@ public class TankService : ITankService
 
         // Get upcoming reminders for this tank (next 7 days)
         var nextWeek = DateTime.UtcNow.AddDays(7);
-        viewModel.UpcomingReminders = await context.Reminders
+        viewModel.UpcomingReminders = await _context.Reminders
             .Where(r => r.UserId == userId &&
                        r.IsActive &&
                        r.TankId == tankId &&
@@ -226,14 +225,14 @@ public class TankService : ITankService
             .ToListAsync();
 
         // Get recent notifications for this tank (last 10)
-        viewModel.RecentNotifications = await context.Notifications
+        viewModel.RecentNotifications = await _context.Notifications
             .Where(n => n.UserId == userId && n.TankId == tankId)
             .OrderByDescending(n => n.CreatedAt)
             .Take(10)
             .ToListAsync();
 
         // Count unread notifications for this tank
-        viewModel.UnreadNotificationCount = await context.Notifications
+        viewModel.UnreadNotificationCount = await _context.Notifications
             .CountAsync(n => n.UserId == userId && n.TankId == tankId && !n.IsRead);
 
         return viewModel;

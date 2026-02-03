@@ -1,0 +1,77 @@
+@model AquaHub.MVC.Models.ViewModels.LivestockDashboardViewModel
+
+@{
+    ViewData["Title"] = $"{Model.Livestock.Name} - Dashboard";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-6 fw-bold">
+                <i class="bi bi-fish text-primary"></i> @Model.Livestock.Name Dashboard
+            </h1>
+            <p class="text-muted">@Model.Livestock.Species</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a asp-action="Details" asp-route-id="@Model.Livestock.Id" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Livestock Information</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Name:</dt>
+                        <dd class="col-sm-8">@Model.Livestock.Name</dd>
+
+                        <dt class="col-sm-4">Species:</dt>
+                        <dd class="col-sm-8">@Model.Livestock.Species</dd>
+
+                        <dt class="col-sm-4">Date Added:</dt>
+                        <dd class="col-sm-8">@Model.Livestock.AddedOn.ToString("MMMM dd, yyyy")</dd>
+
+                        <dt class="col-sm-4">Days in Tank:</dt>
+                        <dd class="col-sm-8">@Model.DaysInTank days</dd>
+
+                        <dt class="col-sm-4">Health Status:</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge bg-@Model.HealthStatusClass">@Model.HealthStatus</span>
+                        </dd>
+
+                        @if (!string.IsNullOrEmpty(Model.Livestock.Notes))
+                        {
+                            <dt class="col-sm-4">Notes:</dt>
+                            <dd class="col-sm-8">@Model.Livestock.Notes</dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Quick Stats</h5>
+                    <dl class="row mb-0">
+                        <dt class="col-sm-6">Type:</dt>
+                        <dd class="col-sm-6">@Model.LivestockTypeName</dd>
+
+                        <dt class="col-sm-6">Days in Tank:</dt>
+                        <dd class="col-sm-6">@Model.DaysInTank</dd>
+
+                        <dt class="col-sm-6">Health:</dt>
+                        <dd class="col-sm-6">
+                            <span class="badge bg-@Model.HealthStatusClass">@Model.HealthStatus</span>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

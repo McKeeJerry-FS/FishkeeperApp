@@ -1,0 +1,53 @@
+@model AquaHub.MVC.Models.Tank
+
+@{
+    ViewData["Title"] = "Delete Tank";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-danger shadow">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Delete Tank
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-warning" role="alert">
+                        <h5 class="alert-heading">
+                            <i class="bi bi-exclamation-circle-fill"></i> Are you sure?
+                        </h5>
+                        <p class="mb-0">This action cannot be undone. All associated data (livestock, water tests, equipment, etc.) will also be deleted.</p>
+                    </div>
+
+                    <dl class="row mt-4">
+                        <dt class="col-sm-4">Tank Name:</dt>
+                        <dd class="col-sm-8 fw-bold">@Model.Name</dd>
+
+                        <dt class="col-sm-4">Type:</dt>
+                        <dd class="col-sm-8">@Model.Type</dd>
+
+                        <dt class="col-sm-4">Volume:</dt>
+                        <dd class="col-sm-8">@Model.VolumeGallons gallons</dd>
+
+                        <dt class="col-sm-4">Setup Date:</dt>
+                        <dd class="col-sm-8">@Model.StartDate.ToString("MMMM dd, yyyy")</dd>
+                    </dl>
+
+                    <form asp-action="Delete" method="post" class="mt-4">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-danger px-4">
+                                <i class="bi bi-trash"></i> Yes, Delete Tank
+                            </button>
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary px-4">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

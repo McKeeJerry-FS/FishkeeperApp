@@ -1,0 +1,177 @@
+@model AquaHub.MVC.Models.ViewModels.TankDashboardViewModel
+
+@{
+    ViewData["Title"] = $"{Model.Tank.Name} - Dashboard";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index">Tanks</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@Model.Tank.Id">@Model.Tank.Name</a></li>
+                    <li class="breadcrumb-item active">Dashboard</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-6 fw-bold">
+                <i class="bi bi-speedometer2 text-primary"></i> @Model.Tank.Name Dashboard
+            </h1>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a asp-action="Details" asp-route-id="@Model.Tank.Id" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left"></i> Back to Details
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1 opacity-75">Livestock</h6>
+                            <h2 class="mb-0 fw-bold">@Model.Tank.Livestock.Count</h2>
+                        </div>
+                        <i class="bi bi-fish" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1 opacity-75">Equipment</h6>
+                            <h2 class="mb-0 fw-bold">@Model.Tank.Equipment.Count</h2>
+                        </div>
+                        <i class="bi bi-gear-fill" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1 opacity-75">Water Tests</h6>
+                            <h2 class="mb-0 fw-bold">@Model.RecentWaterTests.Count</h2>
+                        </div>
+                        <i class="bi bi-droplet-fill" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-warning text-dark">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1 opacity-75">Maintenance</h6>
+                            <h2 class="mb-0 fw-bold">@Model.RecentMaintenance.Count</h2>
+                        </div>
+                        <i class="bi bi-wrench" style="font-size: 2.5rem; opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Recent Activity -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Water Tests</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentWaterTests.Any())
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var test in Model.RecentWaterTests.Take(5))
+                            {
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">@test.Timestamp.ToString("MMM dd, yyyy")</h6>
+                                            <small class="text-muted">
+                                                @if (test.PH.HasValue) { <span class="me-2">pH: @test.PH.Value.ToString("F1")</span> }
+                                                @if (test.Temperature.HasValue) { <span class="me-2">Temp: @test.Temperature.Value.ToString("F1")°F</span> }
+                                            </small>
+                                        </div>
+                                        <a asp-controller="WaterTest" asp-action="Details" asp-route-id="@test.Id" class="btn btn-sm btn-outline-primary">
+                                            View
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-3">No water tests recorded yet.</p>
+                    }
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a asp-controller="WaterTest" asp-action="Create" asp-route-tankId="@Model.Tank.Id" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-circle"></i> Log Water Test
+                    </a>
+                    <a asp-controller="WaterTest" asp-action="Trends" asp-route-tankId="@Model.Tank.Id" class="btn btn-outline-secondary btn-sm float-end">
+                        View Trends
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Maintenance -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="bi bi-wrench"></i> Recent Maintenance</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentMaintenance.Any())
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var log in Model.RecentMaintenance.Take(5))
+                            {
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">@log.Type</h6>
+                                            <small class="text-muted">@log.Timestamp.ToString("MMM dd, yyyy")</small>
+                                        </div>
+                                        <a asp-controller="MaintenanceLog" asp-action="Details" asp-route-id="@log.Id" class="btn btn-sm btn-outline-primary">
+                                            View
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-3">No maintenance logs recorded yet.</p>
+                    }
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a asp-controller="MaintenanceLog" asp-action="Create" asp-route-tankId="@Model.Tank.Id" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-circle"></i> Log Maintenance
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

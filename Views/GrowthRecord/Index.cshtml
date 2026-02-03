@@ -1,0 +1,129 @@
+@model IEnumerable<GrowthRecord>
+
+@{
+    ViewData["Title"] = "Growth Records";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-6">
+            <i class="bi bi-graph-up-arrow text-primary"></i> Growth Records
+        </h1>
+        <div>
+            <a asp-action="Statistics" class="btn btn-info me-2">
+                <i class="bi bi-bar-chart"></i> Statistics
+            </a>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Add Record
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center py-5">
+            <i class="bi bi-graph-up display-1"></i>
+            <h4 class="mt-3">No Growth Records Found</h4>
+            <p>Start tracking the growth and health of your livestock.</p>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Add First Record
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th><i class="bi bi-calendar"></i> Date</th>
+                                <th><i class="bi bi-fish"></i> Livestock</th>
+                                <th><i class="bi bi-rulers"></i> Length</th>
+                                <th><i class="bi bi-scale"></i> Weight</th>
+                                <th><i class="bi bi-heart-pulse"></i> Health</th>
+                                <th><i class="bi bi-palette"></i> Color</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var record in Model.OrderByDescending(r => r.MeasurementDate))
+                            {
+                                <tr>
+                                    <td>@record.MeasurementDate.ToString("MMM dd, yyyy")</td>
+                                    <td>
+                                        <a asp-controller="Livestock" asp-action="Details" asp-route-id="@record.LivestockId" class="text-decoration-none">
+                                            @record.Livestock?.Species
+                                        </a>
+                                    </td>
+                                    <td>
+                                        @if (record.LengthInches.HasValue)
+                                        {
+                                            <span>@record.LengthInches.Value.ToString("F2")"</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (record.WeightGrams.HasValue)
+                                        {
+                                            <span>@record.WeightGrams.Value.ToString("F1")g</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(record.HealthCondition))
+                                        {
+                                            <span class="badge bg-@(record.HealthCondition.ToLower() switch {
+                                                "excellent" => "success",
+                                                "good" => "primary",
+                                                "fair" => "warning",
+                                                "poor" => "danger",
+                                                _ => "secondary"
+                                            })">
+                                                @record.HealthCondition
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(record.ColorVibrancy))
+                                        {
+                                            <small>@record.ColorVibrancy</small>
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm">
+                                            <a asp-action="Details" asp-route-id="@record.Id" class="btn btn-outline-primary" title="Details">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@record.Id" class="btn btn-outline-secondary" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@record.Id" class="btn btn-outline-danger" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>

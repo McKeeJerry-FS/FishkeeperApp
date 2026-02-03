@@ -1,0 +1,96 @@
+@model IEnumerable<AquaHub.MVC.Models.WaterTest>
+
+@{
+    ViewData["Title"] = ViewBag.TankName != null ? $"{ViewBag.TankName} - Water Tests" : "Water Tests";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold">
+                <i class="bi bi-droplet-fill text-info"></i> Water Tests
+            </h1>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a asp-action="Create" asp-route-tankId="@ViewBag.TankId" class="btn btn-primary btn-lg">
+                <i class="bi bi-plus-circle"></i> Log Test
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-droplet display-1 text-muted"></i>
+                <h3 class="mt-3">No Water Tests</h3>
+                <p class="text-muted">Start tracking your water parameters</p>
+                <a asp-action="Create" asp-route-tankId="@ViewBag.TankId" class="btn btn-primary mt-3">
+                    <i class="bi bi-plus-circle"></i> Log First Test
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        @if (ViewBag.TankId != null)
+        {
+            <div class="mb-3">
+                <a asp-action="Trends" asp-route-tankId="@ViewBag.TankId" class="btn btn-info">
+                    <i class="bi bi-graph-up"></i> View Trends
+                </a>
+            </div>
+        }
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Temp</th>
+                                <th>pH</th>
+                                <th>Ammonia</th>
+                                <th>Nitrite</th>
+                                <th>Nitrate</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var test in Model.OrderByDescending(t => t.Timestamp))
+                            {
+                                <tr>
+                                    <td>@test.Timestamp.ToString("MMM dd, yyyy")</td>
+                                    <td>@(test.Temperature.HasValue ? $"{test.Temperature.Value:F1}°F" : "-")</td>
+                                    <td>@(test.PH.HasValue ? test.PH.Value.ToString("F1") : "-")</td>
+                                    <td>@(test.Ammonia.HasValue ? $"{test.Ammonia.Value:F2} ppm" : "-")</td>
+                                    <td>@(test.Nitrite.HasValue ? $"{test.Nitrite.Value:F2} ppm" : "-")</td>
+                                    <td>@(test.Nitrate.HasValue ? $"{test.Nitrate.Value:F1} ppm" : "-")</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a asp-action="Details" asp-route-id="@test.Id" class="btn btn-outline-primary">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@test.Id" class="btn btn-outline-warning">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
