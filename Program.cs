@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using AquaHub.MVC.Data;
 using AquaHub.MVC.Models;
+using AquaHub.MVC.Services.Interfaces;
+using AquaHub.MVC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +38,20 @@ else
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseSqlite(connectionString));
 }
+
+// Registering Services
+builder.Services.AddScoped<ITankService, TankService>();
+builder.Services.AddScoped<IWaterTestService, WaterTestService>();
+builder.Services.AddScoped<IReminderService, ReminderService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IMaintenanceLogService, MaintenanceLogService>();
+builder.Services.AddScoped<ITankHealthService, TankHealthService>();
+builder.Services.AddScoped<IPredictiveReminderService, PredictiveReminderService>();
+builder.Services.AddScoped<IParameterAlertService, ParameterAlertService>();
+builder.Services.AddScoped<IExpenseService, ExpenseService>();
+builder.Services.AddScoped<ILivestockService, LivestockService>();
+builder.Services.AddScoped<IEquipmentService, EquipmentService>();
+
 
 // Add Identity services
 builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = false)
