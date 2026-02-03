@@ -20,4 +20,7 @@ public class AppUser : IdentityUser
     [NotMapped]
     [Display(Name = "Full Name")]
     public string FullName => $"{FirstName} {LastName}";
+
+    // Navigation property for tanks
+    public ICollection<Tank> Tanks { get; set; } = new List<Tank>();
 }
