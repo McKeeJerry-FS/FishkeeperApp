@@ -39,18 +39,28 @@ else
         options.UseSqlite(connectionString));
 }
 
-// Registering Services
+// Registering Services with Dependency Injection
+// Core Services
 builder.Services.AddScoped<ITankService, TankService>();
-builder.Services.AddScoped<IWaterTestService, WaterTestService>();
-builder.Services.AddScoped<IReminderService, ReminderService>();
-builder.Services.AddScoped<INotificationService, NotificationService>();
-builder.Services.AddScoped<IMaintenanceLogService, MaintenanceLogService>();
-builder.Services.AddScoped<ITankHealthService, TankHealthService>();
-builder.Services.AddScoped<IPredictiveReminderService, PredictiveReminderService>();
-builder.Services.AddScoped<IParameterAlertService, ParameterAlertService>();
-builder.Services.AddScoped<IExpenseService, ExpenseService>();
 builder.Services.AddScoped<ILivestockService, LivestockService>();
 builder.Services.AddScoped<IEquipmentService, EquipmentService>();
+
+// Monitoring & Testing Services
+builder.Services.AddScoped<IWaterTestService, WaterTestService>();
+builder.Services.AddScoped<IMaintenanceLogService, MaintenanceLogService>();
+builder.Services.AddScoped<IGrowthRecordService, GrowthRecordService>();
+
+// Financial Services
+builder.Services.AddScoped<IExpenseService, ExpenseService>();
+
+// Notification & Reminder Services
+builder.Services.AddScoped<IReminderService, ReminderService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IPredictiveReminderService, PredictiveReminderService>();
+
+// Health & Alert Services
+builder.Services.AddScoped<ITankHealthService, TankHealthService>();
+builder.Services.AddScoped<IParameterAlertService, ParameterAlertService>();
 
 
 // Add Identity services
