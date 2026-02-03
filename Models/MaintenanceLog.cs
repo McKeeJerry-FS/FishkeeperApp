@@ -1,4 +1,6 @@
 using System;
+using System.ComponentModel.DataAnnotations;
+using AquaHub.MVC.Models.Enums;
 
 namespace AquaHub.MVC.Models;
 
