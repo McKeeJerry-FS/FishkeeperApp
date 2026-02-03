@@ -29,7 +29,7 @@
                             <label asp-for="TankId" class="form-label">
                                 <i class="bi bi-droplet"></i> Tank <span class="text-danger">*</span>
                             </label>
-                            <select asp-for="TankId" class="form-select" asp-items="ViewBag.TankList">
+                            <select asp-for="TankId" class="form-select" asp-items="ViewBag.Tanks">
                                 <option value="">-- Select Tank --</option>
                             </select>
                             <span asp-validation-for="TankId" class="text-danger small"></span>
@@ -40,7 +40,8 @@
                                 <label asp-for="Type" class="form-label">
                                     <i class="bi bi-tag"></i> Maintenance Type <span class="text-danger">*</span>
                                 </label>
-                                <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<AquaHub.MVC.Models.Enums.MaintenanceType>()">
+                                <select asp-for="Type" class="form-select"
+                                    asp-items="Html.GetEnumSelectList<AquaHub.MVC.Models.Enums.MaintenanceType>()">
                                     <option value="">-- Select Type --</option>
                                 </select>
                                 <span asp-validation-for="Type" class="text-danger small"></span>
@@ -60,8 +61,8 @@
                                 <i class="bi bi-water"></i> Water Change Percentage
                             </label>
                             <div class="input-group">
-                                <input asp-for="WaterChangePercent" type="number" class="form-control" 
-                                       placeholder="e.g., 25" min="0" max="100" />
+                                <input asp-for="WaterChangePercent" type="number" class="form-control"
+                                    placeholder="e.g., 25" min="0" max="100" />
                                 <span class="input-group-text">%</span>
                             </div>
                             <span asp-validation-for="WaterChangePercent" class="text-danger small"></span>
@@ -72,8 +73,8 @@
                             <label asp-for="Notes" class="form-label">
                                 <i class="bi bi-chat-left-text"></i> Notes
                             </label>
-                            <textarea asp-for="Notes" class="form-control" rows="4" 
-                                      placeholder="Details about the maintenance performed..."></textarea>
+                            <textarea asp-for="Notes" class="form-control" rows="4"
+                                placeholder="Details about the maintenance performed..."></textarea>
                             <span asp-validation-for="Notes" class="text-danger small"></span>
                         </div>
 
@@ -117,9 +118,11 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <script>
-        document.getElementById('Type').addEventListener('change', function() {
+        document.getElementById('Type').addEventListener('change', function () {
             var waterChangeSection = document.getElementById('waterChangeSection');
             if (this.value === 'WaterChange') {
                 waterChangeSection.style.display = 'block';

@@ -1,4 +1,4 @@
-@model IEnumerable<WaterTest>
+@model AquaHub.MVC.Models.ViewModels.WaterParameterTrendsViewModel
 
 @{
     ViewData["Title"] = "Water Test Trends";
@@ -50,131 +50,97 @@
         </div>
     </div>
 
-    @if (!Model.Any())
+    @if (Model.TotalTests == 0)
     {
         <div class="alert alert-info text-center py-5">
             <i class="bi bi-info-circle display-1"></i>
             <h4 class="mt-3">No Water Test Data Available</h4>
             <p>Start recording water tests to see trends over time.</p>
-            <a asp-action="Create" class="btn btn-primary">
+            <a asp-action="Create" asp-route-tankId="@Model.Tank?.Id" class="btn btn-primary">
                 <i class="bi bi-plus-circle"></i> Add Water Test
             </a>
         </div>
     }
     else
     {
-        <div class="row g-4">
-            <!-- Temperature Trend -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-header bg-primary text-white">
-                        <i class="bi bi-thermometer-half"></i> Temperature Trend
-                    </div>
-                    <div class="card-body">
-                        <canvas id="tempChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- pH Trend -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-header bg-success text-white">
-                        <i class="bi bi-droplet"></i> pH Trend
-                    </div>
-                    <div class="card-body">
-                        <canvas id="phChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Ammonia Trend -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-header bg-warning text-white">
-                        <i class="bi bi-exclamation-triangle"></i> Ammonia Trend
-                    </div>
-                    <div class="card-body">
-                        <canvas id="ammoniaChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Nitrite Trend -->
-            <div class="col-md-6">
-                <div class="card h-100">
+        <!-- Summary Stats -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card border-info">
                     <div class="card-header bg-info text-white">
-                        <i class="bi bi-droplet-half"></i> Nitrite Trend
+                        <i class="bi bi-info-circle"></i> Test Summary
                     </div>
                     <div class="card-body">
-                        <canvas id="nitriteChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Nitrate Trend -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-header bg-danger text-white">
-                        <i class="bi bi-droplet-fill"></i> Nitrate Trend
-                    </div>
-                    <div class="card-body">
-                        <canvas id="nitrateChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Salinity Trend -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-header bg-secondary text-white">
-                        <i class="bi bi-water"></i> Salinity Trend
-                    </div>
-                    <div class="card-body">
-                        <canvas id="salinityChart"></canvas>
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <h5>@Model.TotalTests</h5>
+                                <small class="text-muted">Total Tests</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h5>@Model.StartDate.ToString("MMM dd, yyyy")</h5>
+                                <small class="text-muted">Start Date</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h5>@Model.EndDate.ToString("MMM dd, yyyy")</h5>
+                                <small class="text-muted">End Date</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h5>@Model.AverageTestFrequency.ToString("F1") days</h5>
+                                <small class="text-muted">Avg Test Frequency</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Data Table -->
-        <div class="card mt-4">
-            <div class="card-header bg-dark text-white">
-                <i class="bi bi-table"></i> Historical Data
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover table-sm">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Date</th>
-                                <th>Tank</th>
-                                <th>Temp (°F)</th>
-                                <th>pH</th>
-                                <th>Ammonia</th>
-                                <th>Nitrite</th>
-                                <th>Nitrate</th>
-                                <th>Salinity</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var test in Model.OrderByDescending(t => t.Timestamp))
-                            {
-                                <tr>
-                                    <td>@test.Timestamp.ToString("MMM dd, yyyy")</td>
-                                    <td>@test.Tank?.Name</td>
-                                    <td>@test.Temperature?.ToString("F1")</td>
-                                    <td>@test.PH?.ToString("F1")</td>
-                                    <td>@test.Ammonia?.ToString("F2")</td>
-                                    <td>@test.Nitrite?.ToString("F2")</td>
-                                    <td>@test.Nitrate?.ToString("F1")</td>
-                                    <td>@test.Salinity?.ToString("F3")</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+        <div class="row g-4">
+            @foreach (var trend in Model.ParameterTrends.Where(t => t.DataPoints.Any()))
+            {
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header @GetCardClass(trend.Statistics.IsInIdealRange)">
+                            <i class="bi bi-graph-up"></i> @trend.ParameterName @if(!string.IsNullOrEmpty(trend.Unit)) { <span>(@trend.Unit)</span> }
+                        </div>
+                        <div class="card-body">
+                            <canvas id="chart_@trend.ParameterName.Replace(" ", "_")"></canvas>
+                            
+                            <!-- Statistics -->
+                            <div class="mt-3">
+                                <div class="row small">
+                                    <div class="col-4">
+                                        <strong>Current:</strong> @trend.Statistics.CurrentValue?.ToString("F2")
+                                    </div>
+                                    <div class="col-4">
+                                        <strong>Average:</strong> @trend.Statistics.Average?.ToString("F2")
+                                    </div>
+                                    <div class="col-4">
+                                        <strong>Range:</strong> @trend.Statistics.Min?.ToString("F2") - @trend.Statistics.Max?.ToString("F2")
+                                    </div>
+                                </div>
+                                @if (trend.IdealMin.HasValue || trend.IdealMax.HasValue)
+                                {
+                                    <div class="mt-2 small">
+                                        <span class="badge @(trend.Statistics.IsInIdealRange ? "bg-success" : "bg-warning")">
+                                            @if (trend.Statistics.IsInIdealRange)
+                                            {
+                                                <i class="bi bi-check-circle"></i> <text>In Ideal Range</text>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-exclamation-triangle"></i> <text>Out of Range</text>
+                                            }
+                                        </span>
+                                        <small class="text-muted ms-2">
+                                            Ideal: @trend.IdealMin?.ToString("F2") - @trend.IdealMax?.ToString("F2") @trend.Unit
+                                        </small>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            }
         </div>
     }
 </div>
@@ -182,106 +148,48 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script>
-        const testData = @Html.Raw(Json.Serialize(Model.OrderBy(t => t.Timestamp).Select(t => new {
-            date = t.Timestamp.ToString("MM/dd/yyyy"),
-            temp = t.Temperature,
-            ph = t.PH,
-            ammonia = t.Ammonia,
-            nitrite = t.Nitrite,
-            nitrate = t.Nitrate,
-            salinity = t.Salinity
-        })));
-
-        const labels = testData.map(d => d.date);
-
-        // Temperature Chart
-        new Chart(document.getElementById('tempChart'), {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Temperature (°F)',
-                    data: testData.map(d => d.temp),
-                    borderColor: 'rgb(75, 192, 192)',
-                    tension: 0.1
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: true }
-        });
-
-        // pH Chart
-        new Chart(document.getElementById('phChart'), {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'pH',
-                    data: testData.map(d => d.ph),
-                    borderColor: 'rgb(54, 162, 235)',
-                    tension: 0.1
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: true }
-        });
-
-        // Ammonia Chart
-        new Chart(document.getElementById('ammoniaChart'), {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Ammonia (ppm)',
-                    data: testData.map(d => d.ammonia),
-                    borderColor: 'rgb(255, 205, 86)',
-                    tension: 0.1
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: true }
-        });
-
-        // Nitrite Chart
-        new Chart(document.getElementById('nitriteChart'), {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Nitrite (ppm)',
-                    data: testData.map(d => d.nitrite),
-                    borderColor: 'rgb(153, 102, 255)',
-                    tension: 0.1
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: true }
-        });
-
-        // Nitrate Chart
-        new Chart(document.getElementById('nitrateChart'), {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Nitrate (ppm)',
-                    data: testData.map(d => d.nitrate),
-                    borderColor: 'rgb(255, 99, 132)',
-                    tension: 0.1
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: true }
-        });
-
-        // Salinity Chart
-        new Chart(document.getElementById('salinityChart'), {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Salinity (sg)',
-                    data: testData.map(d => d.salinity),
-                    borderColor: 'rgb(201, 203, 207)',
-                    tension: 0.1
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: true }
-        });
+        @foreach (var trend in Model.ParameterTrends.Where(t => t.DataPoints.Any()))
+        {
+            var chartId = $"chart_{trend.ParameterName.Replace(" ", "_")}";
+            var dataPoints = trend.DataPoints.OrderBy(d => d.Date).ToList();
+            
+            <text>
+            new Chart(document.getElementById('@chartId'), {
+                type: 'line',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(dataPoints.Select(d => d.Date.ToString("MM/dd/yyyy")))),
+                    datasets: [{
+                        label: '@trend.ParameterName (@trend.Unit)',
+                        data: @Html.Raw(Json.Serialize(dataPoints.Select(d => d.Value))),
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+            </text>
+        }
     </script>
+}
+
+@functions {
+    string GetCardClass(bool isInRange)
+    {
+        return isInRange ? "bg-success text-white" : "bg-warning text-dark";
+    }
 }

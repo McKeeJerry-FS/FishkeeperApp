@@ -129,6 +129,12 @@ public class TankService : ITankService
             .OrderByDescending(wt => wt.Timestamp)
             .FirstOrDefault();
 
+        // Get recent water tests (last 10)
+        viewModel.RecentWaterTests = tank.WaterTests
+            .OrderByDescending(wt => wt.Timestamp)
+            .Take(10)
+            .ToList();
+
         // Get water tests for selected month
         var startDate = new DateTime(year, month, 1);
         var endDate = startDate.AddMonths(1);
