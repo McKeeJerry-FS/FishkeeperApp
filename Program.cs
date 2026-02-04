@@ -93,8 +93,24 @@ builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireCo
 
 var app = builder.Build();
 
-// Database migrations are handled by dotnet ef migrations command
-// No automatic migration on startup to avoid factory/runtime config conflicts
+// Apply database migrations automatically in production (Railway)
+if (!app.Environment.IsDevelopment())
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        try
+        {
+            var context = services.GetRequiredService<ApplicationDbContext>();
+            context.Database.Migrate();
+        }
+        catch (Exception ex)
+        {
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "An error occurred while migrating the database.");
+        }
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
