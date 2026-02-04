@@ -8,7 +8,7 @@ RUN dotnet restore
 
 # Copy everything else and build
 COPY . ./
-RUN dotnet publish -c Release -o /app --no-restore
+RUN dotnet publish AquaHub.MVC.csproj -c Release -o /app --no-restore
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
