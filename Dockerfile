@@ -1,9 +1,9 @@
-# Use the official .NET 8 SDK image for building
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+# Use the official .NET SDK image for building
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /source
 
 # Copy csproj and restore dependencies
-COPY *.csproj ./
+COPY AquaHub.MVC.csproj ./
 RUN dotnet restore
 
 # Copy everything else and build
@@ -11,12 +11,13 @@ COPY . ./
 RUN dotnet publish -c Release -o /app --no-restore
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 COPY --from=build /app ./
 
-# Railway sets PORT environment variable
-ENV ASPNETCORE_URLS=http://+:$PORT
+# Expose port 8080 (Railway will map this)
+EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080
 
 # Run the application
 ENTRYPOINT ["dotnet", "AquaHub.MVC.dll"]
