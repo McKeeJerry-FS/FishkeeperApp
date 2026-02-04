@@ -30,4 +30,8 @@ public interface ISupplyService
 
     // Search
     Task<List<SupplyItem>> SearchSuppliesAsync(string userId, string searchTerm);
+
+    // Automatic Usage Tracking
+    Task<bool> RecordSupplyUsageAsync(int supplyId, double amountUsed, string userId, string notes = "");
+    Task<List<SupplyItem>> GetSuppliesForDosingAsync(string userId);
 }

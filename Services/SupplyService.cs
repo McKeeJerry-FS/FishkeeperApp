@@ -341,4 +341,79 @@ public class SupplyService : BaseService, ISupplyService
     }
 
     #endregion
+
+    #region Automatic Usage Tracking
+
+    /// <summary>
+    /// Automatically deduct supply quantity when used in dosing or maintenance.
+    /// This is called when a DosingRecord is created to automatically track inventory.
+    /// </summary>
+    public async Task<bool> RecordSupplyUsageAsync(int supplyId, double amountUsed, string userId, string notes = "")
+    {
+        try
+        {
+            var supply = await GetSupplyByIdAsync(supplyId, userId);
+            if (supply == null)
+            {
+                _logger.LogWarning($"Attempted to record usage for non-existent supply ID: {supplyId}");
+                return false;
+            }
+
+            // Update quantity
+            var previousStatus = supply.Status;
+            supply.CurrentQuantity = Math.Max(0, supply.CurrentQuantity - amountUsed);
+            supply.LastUsedDate = DateTime.UtcNow;
+            supply.UpdatedAt = DateTime.UtcNow;
+
+            // Update notes with usage log
+            var usageNote = $"{DateTime.UtcNow:yyyy-MM-dd HH:mm}: Used {amountUsed} {supply.Unit}";
+            if (!string.IsNullOrEmpty(notes))
+            {
+                usageNote += $" - {notes}";
+            }
+            
+            supply.Notes = string.IsNullOrEmpty(supply.Notes) 
+                ? usageNote 
+                : $"{supply.Notes}\n{usageNote}";
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation($"Recorded usage of {amountUsed} {supply.Unit} for {supply.Name}");
+
+            // Check if status changed to low stock and send notification
+            if (supply.EnableLowStockAlert && 
+                previousStatus != StockStatus.LowStock && 
+                supply.Status == StockStatus.LowStock)
+            {
+                await SendLowStockNotificationAsync(supply);
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error recording supply usage for supply ID: {supplyId}");
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Get supplies that can be used for a specific purpose (e.g., dosing additives).
+    /// Filters by category and active status.
+    /// </summary>
+    public async Task<List<SupplyItem>> GetSuppliesForDosingAsync(string userId)
+    {
+        return await _context.SupplyItems
+            .Include(s => s.Tank)
+            .Where(s => s.UserId == userId && 
+                       s.IsActive &&
+                       (s.Category == SupplyCategory.Supplements ||
+                        s.Category == SupplyCategory.WaterTreatment ||
+                        s.Category == SupplyCategory.Chemicals ||
+                        s.Category == SupplyCategory.Medications))
+            .OrderBy(s => s.Name)
+            .ToListAsync();
+    }
+
+    #endregion
 }
