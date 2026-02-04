@@ -38,7 +38,7 @@ public class TankController : Controller
             }
 
             var tanks = await _tankService.GetAllTanksAsync(userId);
-            
+
             // Convert image data for each tank
             var tankImages = new Dictionary<int, string>();
             foreach (var tank in tanks)
@@ -149,8 +149,13 @@ public class TankController : Controller
                 // Handle image upload
                 if (tank.ImageFile != null)
                 {
+                    _logger.LogInformation("Processing image upload. FileName: {FileName}, ContentType: {ContentType}, Size: {Size}",
+                        tank.ImageFile.FileName, tank.ImageFile.ContentType, tank.ImageFile.Length);
+
                     tank.ImageData = await _imageService.ConvertFileToByteArrayAsync(tank.ImageFile);
                     tank.ImageType = tank.ImageFile.ContentType;
+
+                    _logger.LogInformation("Image converted successfully. Data length: {Length}", tank.ImageData?.Length ?? 0);
                 }
 
                 var createdTank = await _tankService.CreateTankAsync(tank, userId);
@@ -218,8 +223,13 @@ public class TankController : Controller
                 // Handle image upload
                 if (tank.ImageFile != null)
                 {
+                    _logger.LogInformation("Processing image upload for edit. FileName: {FileName}, ContentType: {ContentType}, Size: {Size}",
+                        tank.ImageFile.FileName, tank.ImageFile.ContentType, tank.ImageFile.Length);
+
                     tank.ImageData = await _imageService.ConvertFileToByteArrayAsync(tank.ImageFile);
                     tank.ImageType = tank.ImageFile.ContentType;
+
+                    _logger.LogInformation("Image converted successfully. Data length: {Length}", tank.ImageData?.Length ?? 0);
                 }
                 else
                 {

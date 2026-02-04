@@ -49,9 +49,9 @@
 
                             <div class="col-12">
                                 <label asp-for="ImageFile" class="form-label fw-bold">Tank Image</label>
-                                <input asp-for="ImageFile" class="form-control" type="file" accept="image/*" />
+                                <input asp-for="ImageFile" class="form-control" type="file" accept="image/jpeg,image/jpg,image/png,image/heic,image/heif,image/*" capture="environment" />
                                 <span asp-validation-for="ImageFile" class="text-danger small"></span>
-                                <small class="form-text text-muted">Upload a photo of your tank (optional)</small>
+                                <small class="form-text text-muted">Take a photo or upload an image of your tank (optional)</small>
                             </div>
 
                             <div class="col-12">

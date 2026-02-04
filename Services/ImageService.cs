@@ -35,8 +35,26 @@ public class ImageService : IImageService
                         return _defaultNutrientImage;
                 }
             }
+
+            // Normalize content type for iOS compatibility
+            string contentType = extension?.ToLower().Trim() ?? "image/jpeg";
+
+            // Handle various iOS formats and ensure browser compatibility
+            if (contentType.Contains("heic") || contentType.Contains("heif"))
+            {
+                // HEIC/HEIF not supported in browsers, but we'll try to display it
+                // In production, you'd want to convert these to JPEG server-side
+                contentType = "image/jpeg";
+            }
+            else if (!contentType.StartsWith("image/"))
+            {
+                // Ensure proper mime type format
+                contentType = "image/jpeg";
+            }
+
             string? imageBase64Data = Convert.ToBase64String(fileData!);
-            imageBase64Data = string.Format($"data:{extension};base64, {imageBase64Data}");
+            // Fixed: removed space after comma in data URL
+            imageBase64Data = string.Format($"data:{contentType};base64,{imageBase64Data}");
             return imageBase64Data;
         }
         catch (Exception)
