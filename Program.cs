@@ -25,13 +25,23 @@ builder.Services.AddControllersWithViews();
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 if (!string.IsNullOrEmpty(databaseUrl))
 {
-    // Parse Railway DATABASE_URL format: postgres://user:password@host:port/database
-    var databaseUri = new Uri(databaseUrl);
-    var userInfo = databaseUri.UserInfo.Split(':');
-    var connectionString = $"Host={databaseUri.Host};Port={databaseUri.Port};Database={databaseUri.LocalPath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+    try
+    {
+        // Parse Railway DATABASE_URL format: postgres://user:password@host:port/database
+        var databaseUri = new Uri(databaseUrl);
+        var userInfo = databaseUri.UserInfo.Split(':');
+        var connectionString = $"Host={databaseUri.Host};Port={databaseUri.Port};Database={databaseUri.LocalPath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
 
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseNpgsql(connectionString));
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseNpgsql(connectionString));
+
+        Console.WriteLine($"Using PostgreSQL database: {databaseUri.Host}:{databaseUri.Port}");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error parsing DATABASE_URL: {ex.Message}");
+        throw;
+    }
 }
 else
 {
@@ -91,25 +101,43 @@ builder.Services.AddScoped<IParameterAlertService, ParameterAlertService>();
 builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-var app = builder.Build();
+var app = buildelogger = services.GetRequiredService<ILogger<Program>>();
+logger.LogInformation("Starting database migration...");
 
-// Apply database migrations automatically in production (Railway)
-if (!app.Environment.IsDevelopment())
+var context = services.GetRequiredService<ApplicationDbContext>();
+
+logger.LogInformation("Testing database connection...");
+var canConnect = context.Database.CanConnect();
+logger.LogInformation($"Database connection test: {canConnect}");
+
+if (canConnect)
 {
-    using (var scope = app.Services.CreateScope())
-    {
-        var services = scope.ServiceProvider;
-        try
-        {
-            var context = services.GetRequiredService<ApplicationDbContext>();
-            context.Database.Migrate();
+    logger.LogInformation("Applying pending migrations...");
+    context.Database.Migrate();
+    logger.LogInformation("Database migrations completed successfully.");
+}
+else
+{
+    logger.LogError("Cannot connect to database.");
+}
         }
         catch (Exception ex)
         {
-            var logger = services.GetRequiredService<ILogger<Program>>();
-            logger.LogError(ex, "An error occurred while migrating the database.");
-        }
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "An error occurred while migrating the database: {ErrorMessage}", ex.Message);
+    // Don't throw - let the app start so we can see errors in the UI
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        context.Database.Migrate();
     }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating the database.");
+    }
+}
 }
 
 // Configure the HTTP request pipeline.

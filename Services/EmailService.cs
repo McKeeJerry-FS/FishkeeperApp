@@ -27,7 +27,16 @@ public class EmailService : IEmailSender
             var emailAddress = _emailSettings.EmailAddress ?? Environment.GetEnvironmentVariable("EmailAddress");
             var emailPassword = _emailSettings.EmailPassword ?? Environment.GetEnvironmentVariable("EmailPassword");
             var emailHost = _emailSettings.EmailHost ?? Environment.GetEnvironmentVariable("EmailHost");
-            var emailPort = _emailSettings.EmailPort != 0 ? _emailSettings.EmailPort : int.Parse(Environment.GetEnvironmentVariable("EmailPort")!);
+            var emailPortStr = Environment.GetEnvironmentVariable("EmailPort");
+            var emailPort = _emailSettings.EmailPort != 0 ? _emailSettings.EmailPort : (!string.IsNullOrEmpty(emailPortStr) ? int.Parse(emailPortStr) : 587);
+
+            // If email settings are not configured, just log and return (don't fail)
+            if (string.IsNullOrEmpty(emailAddress) || string.IsNullOrEmpty(emailPassword) || string.IsNullOrEmpty(emailHost))
+            {
+                Console.WriteLine($"Email not configured. Skipping email to: {email}");
+                Console.WriteLine($"Subject: {subject}");
+                return;
+            }
 
             MimeMessage newEmail = new();
             newEmail.Sender = MailboxAddress.Parse(emailAddress);
@@ -70,17 +79,17 @@ public class EmailService : IEmailSender
                 Console.WriteLine("****************** ERROR *****************");
                 Console.ResetColor();
 
-                throw;
+                // Don't throw - just log the error so registration can continue
             }
 
 
 
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-
-            throw;
+            // Log but don't throw - allow registration to proceed even if email fails
+            Console.WriteLine($"Email service error: {ex.Message}");
         }
     }
-    
+
 }
