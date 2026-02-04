@@ -20,20 +20,8 @@ public class ImageService : IImageService
         {
             if (fileData == null || fileData.Length == 0)
             {
-                // show default
-                switch (defaultImage)
-                {
-                    case DefaultImage.ProfileImage:
-                        return _defaultProfileImage;
-                    case DefaultImage.PlantImage:
-                        return _defaultPlantImage;
-                    case DefaultImage.EquipmentImage:
-                        return _defaultEquipmentImage;
-                    case DefaultImage.TankImage:
-                        return _defaultTankImage;
-                    case DefaultImage.NutrientImage:
-                        return _defaultNutrientImage;
-                }
+                // show default - return null to let the view handle fallback display
+                return null;
             }
 
             // Normalize content type for iOS compatibility
@@ -54,13 +42,14 @@ public class ImageService : IImageService
 
             string? imageBase64Data = Convert.ToBase64String(fileData!);
             // Fixed: removed space after comma in data URL
-            imageBase64Data = string.Format($"data:{contentType};base64,{imageBase64Data}");
+            imageBase64Data = $"data:{contentType};base64,{imageBase64Data}";
             return imageBase64Data;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-
-            throw;
+            // Log the error and return null so the view can show a fallback
+            Console.WriteLine($"Error converting image: {ex.Message}");
+            return null;
         }
     }
 

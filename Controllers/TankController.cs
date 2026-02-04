@@ -34,24 +34,48 @@ public class TankController : Controller
             var userId = _userManager.GetUserId(User);
             if (string.IsNullOrEmpty(userId))
             {
+                _logger.LogWarning("Unauthorized access attempt to Tank Index");
                 return Unauthorized();
             }
 
+            _logger.LogInformation("Loading tanks for user {UserId}", userId);
             var tanks = await _tankService.GetAllTanksAsync(userId);
+            _logger.LogInformation("Found {TankCount} tanks for user", tanks?.Count() ?? 0);
 
             // Convert image data for each tank
             var tankImages = new Dictionary<int, string>();
-            foreach (var tank in tanks)
+            foreach (var tank in tanks ?? Enumerable.Empty<Tank>())
             {
-                tankImages[tank.Id] = _imageService.ConvertByteArrayToFile(
-                    tank.ImageData,
-                    tank.ImageType,
-                    Models.Enums.DefaultImage.TankImage
-                ) ?? string.Empty;
+                try
+                {
+                    var imageUrl = _imageService.ConvertByteArrayToFile(
+                        tank.ImageData,
+                        tank.ImageType,
+                        Models.Enums.DefaultImage.TankImage
+                    );
+
+                    if (!string.IsNullOrEmpty(imageUrl))
+                    {
+                        tankImages[tank.Id] = imageUrl;
+                        _logger.LogInformation("Tank {TankId} has image. Type: {ImageType}, DataLength: {DataLength}",
+                            tank.Id, tank.ImageType, tank.ImageData?.Length ?? 0);
+                    }
+                    else
+                    {
+                        tankImages[tank.Id] = string.Empty;
+                        _logger.LogInformation("Tank {TankId} has no image data", tank.Id);
+                    }
+                }
+                catch (Exception imgEx)
+                {
+                    _logger.LogError(imgEx, "Error converting image for tank {TankId}", tank.Id);
+                    tankImages[tank.Id] = string.Empty;
+                }
             }
             ViewData["TankImages"] = tankImages;
 
-            return View(tanks);
+            _logger.LogInformation("Returning Tank Index view with {ImageCount} images", tankImages.Count);
+            return View(tanks ?? new List<Tank>());
         }
         catch (Exception ex)
         {
@@ -79,11 +103,23 @@ public class TankController : Controller
             }
 
             // Convert image data to displayable format
-            ViewData["TankImage"] = _imageService.ConvertByteArrayToFile(
+            var tankImage = _imageService.ConvertByteArrayToFile(
                 tank.ImageData,
                 tank.ImageType,
                 Models.Enums.DefaultImage.TankImage
             );
+
+            ViewData["TankImage"] = tankImage;
+
+            if (!string.IsNullOrEmpty(tankImage))
+            {
+                _logger.LogInformation("Tank {TankId} details showing image. Type: {ImageType}, DataLength: {DataLength}",
+                    id, tank.ImageType, tank.ImageData?.Length ?? 0);
+            }
+            else
+            {
+                _logger.LogInformation("Tank {TankId} details has no image data", id);
+            }
 
             return View(tank);
         }

@@ -29,11 +29,20 @@
             <div class="card border-0 shadow-sm mb-4">
                 @{
                     var tankImage = ViewData["TankImage"] as string;
-                    if (!string.IsNullOrEmpty(tankImage))
-                    {
-                        <img src="@tankImage" class="card-img-top" alt="@Model.Name"
-                            style="max-height: 400px; object-fit: cover;">
-                    }
+                }
+                @* Debug info - remove in production *@
+                @if (string.IsNullOrEmpty(tankImage))
+                {
+                    <div class="alert alert-info">
+                        <small>No image available. ImageData: @(Model.ImageData?.Length ?? 0) bytes, Type: @(Model.ImageType
+                                                    ?? "null")</small>
+                    </div>
+                }
+                else
+                {
+                    <img src="@tankImage" class="card-img-top" alt="@Model.Name"
+                        style="max-height: 400px; object-fit: cover;"
+                        onerror="console.error('Failed to load tank image'); this.style.display='none';">
                 }
                 <div class="card-body">
                     <h2 class="card-title display-6 fw-bold mb-3">@Model.Name</h2>
