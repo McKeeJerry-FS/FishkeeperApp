@@ -51,19 +51,25 @@
     else
     {
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @{
+                var tankImages = ViewData["TankImages"] as Dictionary<int, string>;
+            }
             @foreach (var tank in Model)
             {
                 <div class="col">
                     <div class="card h-100 border-0 shadow-sm hover-shadow transition">
-                        @if (!string.IsNullOrEmpty(tank.ImagePath))
-                        {
-                            <img src="@tank.ImagePath" class="card-img-top" alt="@tank.Name" style="height: 200px; object-fit: cover;">
-                        }
-                        else
-                        {
-                            <div class="card-img-top bg-gradient bg-primary d-flex align-items-center justify-content-center" style="height: 200px;">
-                                <i class="bi bi-droplet-fill text-white" style="font-size: 4rem;"></i>
-                            </div>
+                        @{
+                            var tankImage = tankImages?[tank.Id];
+                            if (!string.IsNullOrEmpty(tankImage))
+                            {
+                                <img src="@tankImage" class="card-img-top" alt="@tank.Name" style="height: 200px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="card-img-top bg-gradient bg-primary d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="bi bi-droplet-fill text-white" style="font-size: 4rem;"></i>
+                                </div>
+                            }
                         }
                         <div class="card-body">
                             <h5 class="card-title fw-bold">@tank.Name</h5>

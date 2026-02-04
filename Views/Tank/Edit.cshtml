@@ -14,7 +14,7 @@
                     </h3>
                 </div>
                 <div class="card-body p-4">
-                    <form asp-action="Edit" method="post">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
                         <input type="hidden" asp-for="Id" />
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
                         
@@ -47,9 +47,10 @@
                             </div>
 
                             <div class="col-12">
-                                <label asp-for="ImagePath" class="form-label fw-bold">Image Path</label>
-                                <input asp-for="ImagePath" class="form-control" />
-                                <span asp-validation-for="ImagePath" class="text-danger small"></span>
+                                <label asp-for="ImageFile" class="form-label fw-bold">Tank Image</label>
+                                <input asp-for="ImageFile" class="form-control" type="file" accept="image/*" />
+                                <span asp-validation-for="ImageFile" class="text-danger small"></span>
+                                <small class="form-text text-muted">Upload a new photo to replace the current image (optional)</small>
                             </div>
 
                             <div class="col-12">

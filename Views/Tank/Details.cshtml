@@ -27,9 +27,12 @@
     <div class="row g-4">
         <div class="col-lg-8">
             <div class="card border-0 shadow-sm mb-4">
-                @if (!string.IsNullOrEmpty(Model.ImagePath))
-                {
-                    <img src="@Model.ImagePath" class="card-img-top" alt="@Model.Name" style="max-height: 400px; object-fit: cover;">
+                @{
+                    var tankImage = ViewData["TankImage"] as string;
+                    if (!string.IsNullOrEmpty(tankImage))
+                    {
+                        <img src="@tankImage" class="card-img-top" alt="@Model.Name" style="max-height: 400px; object-fit: cover;">
+                    }
                 }
                 <div class="card-body">
                     <h2 class="card-title display-6 fw-bold mb-3">@Model.Name</h2>

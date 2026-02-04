@@ -52,6 +52,12 @@ public class Tank : NewBaseType
     public ICollection<Heater> Heaters { get; set; } = new List<Heater>();
     public ICollection<ProteinSkimmer> ProteinSkimmers { get; set; } = new List<ProteinSkimmer>();
 
+    // Image Properties
+    [NotMapped]
+    public IFormFile? ImageFile { get; set; }
+    public byte[]? ImageData { get; set; }
+    public string? ImageType { get; set; }
+
     // Computed property to get all equipment combined
     [NotMapped]
     public ICollection<Equipment> Equipment =>

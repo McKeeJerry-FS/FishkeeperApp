@@ -69,6 +69,7 @@ else
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<IEmailSender, EmailService>();
 builder.Services.AddScoped<IEmailNotifiactionService, EmailNotificationService>();
+builder.Services.AddScoped<IImageService, ImageService>();
 
 // Core Services
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();
@@ -101,43 +102,40 @@ builder.Services.AddScoped<IParameterAlertService, ParameterAlertService>();
 builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-var app = buildelogger = services.GetRequiredService<ILogger<Program>>();
-logger.LogInformation("Starting database migration...");
+var app = builder.Build();
 
-var context = services.GetRequiredService<ApplicationDbContext>();
-
-logger.LogInformation("Testing database connection...");
-var canConnect = context.Database.CanConnect();
-logger.LogInformation($"Database connection test: {canConnect}");
-
-if (canConnect)
+// Apply migrations automatically on startup
+using (var scope = app.Services.CreateScope())
 {
-    logger.LogInformation("Applying pending migrations...");
-    context.Database.Migrate();
-    logger.LogInformation("Database migrations completed successfully.");
-}
-else
-{
-    logger.LogError("Cannot connect to database.");
-}
-        }
-        catch (Exception ex)
-        {
-    var logger = services.GetRequiredService<ILogger<Program>>();
-    logger.LogError(ex, "An error occurred while migrating the database: {ErrorMessage}", ex.Message);
-    // Don't throw - let the app start so we can see errors in the UI
     var services = scope.ServiceProvider;
     try
     {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogInformation("Starting database migration...");
+
         var context = services.GetRequiredService<ApplicationDbContext>();
-        context.Database.Migrate();
+
+        logger.LogInformation("Testing database connection...");
+        var canConnect = context.Database.CanConnect();
+        logger.LogInformation($"Database connection test: {canConnect}");
+
+        if (canConnect)
+        {
+            logger.LogInformation("Applying pending migrations...");
+            context.Database.Migrate();
+            logger.LogInformation("Database migrations completed successfully.");
+        }
+        else
+        {
+            logger.LogError("Cannot connect to database.");
+        }
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while migrating the database.");
+        logger.LogError(ex, "An error occurred while migrating the database: {ErrorMessage}", ex.Message);
+        // Don't throw - let the app start so we can see errors in the UI
     }
-}
 }
 
 // Configure the HTTP request pipeline.

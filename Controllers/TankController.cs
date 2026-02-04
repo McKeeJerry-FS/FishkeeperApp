@@ -12,15 +12,18 @@ public class TankController : Controller
     private readonly ITankService _tankService;
     private readonly UserManager<AppUser> _userManager;
     private readonly ILogger<TankController> _logger;
+    private readonly IImageService _imageService;
 
     public TankController(
         ITankService tankService,
         UserManager<AppUser> userManager,
-        ILogger<TankController> logger)
+        ILogger<TankController> logger,
+        IImageService imageService)
     {
         _tankService = tankService;
         _userManager = userManager;
         _logger = logger;
+        _imageService = imageService;
     }
 
     // GET: Tank
@@ -35,6 +38,19 @@ public class TankController : Controller
             }
 
             var tanks = await _tankService.GetAllTanksAsync(userId);
+            
+            // Convert image data for each tank
+            var tankImages = new Dictionary<int, string>();
+            foreach (var tank in tanks)
+            {
+                tankImages[tank.Id] = _imageService.ConvertByteArrayToFile(
+                    tank.ImageData,
+                    tank.ImageType,
+                    Models.Enums.DefaultImage.TankImage
+                ) ?? string.Empty;
+            }
+            ViewData["TankImages"] = tankImages;
+
             return View(tanks);
         }
         catch (Exception ex)
@@ -61,6 +77,13 @@ public class TankController : Controller
             {
                 return NotFound();
             }
+
+            // Convert image data to displayable format
+            ViewData["TankImage"] = _imageService.ConvertByteArrayToFile(
+                tank.ImageData,
+                tank.ImageType,
+                Models.Enums.DefaultImage.TankImage
+            );
 
             return View(tank);
         }
@@ -111,7 +134,7 @@ public class TankController : Controller
     // POST: Tank/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Name,Type,VolumeGallons,VolumeUnitLiters,Length,Width,Height,Substrate,SetupDate,Notes,ImageURL")] Tank tank)
+    public async Task<IActionResult> Create([Bind("Name,Type,VolumeGallons,StartDate,Notes,ImageFile")] Tank tank)
     {
         try
         {
@@ -123,6 +146,13 @@ public class TankController : Controller
 
             if (ModelState.IsValid)
             {
+                // Handle image upload
+                if (tank.ImageFile != null)
+                {
+                    tank.ImageData = await _imageService.ConvertFileToByteArrayAsync(tank.ImageFile);
+                    tank.ImageType = tank.ImageFile.ContentType;
+                }
+
                 var createdTank = await _tankService.CreateTankAsync(tank, userId);
                 TempData["Success"] = "Tank created successfully!";
                 return RedirectToAction(nameof(Details), new { id = createdTank.Id });
@@ -168,7 +198,7 @@ public class TankController : Controller
     // POST: Tank/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Type,VolumeGallons,VolumeUnitLiters,Length,Width,Height,Substrate,SetupDate,Notes,ImageURL")] Tank tank)
+    public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Type,VolumeGallons,StartDate,Notes,ImageFile")] Tank tank)
     {
         if (id != tank.Id)
         {
@@ -185,6 +215,23 @@ public class TankController : Controller
 
             if (ModelState.IsValid)
             {
+                // Handle image upload
+                if (tank.ImageFile != null)
+                {
+                    tank.ImageData = await _imageService.ConvertFileToByteArrayAsync(tank.ImageFile);
+                    tank.ImageType = tank.ImageFile.ContentType;
+                }
+                else
+                {
+                    // Preserve existing image if no new image is uploaded
+                    var existingTank = await _tankService.GetTankByIdAsync(id, userId);
+                    if (existingTank != null)
+                    {
+                        tank.ImageData = existingTank.ImageData;
+                        tank.ImageType = existingTank.ImageType;
+                    }
+                }
+
                 await _tankService.UpdateTankAsync(tank, userId);
                 TempData["Success"] = "Tank updated successfully!";
                 return RedirectToAction(nameof(Details), new { id = tank.Id });
