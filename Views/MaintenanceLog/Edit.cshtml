@@ -1,0 +1,177 @@
+@model MaintenanceLog
+
+@{
+    ViewData["Title"] = "Edit Maintenance Log";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-6">
+            <i class="bi bi-pencil text-primary"></i> Edit Maintenance Log
+        </h1>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle"></i> Cancel
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Maintenance Information</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="TankId" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="bi bi-droplet"></i> Tank
+                            </label>
+                            <input type="text" class="form-control" value="@Model.Tank?.Name" readonly disabled />
+                            <small class="form-text text-muted">Tank cannot be changed after creation</small>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Type" class="form-label">
+                                    <i class="bi bi-tag"></i> Maintenance Type <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="Type" class="form-select" id="maintenanceType"
+                                    asp-items="Html.GetEnumSelectList<AquaHub.MVC.Models.Enums.MaintenanceType>()">
+                                    <option value="">-- Select Type --</option>
+                                </select>
+                                <span asp-validation-for="Type" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Timestamp" class="form-label">
+                                    <i class="bi bi-calendar-event"></i> Date & Time <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Timestamp" type="datetime-local" class="form-control" />
+                                <span asp-validation-for="Timestamp" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3" id="waterChangeSection"
+                            style="display: @(Model.Type == AquaHub.MVC.Models.Enums.MaintenanceType.WaterChange ? "block" : "none");">
+                            <label asp-for="WaterChangePercent" class="form-label">
+                                <i class="bi bi-water"></i> Water Change Percentage
+                            </label>
+                            <div class="input-group">
+                                <input asp-for="WaterChangePercent" type="number" class="form-control"
+                                    placeholder="e.g., 25" min="0" max="100" />
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <span asp-validation-for="WaterChangePercent" class="text-danger small"></span>
+                            <small class="form-text text-muted">Enter percentage of water changed (0-100)</small>
+                        </div>
+
+                        @if (Model.SupplyItem != null && Model.AmountUsed.HasValue)
+                        {
+                            <div class="mb-3">
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle"></i> <strong>Supply Used:</strong> @Model.SupplyItem.Name
+                                    (@Model.AmountUsed @Model.SupplyItem.Unit)
+                                    <br>
+                                    <small class="text-muted">Supply usage cannot be edited to maintain inventory
+                                        accuracy</small>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label">
+                                <i class="bi bi-chat-left-text"></i> Notes
+                            </label>
+                            <textarea asp-for="Notes" class="form-control" rows="4"
+                                placeholder="Details about the maintenance performed..."></textarea>
+                            <span asp-validation-for="Notes" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm bg-light">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-info-circle"></i> Edit Information
+                </div>
+                <div class="card-body">
+                    <h6><i class="bi bi-exclamation-triangle text-warning"></i> Important Notes</h6>
+                    <p class="small mb-3">The tank assignment cannot be changed after a log is created.</p>
+
+                    <h6><i class="bi bi-box-seam text-primary"></i> Supply Tracking</h6>
+                    <p class="small mb-3">Supply usage is locked after creation to maintain accurate inventory records.
+                    </p>
+
+                    <h6><i class="bi bi-pencil text-success"></i> Editable Fields</h6>
+                    <ul class="small mb-0">
+                        <li>Maintenance Type</li>
+                        <li>Date & Time</li>
+                        <li>Water Change %</li>
+                        <li>Notes</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card shadow-sm bg-light mt-3">
+                <div class="card-header bg-secondary text-white">
+                    <i class="bi bi-clock-history"></i> Log Details
+                </div>
+                <div class="card-body">
+                    <p class="small mb-2"><strong>Tank:</strong> @Model.Tank?.Name</p>
+                    <p class="small mb-2"><strong>Created:</strong> @Model.Timestamp.ToString("MMM dd, yyyy h:mm tt")
+                    </p>
+                    @if (Model.SupplyItem != null)
+                    {
+                        <p class="small mb-0"><strong>Supply Used:</strong> @Model.SupplyItem.Name</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        document.getElementById('maintenanceType').addEventListener('change', function () {
+            var maintenanceType = this.value;
+            var waterChangeSection = document.getElementById('waterChangeSection');
+
+            // Show water change section only for WaterChange type
+            if (maintenanceType === 'WaterChange') {
+                waterChangeSection.style.display = 'block';
+            } else {
+                waterChangeSection.style.display = 'none';
+                document.getElementById('WaterChangePercent').value = '';
+            }
+        });
+
+        // Initialize visibility on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            var maintenanceType = document.getElementById('maintenanceType').value;
+            var waterChangeSection = document.getElementById('waterChangeSection');
+
+            if (maintenanceType === 'WaterChange') {
+                waterChangeSection.style.display = 'block';
+            }
+        });
+    </script>
+}

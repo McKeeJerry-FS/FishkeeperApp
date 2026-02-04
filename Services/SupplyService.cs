@@ -10,16 +10,19 @@ public class SupplyService : BaseService, ISupplyService
 {
     private readonly ApplicationDbContext _context;
     private readonly INotificationService _notificationService;
+    private readonly IEmailNotifiactionService? _emailNotificationService;
     private readonly ILogger<SupplyService> _logger;
 
     public SupplyService(
         ApplicationDbContext context,
         INotificationService notificationService,
-        ILogger<SupplyService> logger)
+        ILogger<SupplyService> logger,
+        IEmailNotifiactionService? emailNotificationService = null)
         : base(context)
     {
         _context = context;
         _notificationService = notificationService;
+        _emailNotificationService = emailNotificationService;
         _logger = logger;
     }
 
@@ -286,6 +289,32 @@ public class SupplyService : BaseService, ISupplyService
 
             await _notificationService.CreateNotificationAsync(notification);
             _logger.LogInformation($"Sent low stock notification for {supply.Name}");
+
+            // Send email notification if email service is available
+            if (_emailNotificationService != null)
+            {
+                var user = await _context.Users.FindAsync(supply.UserId);
+                if (user != null && !string.IsNullOrEmpty(user.Email))
+                {
+                    var settings = await _context.UserNotificationSettings
+                        .FirstOrDefaultAsync(s => s.UserId == supply.UserId);
+
+                    if (settings?.EmailNotificationsEnabled ?? true)
+                    {
+                        var tankName = supply.Tank?.Name;
+                        await _emailNotificationService.SendLowStockAlertEmailAsync(
+                            user.Email,
+                            user.FullName,
+                            supply.Name,
+                            supply.CurrentQuantity,
+                            supply.MinimumQuantity,
+                            supply.Unit,
+                            tankName
+                        );
+                        _logger.LogInformation($"Sent low stock email to {user.Email} for {supply.Name}");
+                    }
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -371,9 +400,9 @@ public class SupplyService : BaseService, ISupplyService
             {
                 usageNote += $" - {notes}";
             }
-            
-            supply.Notes = string.IsNullOrEmpty(supply.Notes) 
-                ? usageNote 
+
+            supply.Notes = string.IsNullOrEmpty(supply.Notes)
+                ? usageNote
                 : $"{supply.Notes}\n{usageNote}";
 
             await _context.SaveChangesAsync();
@@ -381,8 +410,8 @@ public class SupplyService : BaseService, ISupplyService
             _logger.LogInformation($"Recorded usage of {amountUsed} {supply.Unit} for {supply.Name}");
 
             // Check if status changed to low stock and send notification
-            if (supply.EnableLowStockAlert && 
-                previousStatus != StockStatus.LowStock && 
+            if (supply.EnableLowStockAlert &&
+                previousStatus != StockStatus.LowStock &&
                 supply.Status == StockStatus.LowStock)
             {
                 await SendLowStockNotificationAsync(supply);
@@ -405,7 +434,7 @@ public class SupplyService : BaseService, ISupplyService
     {
         return await _context.SupplyItems
             .Include(s => s.Tank)
-            .Where(s => s.UserId == userId && 
+            .Where(s => s.UserId == userId &&
                        s.IsActive &&
                        (s.Category == SupplyCategory.Supplements ||
                         s.Category == SupplyCategory.WaterTreatment ||

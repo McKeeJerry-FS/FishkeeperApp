@@ -7,6 +7,7 @@ The supply tracking system now automatically deducts inventory when you log dosi
 ## How It Works
 
 When you add a dosing record and link it to a supply item:
+
 1. The system automatically deducts the dosage amount from the supply inventory
 2. Updates the "last used" date
 3. Logs the usage in the supply's notes
@@ -70,6 +71,7 @@ When you dose a product:
 ### Scenario: Dosing Water Conditioner
 
 **Initial Setup:**
+
 - Supply: "Seachem Prime"
 - Current Quantity: 350 ml
 - Minimum Quantity: 50 ml
@@ -79,12 +81,14 @@ When you dose a product:
 **Weekly Dosing:**
 
 **Week 1:** Water change, dose 5ml
+
 - Before: 350 ml
 - After: 345 ml
 - Status: In Stock ✓
 - Days Remaining: ~69 days
 
 **Week 2:** Water change, dose 5ml
+
 - Before: 345 ml
 - After: 340 ml
 - Status: In Stock ✓
@@ -92,12 +96,14 @@ When you dose a product:
 ... (weeks continue)
 
 **Week 60:** Water change, dose 5ml
+
 - Before: 55 ml
 - After: 50 ml
 - Status: **Low Stock ⚠️**
 - Alert sent: "Your Seachem Prime is running low. Current: 50ml, Minimum: 50ml"
 
 **Week 61:** Water change, dose 5ml
+
 - Before: 50 ml
 - After: 45 ml
 - Status: **Low Stock ⚠️**
@@ -119,6 +125,7 @@ await _supplyService.RecordSupplyUsageAsync(
 ```
 
 This method:
+
 - Validates supply exists and belongs to user
 - Deducts amount from current quantity
 - Updates last used date
@@ -136,6 +143,7 @@ var dosingSupplies = await _supplyService.GetSuppliesForDosingAsync(userId);
 ```
 
 Returns supplies in categories:
+
 - Supplements
 - Water Treatment
 - Chemicals
@@ -144,21 +152,27 @@ Returns supplies in categories:
 ## Best Practices
 
 ### 1. Accurate Initial Quantities
+
 When adding a new supply, measure the actual quantity instead of using the bottle size. A "500ml" bottle might only have 480ml after accounting for the cap and tube.
 
 ### 2. Track Average Usage
+
 Enter your typical weekly usage to get accurate "days remaining" estimates. Update this periodically as your dosing routine changes.
 
 ### 3. Set Appropriate Minimums
+
 Set your minimum quantity to give yourself time to reorder:
+
 - **Fast shipping (2-3 days)**: Minimum = 1 week usage
 - **Slow shipping (7-14 days)**: Minimum = 3 weeks usage
 - **Hard to find items**: Minimum = 1 month usage
 
 ### 4. Use Product URLs
+
 Add product URLs to supply items for one-click reordering when you receive low stock alerts.
 
 ### 5. Regular Audits
+
 Periodically verify actual quantities match system quantities. Adjust if needed using the "Set Quantity" feature.
 
 ## Notifications
@@ -170,6 +184,7 @@ You'll receive notifications when:
 3. **Expiring Soon**: Supply expires within 30 days (if expiration date set)
 
 Notifications appear in:
+
 - Notification bell icon (top navigation)
 - Low Stock page (Supplies → Low Stock)
 - Home dashboard (if configured)
@@ -177,6 +192,7 @@ Notifications appear in:
 ## Shopping List Feature
 
 The **Low Stock** page auto-generates a shopping list showing:
+
 - Items needing attention (priority sorted)
 - Calculated quantities needed (optimal - current)
 - Preferred vendors
@@ -186,25 +202,31 @@ The **Low Stock** page auto-generates a shopping list showing:
 ## Troubleshooting
 
 ### Supply Not Deducting
+
 **Problem**: Dosing but inventory not updating
 
 **Solutions**:
+
 1. Verify you're using the "Use Supply" button or integrated dosing
 2. Check you have permission to modify the supply
 3. Ensure supply is marked as "Active"
 
 ### Incorrect Low Stock Alerts
+
 **Problem**: Getting alerts too early or too late
 
 **Solutions**:
+
 1. Adjust the "Minimum Quantity" threshold
 2. Verify "Enable Low Stock Alerts" is checked
 3. Update "Average Usage Per Week" for better predictions
 
 ### Supply Not in Dosing Dropdown
+
 **Problem**: Can't find supply when creating dosing record
 
 **Solutions**:
+
 1. Verify supply category is appropriate (Supplements, Water Treatment, Chemicals, or Medications)
 2. Check supply is marked as "Active"
 3. Ensure it's associated with the correct tank (or set to "General")
@@ -212,6 +234,7 @@ The **Low Stock** page auto-generates a shopping list showing:
 ## Future Enhancements
 
 Planned improvements:
+
 - **Barcode scanning**: Quick add/use via barcode
 - **Dosing schedules**: Auto-deduct on schedule
 - **Batch operations**: Process multiple supplies at once

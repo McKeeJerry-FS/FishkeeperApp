@@ -146,7 +146,7 @@ public class LivestockController : Controller
     // POST: Livestock/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Name,Species,DateAdded,PurchasePrice,Notes,IsAlive,ImageURL")] Livestock livestock, int tankId)
+    public async Task<IActionResult> Create(int tankId, string livestockType)
     {
         try
         {
@@ -156,10 +156,98 @@ public class LivestockController : Controller
                 return Unauthorized();
             }
 
+            // Create the appropriate livestock type based on selection
+            Livestock livestock = livestockType switch
+            {
+                "FreshwaterFish" => new FreshwaterFish(),
+                "SaltwaterFish" => new SaltwaterFish(),
+                "Coral" => new Coral(),
+                "Plant" => new Plant(),
+                "FreshwaterInvertebrate" => new FreshwaterInvertebrate(),
+                "SaltwaterInvertebrate" => new SaltwaterInvertebrate(),
+                _ => throw new ArgumentException("Invalid livestock type")
+            };
+
+            // Bind common properties
+            await TryUpdateModelAsync(livestock, "",
+                l => l.Name,
+                l => l.Species,
+                l => l.AddedOn,
+                l => l.Notes);
+
+            // Bind type-specific properties
+            switch (livestock)
+            {
+                case FreshwaterFish ff:
+                    await TryUpdateModelAsync(ff, "",
+                        f => f.AdultSize,
+                        f => f.Coloration,
+                        f => f.Temperament,
+                        f => f.ActivityLevel,
+                        f => f.MinTankSize,
+                        f => f.SwimmingRegion,
+                        f => f.IsSchooling,
+                        f => f.RecommendedSchoolSize);
+                    break;
+
+                case SaltwaterFish sf:
+                    await TryUpdateModelAsync(sf, "",
+                        f => f.AdultSize,
+                        f => f.Coloration,
+                        f => f.Temperament,
+                        f => f.ActivityLevel,
+                        f => f.MinTankSize,
+                        f => f.SwimmingRegion,
+                        f => f.IsSchooling,
+                        f => f.RecommendedSchoolSize,
+                        f => f.IsReefSafe);
+                    break;
+
+                case Coral coral:
+                    await TryUpdateModelAsync(coral, "",
+                        c => c.ColonySize,
+                        c => c.Coloration,
+                        c => c.LightingNeeds,
+                        c => c.FlowNeeds,
+                        c => c.Placement,
+                        c => c.GrowthRate,
+                        c => c.CareLevel);
+                    break;
+
+                case Plant plant:
+                    await TryUpdateModelAsync(plant, "",
+                        p => p.MaxHeight,
+                        p => p.GrowthRate,
+                        p => p.Coloration,
+                        p => p.Placement,
+                        p => p.LightingRequirement,
+                        p => p.CareLevel,
+                        p => p.RequiresCO2);
+                    break;
+
+                case FreshwaterInvertebrate fi:
+                    await TryUpdateModelAsync(fi, "",
+                        i => i.AdultSize,
+                        i => i.Coloration,
+                        i => i.Behavior,
+                        i => i.MinTankSize,
+                        i => i.IsPlantSafe);
+                    break;
+
+                case SaltwaterInvertebrate si:
+                    await TryUpdateModelAsync(si, "",
+                        i => i.AdultSize,
+                        i => i.Coloration,
+                        i => i.Behavior,
+                        i => i.MinTankSize,
+                        i => i.IsReefSafe);
+                    break;
+            }
+
             if (ModelState.IsValid)
             {
                 var createdLivestock = await _livestockService.CreateLivestockAsync(livestock, tankId, userId);
-                TempData["Success"] = "Livestock added successfully!";
+                TempData["Success"] = $"{livestockType} added successfully!";
                 return RedirectToAction(nameof(Details), new { id = createdLivestock.Id });
             }
 
@@ -172,7 +260,7 @@ public class LivestockController : Controller
             _logger.LogError(ex, "Error creating livestock");
             TempData["Error"] = "An error occurred while adding the livestock.";
             await PopulateTanksDropdown(_userManager.GetUserId(User)!);
-            return View(livestock);
+            return View();
         }
     }
 

@@ -40,7 +40,7 @@
                                 <label asp-for="Type" class="form-label">
                                     <i class="bi bi-tag"></i> Maintenance Type <span class="text-danger">*</span>
                                 </label>
-                                <select asp-for="Type" class="form-select"
+                                <select asp-for="Type" class="form-select" id="maintenanceType"
                                     asp-items="Html.GetEnumSelectList<AquaHub.MVC.Models.Enums.MaintenanceType>()">
                                     <option value="">-- Select Type --</option>
                                 </select>
@@ -67,6 +67,177 @@
                             </div>
                             <span asp-validation-for="WaterChangePercent" class="text-danger small"></span>
                             <small class="form-text text-muted">Enter percentage of water changed (0-100)</small>
+                        </div>
+
+                        <div id="filterCleaningSection" style="display: none;">
+                            <div class="mb-3">
+                                <label for="filterMediaType" class="form-label">
+                                    <i class="bi bi-funnel"></i> Filter Media Type
+                                </label>
+                                <select class="form-select" id="filterMediaType" name="filterMediaType">
+                                    <option value="">-- Select Media Type --</option>
+                                    <option value="Mechanical">Mechanical (Sponge/Pad)</option>
+                                    <option value="Chemical">Chemical (Carbon/Resin)</option>
+                                    <option value="Biological">Biological (Bio-Media)</option>
+                                    <option value="Ceramic">Ceramic Rings</option>
+                                    <option value="Floss">Filter Floss/Wool</option>
+                                    <option value="Complete">Complete Filter Cartridge</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <small class="form-text text-muted">Type of filter media being cleaned/replaced</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="createFilterReminder"
+                                        name="createFilterReminder">
+                                    <label class="form-check-label" for="createFilterReminder">
+                                        <i class="bi bi-bell"></i> Create reminder for next filter change
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div id="filterReminderDetails" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="filterReminderFrequency" class="form-label">
+                                            <i class="bi bi-calendar-event"></i> Change Frequency
+                                        </label>
+                                        <select class="form-select" id="filterReminderFrequency"
+                                            name="filterReminderFrequency">
+                                            <option value="7">Every Week</option>
+                                            <option value="14" selected>Every 2 Weeks</option>
+                                            <option value="21">Every 3 Weeks</option>
+                                            <option value="30">Every Month</option>
+                                            <option value="60">Every 2 Months</option>
+                                            <option value="90">Every 3 Months</option>
+                                            <option value="180">Every 6 Months</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="filterReminderDays" class="form-label">
+                                            <i class="bi bi-alarm"></i> Notify Before
+                                        </label>
+                                        <select class="form-select" id="filterReminderDays" name="filterReminderDays">
+                                            <option value="1">1 Day Before</option>
+                                            <option value="2">2 Days Before</option>
+                                            <option value="3" selected>3 Days Before</option>
+                                            <option value="5">5 Days Before</option>
+                                            <option value="7">1 Week Before</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="filterEmailNotification"
+                                            name="filterEmailNotification">
+                                        <label class="form-check-label" for="filterEmailNotification">
+                                            <i class="bi bi-envelope"></i> Send email notification
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="equipmentMaintenanceSection" style="display: none;">
+                            <div class="mb-3">
+                                <label for="equipmentType" class="form-label">
+                                    <i class="bi bi-gear-fill"></i> Equipment Type
+                                </label>
+                                <select class="form-select" id="equipmentType" name="equipmentType">
+                                    <option value="">-- Select Equipment Type --</option>
+                                    <option value="Filter">Filter</option>
+                                    <option value="Light">Light</option>
+                                    <option value="Heater">Heater</option>
+                                    <option value="Pump">Pump</option>
+                                    <option value="ProteinSkimmer">Protein Skimmer</option>
+                                    <option value="WaveMaker">Wave Maker</option>
+                                    <option value="DosingPump">Dosing Pump</option>
+                                    <option value="Reactor">Reactor</option>
+                                    <option value="UVSterilizer">UV Sterilizer</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3" id="specificEquipmentSection" style="display: none;">
+                                <label for="specificEquipmentId" class="form-label">
+                                    <i class="bi bi-tools"></i> Specific Equipment (Optional)
+                                </label>
+                                <select class="form-select" id="specificEquipmentId" name="specificEquipmentId">
+                                    <option value="">-- Select from your equipment --</option>
+                                </select>
+                                <small class="form-text text-muted">Select a specific piece of equipment from your
+                                    tank</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="maintenanceActivity" class="form-label">
+                                    <i class="bi bi-wrench"></i> Maintenance Activity
+                                </label>
+                                <select class="form-select" id="maintenanceActivity" name="maintenanceActivity">
+                                    <option value="">-- Select Activity --</option>
+                                    <option value="Cleaning">Cleaning</option>
+                                    <option value="Inspection">Inspection</option>
+                                    <option value="Repair">Repair</option>
+                                    <option value="PartReplacement">Part Replacement</option>
+                                    <option value="Calibration">Calibration</option>
+                                    <option value="Testing">Testing</option>
+                                    <option value="Adjustment">Adjustment</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="supplySection" style="display: none;">
+                            <div class="mb-3">
+                                <label asp-for="SupplyItemId" class="form-label">
+                                    <i class="bi bi-box-seam"></i> <span id="supplyLabel">Supply Item</span> (Optional)
+                                </label>
+                                <select asp-for="SupplyItemId" class="form-select" asp-items="ViewBag.Supplies"
+                                    id="supplyItemSelect">
+                                    <option value="">-- Select Supply Item --</option>
+                                </select>
+                                <span asp-validation-for="SupplyItemId" class="text-danger small"></span>
+                                <small class="form-text text-muted" id="supplyHelperText">Select a medication,
+                                    treatment, or additive used</small>
+                            </div>
+
+                            <!-- Testing Type Selection (only for Testing) -->
+                            <div class="mb-3" id="testTypeSection" style="display: none;">
+                                <label class="form-label">
+                                    <i class="bi bi-clipboard-check"></i> Test Type
+                                </label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="testType" id="dipTest"
+                                        value="dip" checked>
+                                    <label class="form-check-label" for="dipTest">
+                                        Single Dip Test Strip
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="testType" id="reagentTest"
+                                        value="reagent">
+                                    <label class="form-check-label" for="reagentTest">
+                                        Reagent Test (Liquid/Drops)
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="AmountUsed" class="form-label">
+                                    <i class="bi bi-droplet-half"></i> <span id="amountLabel">Amount Used</span>
+                                </label>
+                                <div class="input-group">
+                                    <input asp-for="AmountUsed" type="number" step="0.01" class="form-control"
+                                        id="amountUsedInput" placeholder="e.g., 10.5" min="0" />
+                                    <span class="input-group-text" id="unitDisplay"></span>
+                                </div>
+                                <span asp-validation-for="AmountUsed" class="text-danger small"></span>
+                                <small class="form-text text-muted" id="amountHelperText">Amount will be deducted from
+                                    inventory</small>
+                            </div>
                         </div>
 
                         <div class="mb-3">
@@ -110,7 +281,23 @@
                     <p class="small mb-3">Pruning and maintaining aquatic plants.</p>
 
                     <h6><i class="bi bi-gear text-warning"></i> Equipment Check</h6>
-                    <p class="small mb-0">Inspecting and servicing equipment.</p>
+                    <p class="small mb-3">Inspecting and servicing equipment.</p>
+
+                    <h6><i class="bi bi-capsule text-danger"></i> Dosing/Testing</h6>
+                    <p class="small mb-3">Select Dosing, Testing, or Other to track supply usage.</p>
+
+                    @if (ViewBag.Supplies != null)
+                    {
+                        <div class="alert alert-success small py-2">
+                            <i class="bi bi-check-circle"></i> @(((SelectList)ViewBag.Supplies).Count()) supplies available
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning small py-2">
+                            <i class="bi bi-exclamation-circle"></i> No supplies found
+                        </div>
+                    }
                 </div>
             </div>
         </div>
@@ -122,13 +309,173 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
-        document.getElementById('Type').addEventListener('change', function () {
+        function updateSupplySection() {
+            var maintenanceType = document.getElementById('maintenanceType').value;
+            var supplySelect = document.getElementById('supplyItemSelect');
+            var selectedSupply = supplySelect.options[supplySelect.selectedIndex];
+            var supplyUnit = selectedSupply.text.match(/\(([^)]+)\)/)?.[1]?.split(' ')[1] || '';
+
+            var testTypeSection = document.getElementById('testTypeSection');
+            var supplyLabel = document.getElementById('supplyLabel');
+            var supplyHelperText = document.getElementById('supplyHelperText');
+            var amountLabel = document.getElementById('amountLabel');
+            var amountInput = document.getElementById('amountUsedInput');
+            var amountHelperText = document.getElementById('amountHelperText');
+            var unitDisplay = document.getElementById('unitDisplay');
+
+            // Testing type (8)
+            if (maintenanceType === '8') {
+                testTypeSection.style.display = 'block';
+                supplyLabel.textContent = 'Test Kit';
+                supplyHelperText.textContent = 'Select the test kit used';
+                amountLabel.textContent = 'Number of Tests';
+                amountInput.placeholder = 'e.g., 1';
+                amountInput.step = '1';
+                unitDisplay.textContent = 'tests';
+                amountHelperText.textContent = 'Number of tests will be deducted from inventory';
+            }
+            // Dosing type (9)
+            else if (maintenanceType === '9') {
+                testTypeSection.style.display = 'none';
+                supplyLabel.textContent = 'Medication/Treatment';
+                supplyHelperText.textContent = 'Select the medication or treatment used';
+                amountLabel.textContent = 'Amount Used';
+                amountInput.placeholder = 'e.g., 10.5';
+                amountInput.step = '0.01';
+                unitDisplay.textContent = supplyUnit || 'units';
+                amountHelperText.textContent = 'Amount will be deducted from inventory';
+            }
+            // Other type (10)
+            else if (maintenanceType === '10') {
+                testTypeSection.style.display = 'none';
+                supplyLabel.textContent = 'Supply Item';
+                supplyHelperText.textContent = 'Select the supply item used';
+                amountLabel.textContent = 'Amount Used';
+                amountInput.placeholder = 'e.g., 10.5';
+                amountInput.step = '0.01';
+                unitDisplay.textContent = supplyUnit || 'units';
+                amountHelperText.textContent = 'Amount will be deducted from inventory';
+            }
+        }
+
+        function toggleSections() {
+            var maintenanceType = document.getElementById('maintenanceType').value;
             var waterChangeSection = document.getElementById('waterChangeSection');
-            if (this.value === 'WaterChange') {
+            var filterCleaningSection = document.getElementById('filterCleaningSection');
+            var equipmentMaintenanceSection = document.getElementById('equipmentMaintenanceSection');
+            var supplySection = document.getElementById('supplySection');
+
+            console.log('Maintenance Type Value:', maintenanceType); // Debug log
+
+            // Show water change section only for WaterChange type (value = 1)
+            if (maintenanceType === '1') {
                 waterChangeSection.style.display = 'block';
             } else {
                 waterChangeSection.style.display = 'none';
-                document.getElementById('WaterChangePercent').value = '';
+                var waterChangeInput = document.getElementById('WaterChangePercent');
+                if (waterChangeInput) waterChangeInput.value = '';
+            }
+
+            // Show filter cleaning section for FilterCleaning type (value = 2)
+            if (maintenanceType === '2') {
+                filterCleaningSection.style.display = 'block';
+            } else {
+                filterCleaningSection.style.display = 'none';
+            }
+
+            // Show equipment maintenance section for EquipmentMaintenance type (value = 5)
+            if (maintenanceType === '5') {
+                equipmentMaintenanceSection.style.display = 'block';
+                loadEquipmentForTank();
+            } else {
+                equipmentMaintenanceSection.style.display = 'none';
+            }
+
+            // Show supply section for Testing (8), Dosing (9), and Other (10) types
+            if (maintenanceType === '8' || maintenanceType === '9' || maintenanceType === '10') {
+                supplySection.style.display = 'block';
+                updateSupplySection();
+                console.log('Supply section is now visible for type:', maintenanceType); // Debug log
+            } else {
+                supplySection.style.display = 'none';
+                var supplyInput = document.getElementById('SupplyItemId');
+                var amountInput = document.getElementById('AmountUsed');
+                if (supplyInput) supplyInput.value = '';
+                if (amountInput) amountInput.value = '';
+            }
+        }
+
+        function loadEquipmentForTank() {
+            var tankId = document.getElementById('TankId').value;
+            var specificEquipmentSection = document.getElementById('specificEquipmentSection');
+            var specificEquipmentSelect = document.getElementById('specificEquipmentId');
+
+            if (tankId) {
+                // Load equipment for the selected tank via AJAX
+                fetch(`/Equipment/GetEquipmentByTank?tankId=${tankId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        specificEquipmentSelect.innerHTML = '<option value="">-- Select from your equipment --</option>';
+                        if (data && data.length > 0) {
+                            data.forEach(equipment => {
+                                var option = document.createElement('option');
+                                option.value = equipment.id;
+                                option.text = `${equipment.brand} ${equipment.model}`;
+                                specificEquipmentSelect.appendChild(option);
+                            });
+                            specificEquipmentSection.style.display = 'block';
+                        } else {
+                            specificEquipmentSection.style.display = 'none';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading equipment:', error);
+                        specificEquipmentSection.style.display = 'none';
+                    });
+            } else {
+                specificEquipmentSection.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var maintenanceTypeSelect = document.getElementById('maintenanceType');
+            var supplyItemSelect = document.getElementById('supplyItemSelect');
+            var createFilterReminder = document.getElementById('createFilterReminder');
+            var filterReminderDetails = document.getElementById('filterReminderDetails');
+            var tankSelect = document.getElementById('TankId');
+
+            if (maintenanceTypeSelect) {
+                maintenanceTypeSelect.addEventListener('change', toggleSections);
+                // Check initial state on page load
+                toggleSections();
+            } else {
+                console.error('maintenanceType element not found');
+            }
+
+            // Update unit display when supply item changes
+            if (supplyItemSelect) {
+                supplyItemSelect.addEventListener('change', updateSupplySection);
+            }
+
+            // Show/hide filter reminder details
+            if (createFilterReminder) {
+                createFilterReminder.addEventListener('change', function () {
+                    if (this.checked) {
+                        filterReminderDetails.style.display = 'block';
+                    } else {
+                        filterReminderDetails.style.display = 'none';
+                    }
+                });
+            }
+
+            // Reload equipment when tank changes
+            if (tankSelect) {
+                tankSelect.addEventListener('change', function() {
+                    var maintenanceType = document.getElementById('maintenanceType').value;
+                    if (maintenanceType === '5') {
+                        loadEquipmentForTank();
+                    }
+                });
             }
         });
     </script>

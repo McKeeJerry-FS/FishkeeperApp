@@ -7,7 +7,9 @@ The Supply Tracking feature provides comprehensive inventory management for aqua
 ## Features Implemented
 
 ### 1. **Supply Item Model** (`SupplyItem.cs`)
+
 Complete data model for tracking aquarium supplies including:
+
 - **Basic Information**: Name, brand, category, description
 - **Inventory Tracking**: Current quantity, minimum threshold, optimal quantity, unit of measurement
 - **Stock Status**: Automatically calculated (InStock, LowStock, OutOfStock)
@@ -16,7 +18,9 @@ Complete data model for tracking aquarium supplies including:
 - **Smart Features**: Estimated days remaining calculation
 
 ### 2. **Supply Categories** (`SupplyCategory.cs` enum)
+
 Pre-defined categories for organizing supplies:
+
 - Food
 - Water Treatment
 - Test Kits
@@ -28,16 +32,20 @@ Pre-defined categories for organizing supplies:
 - Other
 
 ### 3. **Stock Status** (`StockStatus.cs` enum)
+
 Automatic status calculation based on current vs. minimum quantities:
+
 - InStock: Adequate supply available
 - LowStock: Below minimum threshold
 - OutOfStock: Quantity is zero
 - Discontinued: Item no longer used
 
 ### 4. **Supply Service** (`SupplyService.cs`)
+
 Complete service layer implementing:
+
 - **CRUD Operations**: Create, read, update, delete supplies
-- **Inventory Management**: 
+- **Inventory Management**:
   - Add stock (with optional purchase price)
   - Remove stock (usage tracking)
   - Update quantities
@@ -49,7 +57,9 @@ Complete service layer implementing:
 - **Search**: Full-text search across name, brand, description
 
 ### 5. **Supply Controller** (`SupplyController.cs`)
+
 MVC controller with actions for:
+
 - **Index**: List all supplies with filtering (by tank, category, status)
 - **Details**: View supply details with quick stock actions
 - **Create/Edit**: Full CRUD operations with validation
@@ -61,6 +71,7 @@ MVC controller with actions for:
 ### 6. **Views**
 
 #### **Index View** (`Views/Supply/Index.cshtml`)
+
 - Summary cards showing total items, low stock, out of stock, total value
 - Filter by tank, category, and status
 - Table view with stock levels and status badges
@@ -68,6 +79,7 @@ MVC controller with actions for:
 - Visual status indicators with color coding
 
 #### **Details View** (`Views/Supply/Details.cshtml`)
+
 - Large stock status card with progress bar
 - Estimated days remaining display
 - Quick action modals for adding/removing stock
@@ -75,6 +87,7 @@ MVC controller with actions for:
 - Complete item details with expiration warnings
 
 #### **Create/Edit Views**
+
 - Organized form sections:
   - Basic Information
   - Inventory Information
@@ -86,6 +99,7 @@ MVC controller with actions for:
 - Low stock alert toggle
 
 #### **Low Stock View** (`Views/Supply/LowStock.cshtml`)
+
 - Summary of low stock, out of stock, and expiring items
 - Expiring items table (within 30 days)
 - Priority-sorted list of items needing attention
@@ -94,33 +108,41 @@ MVC controller with actions for:
 - Quick reorder links to product URLs
 
 ### 7. **Navigation Integration**
+
 Added "Supplies" menu item to main navigation between Equipment and Expenses
 
 ### 8. **Database Migration**
+
 Created migration `AddSupplyTracking` to add `SupplyItems` table with all fields and relationships
 
 ## Key Features
 
 ### Automatic Low Stock Notifications
+
 When a supply item's quantity falls below the minimum threshold:
+
 1. Status automatically changes to `LowStock` or `OutOfStock`
 2. System creates a notification for the user
 3. Item appears in the Low Stock Alerts page
 4. Badge counter updates in navigation
 
 ### Smart Stock Management
+
 - **Add Stock**: Records purchase date and price, updates quantity
 - **Remove Stock**: Tracks usage, updates "last used" date
 - **Estimated Depletion**: Calculates days remaining based on average weekly usage
 
 ### Expiration Tracking
+
 - Set expiration dates for perishable items
 - Visual warnings when items are expiring soon (< 30 days)
 - Red badges for expired items
 - Separate tracking in Low Stock Alerts page
 
 ### Shopping List Generator
+
 The Low Stock view includes an auto-generated shopping list that:
+
 - Calculates needed quantities (optimal - current)
 - Groups items by vendor when available
 - Provides printable format
@@ -129,6 +151,7 @@ The Low Stock view includes an auto-generated shopping list that:
 ## Usage Examples
 
 ### Adding a New Supply
+
 ```
 1. Navigate to Supplies > Add Supply
 2. Fill in:
@@ -144,6 +167,7 @@ The Low Stock view includes an auto-generated shopping list that:
 ```
 
 ### Recording Supply Usage
+
 ```
 1. Go to Supply Details page
 2. Click "Use Supply" button
@@ -156,6 +180,7 @@ The Low Stock view includes an auto-generated shopping list that:
 ```
 
 ### Viewing Low Stock Items
+
 ```
 1. Click "Low Stock" button in Supplies index
 2. View three sections:
@@ -169,20 +194,24 @@ The Low Stock view includes an auto-generated shopping list that:
 ## Technical Implementation
 
 ### Model Relationships
+
 - `SupplyItem` → `AppUser` (many-to-one)
 - `SupplyItem` → `Tank` (many-to-one, optional)
 
 ### Computed Properties
+
 - `Status`: Calculated based on CurrentQuantity vs. MinimumQuantity
 - `EstimatedDaysRemaining`: Calculated from CurrentQuantity / AverageUsagePerWeek
 
 ### Service Layer Pattern
+
 - Inherits from `BaseService` for context access
 - Implements `ISupplyService` interface
 - Uses dependency injection for `INotificationService`
 - Includes comprehensive logging
 
 ### Security
+
 - All actions require authentication (`[Authorize]` attribute)
 - User ID validation on all operations
 - Prevents users from accessing other users' supplies
@@ -191,6 +220,7 @@ The Low Stock view includes an auto-generated shopping list that:
 ## Future Enhancements
 
 Potential improvements for future versions:
+
 1. **Barcode Scanning**: Quick add/remove via barcode
 2. **Reorder Automation**: Auto-generate orders to vendors
 3. **Usage Analytics**: Detailed consumption trends and forecasting
@@ -256,6 +286,7 @@ CREATE TABLE SupplyItems (
 ## Contributing
 
 When extending this feature:
+
 1. Add new supply categories to `SupplyCategory` enum
 2. Update views if adding new fields
 3. Maintain soft delete pattern

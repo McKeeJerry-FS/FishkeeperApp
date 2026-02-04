@@ -21,6 +21,8 @@
     <div class="card shadow">
         <div class="card-body">
             <form asp-action="Create" method="post">
+                <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+
                 <div class="row g-3">
                     <!-- Basic Information -->
                     <div class="col-12">

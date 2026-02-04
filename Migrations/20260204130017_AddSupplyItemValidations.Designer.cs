@@ -3,6 +3,7 @@ using System;
 using AquaHub.MVC.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AquaHub.MVC.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260204130017_AddSupplyItemValidations")]
+    partial class AddSupplyItemValidations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,9 +32,6 @@ namespace AquaHub.MVC.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime?>("CancellationRequestedDate")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -49,24 +49,15 @@ namespace AquaHub.MVC.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<DateTime?>("GracePeriodEndDate")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<DateTime?>("LastPaymentDate")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("NextBillingDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("NormalizedEmail")
@@ -86,32 +77,8 @@ namespace AquaHub.MVC.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime?>("ProTierEndDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("ProTierStartDate")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
-
-                    b.Property<string>("StripeCustomerId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("StripeSubscriptionId")
-                        .HasColumnType("text");
-
-                    b.Property<int>("SubscriptionStatus")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Tier")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("TrialEndDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("TrialStartDate")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
@@ -474,15 +441,9 @@ namespace AquaHub.MVC.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<double?>("AmountUsed")
-                        .HasColumnType("double precision");
-
                     b.Property<string>("Notes")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<int?>("SupplyItemId")
-                        .HasColumnType("integer");
 
                     b.Property<int>("TankId")
                         .HasColumnType("integer");
@@ -497,8 +458,6 @@ namespace AquaHub.MVC.Migrations
                         .HasColumnType("double precision");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("SupplyItemId");
 
                     b.HasIndex("TankId");
 
@@ -624,81 +583,6 @@ namespace AquaHub.MVC.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ParameterAlerts");
-                });
-
-            modelBuilder.Entity("AquaHub.MVC.Models.Payment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("AppUserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("BillingPeriodEnd")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("BillingPeriodStart")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Currency")
-                        .IsRequired()
-                        .HasMaxLength(3)
-                        .HasColumnType("character varying(3)");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<string>("FailureReason")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<string>("InvoiceUrl")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal?>("RefundedAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("RefundedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("StripeChargeId")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("StripePaymentIntentId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<int>("TierAtPayment")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AppUserId");
-
-                    b.ToTable("Payment");
                 });
 
             modelBuilder.Entity("AquaHub.MVC.Models.PhotoLog", b =>
@@ -2560,17 +2444,11 @@ namespace AquaHub.MVC.Migrations
 
             modelBuilder.Entity("AquaHub.MVC.Models.MaintenanceLog", b =>
                 {
-                    b.HasOne("AquaHub.MVC.Models.SupplyItem", "SupplyItem")
-                        .WithMany()
-                        .HasForeignKey("SupplyItemId");
-
                     b.HasOne("AquaHub.MVC.Models.Tank", "Tank")
                         .WithMany("MaintenanceLogs")
                         .HasForeignKey("TankId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("SupplyItem");
 
                     b.Navigation("Tank");
                 });
@@ -2621,17 +2499,6 @@ namespace AquaHub.MVC.Migrations
                     b.Navigation("Tank");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("AquaHub.MVC.Models.Payment", b =>
-                {
-                    b.HasOne("AquaHub.MVC.Models.AppUser", "AppUser")
-                        .WithMany("Payments")
-                        .HasForeignKey("AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AppUser");
                 });
 
             modelBuilder.Entity("AquaHub.MVC.Models.PhotoLog", b =>
@@ -2861,8 +2728,6 @@ namespace AquaHub.MVC.Migrations
 
             modelBuilder.Entity("AquaHub.MVC.Models.AppUser", b =>
                 {
-                    b.Navigation("Payments");
-
                     b.Navigation("Tanks");
                 });
 

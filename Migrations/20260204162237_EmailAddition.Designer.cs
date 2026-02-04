@@ -3,6 +3,7 @@ using System;
 using AquaHub.MVC.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AquaHub.MVC.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260204162237_EmailAddition")]
+    partial class EmailAddition
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -474,15 +477,9 @@ namespace AquaHub.MVC.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<double?>("AmountUsed")
-                        .HasColumnType("double precision");
-
                     b.Property<string>("Notes")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<int?>("SupplyItemId")
-                        .HasColumnType("integer");
 
                     b.Property<int>("TankId")
                         .HasColumnType("integer");
@@ -497,8 +494,6 @@ namespace AquaHub.MVC.Migrations
                         .HasColumnType("double precision");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("SupplyItemId");
 
                     b.HasIndex("TankId");
 
@@ -2560,17 +2555,11 @@ namespace AquaHub.MVC.Migrations
 
             modelBuilder.Entity("AquaHub.MVC.Models.MaintenanceLog", b =>
                 {
-                    b.HasOne("AquaHub.MVC.Models.SupplyItem", "SupplyItem")
-                        .WithMany()
-                        .HasForeignKey("SupplyItemId");
-
                     b.HasOne("AquaHub.MVC.Models.Tank", "Tank")
                         .WithMany("MaintenanceLogs")
                         .HasForeignKey("TankId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("SupplyItem");
 
                     b.Navigation("Tank");
                 });

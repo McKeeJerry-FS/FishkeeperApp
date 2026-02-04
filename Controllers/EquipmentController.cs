@@ -146,7 +146,7 @@ public class EquipmentController : Controller
     // POST: Equipment/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Name,Type,Brand,Model,PurchaseDate,PurchasePrice,WarrantyExpirationDate,Notes")] Equipment equipment, int tankId)
+    public async Task<IActionResult> Create(int tankId, string equipmentType)
     {
         try
         {
@@ -156,15 +156,67 @@ public class EquipmentController : Controller
                 return Unauthorized();
             }
 
+            // Create the appropriate equipment type based on selection
+            Equipment equipment = equipmentType switch
+            {
+                "Filter" => new Filter(),
+                "Heater" => new Heater(),
+                "Light" => new Light(),
+                "ProteinSkimmer" => new ProteinSkimmer(),
+                _ => throw new ArgumentException("Invalid equipment type")
+            };
+
+            // Bind common properties
+            await TryUpdateModelAsync(equipment, "",
+                e => e.Brand,
+                e => e.Model,
+                e => e.InstalledOn);
+
+            // Bind type-specific properties
+            switch (equipment)
+            {
+                case Filter filter:
+                    await TryUpdateModelAsync(filter, "",
+                        f => f.Type,
+                        f => f.FlowRate,
+                        f => f.Media,
+                        f => f.LastMaintenanceDate);
+                    break;
+
+                case Heater heater:
+                    await TryUpdateModelAsync(heater, "",
+                        h => h.MinTemperature,
+                        h => h.MaxTemperature);
+                    break;
+
+                case Light light:
+                    await TryUpdateModelAsync(light, "",
+                        l => l.Wattage,
+                        l => l.Spectrum,
+                        l => l.IsDimmable,
+                        l => l.IntensityPercent,
+                        l => l.Schedule);
+                    break;
+
+                case ProteinSkimmer skimmer:
+                    await TryUpdateModelAsync(skimmer, "",
+                        s => s.Capacity,
+                        s => s.Type,
+                        s => s.AirIntake,
+                        s => s.CupFillLevel);
+                    break;
+            }
+
             if (ModelState.IsValid)
             {
                 var createdEquipment = await _equipmentService.CreateEquipmentAsync(equipment, tankId, userId);
-                TempData["Success"] = "Equipment added successfully!";
+                TempData["Success"] = $"{equipmentType} added successfully!";
                 return RedirectToAction(nameof(Details), new { id = createdEquipment.Id });
             }
 
             await PopulateTanksDropdown(userId);
             ViewBag.SelectedTankId = tankId;
+            ViewBag.EquipmentType = equipmentType;
             return View(equipment);
         }
         catch (Exception ex)
@@ -172,7 +224,7 @@ public class EquipmentController : Controller
             _logger.LogError(ex, "Error creating equipment");
             TempData["Error"] = "An error occurred while adding the equipment.";
             await PopulateTanksDropdown(_userManager.GetUserId(User)!);
-            return View(equipment);
+            return View();
         }
     }
 
@@ -305,5 +357,34 @@ public class EquipmentController : Controller
     {
         var tanks = await _tankService.GetAllTanksAsync(userId);
         ViewBag.Tanks = new SelectList(tanks, "Id", "Name");
+    }
+
+    // API endpoint to get equipment by tank for AJAX calls
+    [HttpGet]
+    public async Task<IActionResult> GetEquipmentByTank(int tankId)
+    {
+        try
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var equipment = await _equipmentService.GetEquipmentByTankAsync(tankId, userId);
+            var equipmentList = equipment.Select(e => new
+            {
+                id = e.Id,
+                brand = e.Brand,
+                model = e.Model
+            }).ToList();
+
+            return Json(equipmentList);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving equipment for tank ID: {TankId}", tankId);
+            return Json(new List<object>());
+        }
     }
 }

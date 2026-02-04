@@ -193,6 +193,15 @@ public class SupplyController : Controller
                 return RedirectToAction(nameof(Index));
             }
 
+            // Log validation errors for debugging
+            foreach (var state in ModelState)
+            {
+                foreach (var error in state.Value.Errors)
+                {
+                    _logger.LogWarning($"Validation error in {state.Key}: {error.ErrorMessage}");
+                }
+            }
+
             await LoadViewDataAsync(userId);
             return View(supply);
         }

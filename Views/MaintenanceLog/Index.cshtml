@@ -45,6 +45,7 @@
                                 <th><i class="bi bi-droplet"></i> Tank</th>
                                 <th><i class="bi bi-tag"></i> Type</th>
                                 <th><i class="bi bi-water"></i> Water Change</th>
+                                <th><i class="bi bi-box-seam"></i> Supply Used</th>
                                 <th><i class="bi bi-chat-left-text"></i> Notes</th>
                                 <th class="text-end">Actions</th>
                             </tr>
@@ -79,6 +80,19 @@
                                         else
                                         {
                                             <span class="text-muted">N/A</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (log.SupplyItem != null && log.AmountUsed.HasValue)
+                                        {
+                                            <div class="d-flex flex-column">
+                                                <small class="text-primary">@log.SupplyItem.Name</small>
+                                                <small class="text-muted">@log.AmountUsed @log.SupplyItem.Unit</small>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
                                         }
                                     </td>
                                     <td>

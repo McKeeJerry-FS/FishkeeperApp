@@ -1,9 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using AquaHub.MVC.Data;
 using AquaHub.MVC.Models;
 using AquaHub.MVC.Services.Interfaces;
 using AquaHub.MVC.Services;
+
+// Configure Npgsql to handle DateTime without UTC kind
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +55,11 @@ else
 }
 
 // Registering Services with Dependency Injection
+// Email Services
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<IEmailSender, EmailService>();
+builder.Services.AddScoped<IEmailNotifiactionService, EmailNotificationService>();
+
 // Core Services
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 builder.Services.AddScoped<ITankService, TankService>();
