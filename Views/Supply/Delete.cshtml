@@ -1,0 +1,99 @@
+@model AquaHub.MVC.Models.SupplyItem
+
+@{
+    ViewData["Title"] = $"Delete - {Model.Name}";
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-action="Index">Supplies</a></li>
+            <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@Model.Id">@Model.Name</a></li>
+            <li class="breadcrumb-item active">Delete</li>
+        </ol>
+    </nav>
+
+    <div class="card border-danger shadow">
+        <div class="card-header bg-danger text-white">
+            <h3 class="mb-0">
+                <i class="bi bi-exclamation-triangle-fill"></i> Delete Supply Item
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-danger">
+                <h4 class="alert-heading">
+                    <i class="bi bi-exclamation-triangle"></i> Are you sure you want to delete this supply item?
+                </h4>
+                <p>This action will archive the item. You can reactivate it later by editing it.</p>
+            </div>
+
+            <dl class="row">
+                <dt class="col-sm-3">Name</dt>
+                <dd class="col-sm-9"><strong>@Model.Name</strong></dd>
+
+                @if (!string.IsNullOrEmpty(Model.Brand))
+                {
+                    <dt class="col-sm-3">Brand</dt>
+                    <dd class="col-sm-9">@Model.Brand</dd>
+                }
+
+                <dt class="col-sm-3">Category</dt>
+                <dd class="col-sm-9">
+                    <span class="badge bg-secondary">@Model.Category</span>
+                </dd>
+
+                @if (Model.Tank != null)
+                {
+                    <dt class="col-sm-3">Tank</dt>
+                    <dd class="col-sm-9">@Model.Tank.Name</dd>
+                }
+
+                <dt class="col-sm-3">Current Stock</dt>
+                <dd class="col-sm-9">
+                    <strong>@Model.CurrentQuantity.ToString("N2") @Model.Unit</strong>
+                </dd>
+
+                <dt class="col-sm-3">Status</dt>
+                <dd class="col-sm-9">
+                    @{
+                        var badgeClass = Model.Status switch
+                        {
+                            AquaHub.MVC.Models.Enums.StockStatus.InStock => "bg-success",
+                            AquaHub.MVC.Models.Enums.StockStatus.LowStock => "bg-warning",
+                            AquaHub.MVC.Models.Enums.StockStatus.OutOfStock => "bg-danger",
+                            _ => "bg-secondary"
+                        };
+                    }
+                    <span class="badge @badgeClass">
+                        @Model.Status.ToString().Replace("Stock", " Stock")
+                    </span>
+                </dd>
+
+                @if (Model.LastPurchasePrice.HasValue)
+                {
+                    <dt class="col-sm-3">Inventory Value</dt>
+                    <dd class="col-sm-9">
+                        $@((Model.CurrentQuantity * (double)Model.LastPurchasePrice.Value).ToString("N2"))
+                    </dd>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <dt class="col-sm-3">Description</dt>
+                    <dd class="col-sm-9">@Model.Description</dd>
+                }
+            </dl>
+
+            <form asp-action="Delete" method="post" class="mt-4">
+                <input type="hidden" asp-for="Id" />
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Yes, Delete This Supply
+                </button>
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,296 @@
+@model IEnumerable<AquaHub.MVC.Models.SupplyItem>
+@using AquaHub.MVC.Models.Enums
+
+@{
+    ViewData["Title"] = "Low Stock Alerts";
+}
+
+<div class="container-fluid py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-action="Index">Supplies</a></li>
+            <li class="breadcrumb-item active">Low Stock Alerts</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-6">
+            <i class="bi bi-exclamation-triangle-fill text-warning"></i> Low Stock Alerts
+        </h1>
+        <a asp-action="Index" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left"></i> Back to Inventory
+        </a>
+    </div>
+
+    <!-- Alert Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="bi bi-exclamation-triangle"></i> Low Stock Items</h6>
+                    <h2 class="mb-0">@ViewBag.LowStockCount</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="bi bi-x-circle"></i> Out of Stock</h6>
+                    <h2 class="mb-0">@ViewBag.OutOfStockCount</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="bi bi-clock"></i> Expiring Soon</h6>
+                    <h2 class="mb-0">@ViewBag.ExpiringCount</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Expiring Soon Section -->
+    @if (ViewBag.ExpiringItems is IEnumerable<AquaHub.MVC.Models.SupplyItem> expiringItems && expiringItems.Any())
+    {
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-clock"></i> Expiring Within 30 Days</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Expiration Date</th>
+                                <th>Days Remaining</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in expiringItems)
+                            {
+                                var daysRemaining = (item.ExpirationDate.Value - DateTime.UtcNow).Days;
+                                <tr class="@(daysRemaining < 7 ? "table-danger" : "table-warning")">
+                                    <td>
+                                        <strong>@item.Name</strong>
+                                        @if (!string.IsNullOrEmpty(item.Brand))
+                                        {
+                                            <br />
+                                
+                                            <small class="text-muted">@item.Brand</small>
+                                        }
+                                    </td>
+                                    <td>@item.ExpirationDate.Value.ToString("MMM dd, yyyy")</td>
+                                    <td>
+                                        <span class="badge @(daysRemaining < 7 ? "bg-danger" : "bg-warning")">
+                                            @daysRemaining days
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Low/Out of Stock Section -->
+    @if (!Model.Any())
+    {
+        <div class="alert alert-success text-center py-5">
+            <i class="bi bi-check-circle display-1"></i>
+            <h4 class="mt-3">All Supplies Are Well Stocked!</h4>
+            <p>You have no items running low or out of stock.</p>
+            <a asp-action="Index" class="btn btn-primary">
+                <i class="bi bi-box-seam"></i> View All Supplies
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Items Needing Attention</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Priority</th>
+                                <th>Item</th>
+                                <th>Category</th>
+                                <th>Current Stock</th>
+                                <th>Minimum Required</th>
+                                <th>Status</th>
+                                <th>Est. Days Left</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var sortedItems = Model.OrderBy(s => s.CurrentQuantity).ToList();
+                                var priority = 1;
+                            }
+                            @foreach (var item in sortedItems)
+                            {
+                                var urgency = item.Status == StockStatus.OutOfStock ? "danger" : "warning";
+                                <tr class="table-@urgency">
+                                    <td>
+                                        <span class="badge bg-@urgency">
+                                            @priority
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <strong>@item.Name</strong>
+                                        @if (!string.IsNullOrEmpty(item.Brand))
+                                        {
+                                            <br />
+                                
+                                            <small class="text-muted">@item.Brand</small>
+                                        }
+                                        @if (item.Tank != null)
+                                        {
+                                            <br />
+                                
+                                            <small class="text-muted"><i class="bi bi-droplet"></i> @item.Tank.Name</small>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">@item.Category</span>
+                                    </td>
+                                    <td>
+                                        <strong>@item.CurrentQuantity.ToString("N2")</strong> @item.Unit
+                                    </td>
+                                    <td>
+                                        @item.MinimumQuantity.ToString("N2") @item.Unit
+                                    </td>
+                                    <td>
+                                        @{
+                                            var statusBadge = item.Status switch
+                                            {
+                                                StockStatus.OutOfStock => "bg-danger",
+                                                StockStatus.LowStock => "bg-warning",
+                                                _ => "bg-secondary"
+                                            };
+                                        }
+                                        <span class="badge @statusBadge">
+                                            @item.Status.ToString().Replace("Stock", " Stock")
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @if (item.EstimatedDaysRemaining.HasValue)
+                                        {
+                                            <span class="badge @(item.EstimatedDaysRemaining < 7 ? "bg-danger" : "bg-warning")">
+                                                ~@item.EstimatedDaysRemaining days
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i> View
+                                        </a>
+                                        @if (!string.IsNullOrEmpty(item.ProductUrl))
+                                        {
+                                            <a href="@item.ProductUrl" target="_blank" class="btn btn-sm btn-outline-success"
+                                                title="Reorder">
+                                                <i class="bi bi-cart"></i>
+                                            </a>
+                                        }
+                                    </td>
+                                </tr>
+                                priority++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer text-muted">
+                <i class="bi bi-info-circle"></i>
+                Items are sorted by urgency (lowest stock first). Click "View" to add stock or update quantities.
+            </div>
+        </div>
+
+        <!-- Shopping List -->
+        <div class="card mt-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-cart-check"></i> Shopping List</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">Print or copy this list for your next shopping trip:</p>
+                <ul class="list-group">
+                    @foreach (var item in sortedItems)
+                    {
+                        var neededQuantity = item.OptimalQuantity.HasValue
+                        ? item.OptimalQuantity.Value - item.CurrentQuantity
+                        : item.MinimumQuantity - item.CurrentQuantity;
+
+                        if (neededQuantity > 0)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>@item.Name</strong>
+                                    @if (!string.IsNullOrEmpty(item.Brand))
+                                    {
+                                        <text> - @item.Brand</text>
+                                    }
+                                    @if (!string.IsNullOrEmpty(item.PreferredVendor))
+                                    {
+                                        <br />
+                        
+                                        <small class="text-muted">Vendor: @item.PreferredVendor</small>
+                                    }
+                                </div>
+                                <span class="badge bg-primary rounded-pill">
+                                    ~@neededQuantity.ToString("N0") @item.Unit needed
+                                </span>
+                            </li>
+                        }
+                    }
+                </ul>
+                <button onclick="window.print()" class="btn btn-outline-primary mt-3">
+                    <i class="bi bi-printer"></i> Print Shopping List
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    @@media print {
+
+        .btn,
+        .breadcrumb,
+        nav,
+        .card-header.bg-info,
+        .card-header.bg-warning {
+            display: none !important;
+        }
+
+        .card {
+            border: 1px solid #000 !important;
+            page-break-inside: avoid;
+        }
+    }
+</style>

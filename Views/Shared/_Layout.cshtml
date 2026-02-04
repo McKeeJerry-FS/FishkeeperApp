@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,6 +12,7 @@
     <link rel="stylesheet" href="~/AquaHub.MVC.styles.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
+
 <body class="d-flex flex-column min-vh-100">
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
@@ -44,19 +46,24 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" asp-controller="WaterTest" asp-action="Index">
-                                    <i class="bi bi-droplet-fill text-info"></i> Water Tests
-                                </a></li>
+                                        <i class="bi bi-droplet-fill text-info"></i> Water Tests
+                                    </a></li>
                                 <li><a class="dropdown-item" asp-controller="MaintenanceLog" asp-action="Index">
-                                    <i class="bi bi-wrench text-success"></i> Maintenance Logs
-                                </a></li>
+                                        <i class="bi bi-wrench text-success"></i> Maintenance Logs
+                                    </a></li>
                                 <li><a class="dropdown-item" asp-controller="GrowthRecord" asp-action="Index">
-                                    <i class="bi bi-graph-up text-primary"></i> Growth Records
-                                </a></li>
+                                        <i class="bi bi-graph-up text-primary"></i> Growth Records
+                                    </a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Equipment" asp-action="Index">
                                 <i class="bi bi-gear"></i> Equipment
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Supply" asp-action="Index">
+                                <i class="bi bi-box-seam"></i> Supplies
                             </a>
                         </li>
                         <li class="nav-item">
@@ -83,11 +90,12 @@
     <footer class="bg-light border-top mt-5 py-4">
         <div class="container text-center text-muted">
             <p class="mb-2">
-                <i class="bi bi-droplet-fill text-primary"></i> 
+                <i class="bi bi-droplet-fill text-primary"></i>
                 <strong>AquaHub</strong> - Your Complete Aquarium Management Solution
             </p>
             <p class="mb-0 small">
-                &copy; 2026 AquaHub - <a asp-controller="Home" asp-action="Privacy" class="text-decoration-none">Privacy Policy</a>
+                &copy; 2026 AquaHub - <a asp-controller="Home" asp-action="Privacy" class="text-decoration-none">Privacy
+                    Policy</a>
             </p>
         </div>
     </footer>
@@ -97,4 +105,5 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>

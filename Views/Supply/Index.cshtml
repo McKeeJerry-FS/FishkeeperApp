@@ -1,0 +1,257 @@
+@model IEnumerable<AquaHub.MVC.Models.SupplyItem>
+@using AquaHub.MVC.Models.Enums
+
+@{
+    ViewData["Title"] = "Supply Inventory";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-6">
+            <i class="bi bi-box-seam-fill text-primary"></i> Supply Inventory
+        </h1>
+        <div>
+            <a asp-action="LowStock" class="btn btn-warning me-2">
+                <i class="bi bi-exclamation-triangle"></i> Low Stock
+                @if (ViewBag.LowStockCount > 0)
+                {
+                    <span class="badge bg-danger">@ViewBag.LowStockCount</span>
+                }
+            </a>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Add Supply
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["WarningMessage"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["WarningMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="bi bi-boxes"></i> Total Items</h6>
+                    <h2 class="mb-0">@ViewBag.TotalItems</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="bi bi-exclamation-triangle"></i> Low Stock</h6>
+                    <h2 class="mb-0">@ViewBag.LowStockCount</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="bi bi-x-circle"></i> Out of Stock</h6>
+                    <h2 class="mb-0">@ViewBag.OutOfStockCount</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="bi bi-currency-dollar"></i> Total Value</h6>
+                    <h2 class="mb-0">$@ViewBag.TotalValue.ToString("N2")</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form asp-action="Index" method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Tank</label>
+                    <select name="tankId" class="form-select">
+                        <option value="">All Tanks</option>
+                        @foreach (var tank in (ViewBag.Tanks as SelectList))
+                        {
+                            <option value="@tank.Value" selected="@(ViewBag.TankId?.ToString() == tank.Value)">@tank.Text
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Category</label>
+                    <select name="category" class="form-select">
+                        <option value="">All Categories</option>
+                        @foreach (SupplyCategory cat in Enum.GetValues(typeof(SupplyCategory)))
+                        {
+                            <option value="@((int)cat)" selected="@(ViewBag.CategoryFilter?.ToString() == cat.ToString())">
+                                @cat</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="low" selected="@(ViewBag.StatusFilter == "low")">Low Stock</option>
+                        <option value="out" selected="@(ViewBag.StatusFilter == "out")">Out of Stock</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-funnel"></i> Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center py-5">
+            <i class="bi bi-box-seam display-1"></i>
+            <h4 class="mt-3">No Supplies Found</h4>
+            <p>Start tracking your aquarium supplies to monitor inventory and avoid running out.</p>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Add Your First Supply
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Tank</th>
+                        <th>Current Stock</th>
+                        <th>Status</th>
+                        <th>Last Purchase</th>
+                        <th>Value</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@item.Name</strong>
+                                @if (!string.IsNullOrEmpty(item.Brand))
+                                {
+                                    <br />
+                        
+                                    <small class="text-muted">@item.Brand</small>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">@item.Category</span>
+                            </td>
+                            <td>
+                                @if (item.Tank != null)
+                                {
+                                    <a asp-controller="Tank" asp-action="Details" asp-route-id="@item.TankId"
+                                        class="text-decoration-none">
+                                        @item.Tank.Name
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">General</span>
+                                }
+                            </td>
+                            <td>
+                                <strong>@item.CurrentQuantity.ToString("N2")</strong> @item.Unit
+                                @if (item.MinimumQuantity > 0)
+                                {
+                                    <br />
+                        
+                                    <small class="text-muted">Min: @item.MinimumQuantity @item.Unit</small>
+                                }
+                            </td>
+                            <td>
+                                @{
+                                    var badgeClass = item.Status switch
+                                    {
+                                        StockStatus.InStock => "bg-success",
+                                        StockStatus.LowStock => "bg-warning",
+                                        StockStatus.OutOfStock => "bg-danger",
+                                        _ => "bg-secondary"
+                                    };
+                                    var statusText = item.Status.ToString().Replace("Stock", " Stock");
+                                }
+                                <span class="badge @badgeClass">
+                                    @statusText
+                                </span>
+                                @if (item.EstimatedDaysRemaining.HasValue && item.EstimatedDaysRemaining.Value < 14)
+                                {
+                                    <br />
+                        
+                                    <small class="text-danger">~@item.EstimatedDaysRemaining days left</small>
+                                }
+                            </td>
+                            <td>
+                                @if (item.LastPurchaseDate.HasValue)
+                                {
+                                    @item.LastPurchaseDate.Value.ToString("MMM dd, yyyy")
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.LastPurchasePrice.HasValue)
+                                {
+                                    <text>$@((item.CurrentQuantity * (double)item.LastPurchasePrice.Value).ToString("N2"))</text>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<style>
+    .hover-shadow:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        transition: box-shadow 0.3s ease-in-out;
+    }
+</style>

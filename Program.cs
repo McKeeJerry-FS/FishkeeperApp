@@ -65,6 +65,9 @@ builder.Services.AddScoped<IGrowthRecordService, GrowthRecordService>();
 // Financial Services
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
 
+// Supply & Inventory Services
+builder.Services.AddScoped<ISupplyService, SupplyService>();
+
 // Notification & Reminder Services
 builder.Services.AddScoped<IReminderService, ReminderService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
