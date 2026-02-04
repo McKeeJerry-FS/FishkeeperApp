@@ -163,6 +163,17 @@ public class EquipmentController : Controller
                 "Heater" => new Heater(),
                 "Light" => new Light(),
                 "ProteinSkimmer" => new ProteinSkimmer(),
+                "Pump" => new Pump(),
+                "Chiller" => new Chiller(),
+                "WaveMaker" => new WaveMaker(),
+                "AutoTopOff" => new AutoTopOff(),
+                "DosingPump" => new DosingPump(),
+                "Reactor" => new Reactor(),
+                "AutoFeeder" => new AutoFeeder(),
+                "CO2System" => new CO2System(),
+                "DigitalWaterTester" => new DigitalWaterTester(),
+                "ReverseOsmosisSystem" => new ReverseOsmosisSystem(),
+                "UVSterilizer" => new UVSterilizer(),
                 _ => throw new ArgumentException("Invalid equipment type")
             };
 
@@ -204,6 +215,103 @@ public class EquipmentController : Controller
                         s => s.Type,
                         s => s.AirIntake,
                         s => s.CupFillLevel);
+                    break;
+
+                case Pump pump:
+                    await TryUpdateModelAsync(pump, "",
+                        p => p.FlowRate,
+                        p => p.MaxHeadHeight,
+                        p => p.PowerConsumption,
+                        p => p.IsVariableSpeed);
+                    break;
+
+                case Chiller chiller:
+                    await TryUpdateModelAsync(chiller, "",
+                        c => c.MinTemperature,
+                        c => c.MaxTemperature,
+                        c => c.TargetTemperature,
+                        c => c.BTUCapacity,
+                        c => c.MaxTankSize);
+                    break;
+
+                case WaveMaker waveMaker:
+                    await TryUpdateModelAsync(waveMaker, "",
+                        w => w.FlowRate,
+                        w => w.IsControllable,
+                        w => w.WavePattern,
+                        w => w.IntensityPercent,
+                        w => w.PowerConsumption);
+                    break;
+
+                case AutoTopOff ato:
+                    await TryUpdateModelAsync(ato, "",
+                        a => a.ReservoirCapacity,
+                        a => a.PumpRate,
+                        a => a.SensorType,
+                        a => a.LastReservoirRefill);
+                    break;
+
+                case DosingPump dosingPump:
+                    await TryUpdateModelAsync(dosingPump, "",
+                        d => d.NumberOfChannels,
+                        d => d.SolutionType,
+                        d => d.DoseAmount,
+                        d => d.DosingSchedule,
+                        d => d.LastRefillDate);
+                    break;
+
+                case Reactor reactor:
+                    await TryUpdateModelAsync(reactor, "",
+                        r => r.ReactorType,
+                        r => r.FlowRate,
+                        r => r.MediaType,
+                        r => r.LastMediaChange,
+                        r => r.MediaCapacity);
+                    break;
+
+                case AutoFeeder autoFeeder:
+                    await TryUpdateModelAsync(autoFeeder, "",
+                        a => a.FeedingsPerDay,
+                        a => a.FeedingSchedule,
+                        a => a.PortionSize,
+                        a => a.HopperCapacity,
+                        a => a.LastRefillDate);
+                    break;
+
+                case CO2System co2System:
+                    await TryUpdateModelAsync(co2System, "",
+                        c => c.TargetPH,
+                        c => c.CurrentPH,
+                        c => c.RegulatorType,
+                        c => c.DiffuserType);
+                    break;
+
+                case DigitalWaterTester tester:
+                    await TryUpdateModelAsync(tester, "",
+                        t => t.ParametersMonitored,
+                        t => t.HasWifiConnectivity,
+                        t => t.HasAlerts,
+                        t => t.LastCalibrationDate,
+                        t => t.CalibrationIntervalDays);
+                    break;
+
+                case ReverseOsmosisSystem ros:
+                    await TryUpdateModelAsync(ros, "",
+                        r => r.GPDRating,
+                        r => r.NumberOfStages,
+                        r => r.LastMembraneChange,
+                        r => r.LastFilterChange,
+                        r => r.MembraneLifespanMonths,
+                        r => r.WasteWaterRatio);
+                    break;
+
+                case UVSterilizer uvSterilizer:
+                    await TryUpdateModelAsync(uvSterilizer, "",
+                        u => u.Wattage,
+                        u => u.FlowRate,
+                        u => u.BulbInstalledDate,
+                        u => u.BulbLifespanHours,
+                        u => u.MaxTankSize);
                     break;
             }
 

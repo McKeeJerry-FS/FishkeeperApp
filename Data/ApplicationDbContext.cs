@@ -19,6 +19,17 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>
     public DbSet<Light> Lights { get; set; }
     public DbSet<Heater> Heaters { get; set; }
     public DbSet<ProteinSkimmer> ProteinSkimmers { get; set; }
+    public DbSet<Pump> Pumps { get; set; }
+    public DbSet<Chiller> Chillers { get; set; }
+    public DbSet<WaveMaker> WaveMakers { get; set; }
+    public DbSet<AutoTopOff> AutoTopOffs { get; set; }
+    public DbSet<DosingPump> DosingPumps { get; set; }
+    public DbSet<Reactor> Reactors { get; set; }
+    public DbSet<AutoFeeder> AutoFeeders { get; set; }
+    public DbSet<CO2System> CO2Systems { get; set; }
+    public DbSet<DigitalWaterTester> DigitalWaterTesters { get; set; }
+    public DbSet<ReverseOsmosisSystem> ReverseOsmosisSystems { get; set; }
+    public DbSet<UVSterilizer> UVSterilizers { get; set; }
     public DbSet<WaterTest> WaterTests { get; set; }
     public DbSet<MaintenanceLog> MaintenanceLogs { get; set; }
     public DbSet<DosingRecord> DosingRecords { get; set; }

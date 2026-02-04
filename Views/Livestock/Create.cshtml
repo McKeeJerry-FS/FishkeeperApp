@@ -131,226 +131,226 @@
                     case 'FreshwaterFish':
                     case 'SaltwaterFish':
                         html += `
-                                <div class="col-12"><h5 class="text-primary mt-3"><i class="bi bi-fish"></i> Fish Details</h5></div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Adult Size (inches)</label>
-                                    <input name="adultSize" type="number" step="0.1" class="form-control" placeholder="e.g., 3.5" />
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Coloration</label>
-                                    <input name="coloration" type="text" class="form-control" placeholder="e.g., Orange and white" />
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Temperament</label>
-                                    <select name="temperament" class="form-select">
-                                        <option value="">-- Select --</option>
-                                        <option value="Peaceful">Peaceful</option>
-                                        <option value="Semi-aggressive">Semi-aggressive</option>
-                                        <option value="Aggressive">Aggressive</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Activity Level</label>
-                                    <select name="activityLevel" class="form-select">
-                                        <option value="">-- Select --</option>
-                                        <option value="Low">Low</option>
-                                        <option value="Moderate">Moderate</option>
-                                        <option value="High">High</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Minimum Tank Size (gallons)</label>
-                                    <input name="minTankSize" type="number" class="form-control" placeholder="e.g., 20" />
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Swimming Region</label>
-                                    <select name="swimmingRegion" class="form-select">
-                                        <option value="">-- Select --</option>
-                                        <option value="Top">Top</option>
-                                        <option value="Middle">Middle</option>
-                                        <option value="Bottom">Bottom</option>
-                                        <option value="All">All Levels</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-check mt-4">
-                                        <input name="isSchooling" type="checkbox" class="form-check-input" id="isSchooling" />
-                                        <label class="form-check-label" for="isSchooling">Schooling Fish</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6" id="schoolSizeField" style="display: none;">
-                                    <label class="form-label fw-bold">Recommended School Size</label>
-                                    <input name="recommendedSchoolSize" type="number" class="form-control" placeholder="e.g., 6" />
-                                </div>
-                            `;
-                        if (type === 'SaltwaterFish') {
-                            html += `
+                                    <div class="col-12"><h5 class="text-primary mt-3"><i class="bi bi-fish"></i> Fish Details</h5></div>
                                     <div class="col-md-6">
-                                        <div class="form-check mt-2">
-                                            <input name="isReefSafe" type="checkbox" class="form-check-input" id="isReefSafe" />
-                                            <label class="form-check-label" for="isReefSafe">Reef Safe</label>
+                                        <label class="form-label fw-bold">Adult Size (inches)</label>
+                                        <input name="adultSize" type="number" step="0.1" class="form-control" placeholder="e.g., 3.5" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Coloration</label>
+                                        <input name="coloration" type="text" class="form-control" placeholder="e.g., Orange and white" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Temperament</label>
+                                        <select name="temperament" class="form-select">
+                                            <option value="">-- Select --</option>
+                                            <option value="Peaceful">Peaceful</option>
+                                            <option value="Semi-aggressive">Semi-aggressive</option>
+                                            <option value="Aggressive">Aggressive</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Activity Level</label>
+                                        <select name="activityLevel" class="form-select">
+                                            <option value="">-- Select --</option>
+                                            <option value="Low">Low</option>
+                                            <option value="Moderate">Moderate</option>
+                                            <option value="High">High</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Minimum Tank Size (gallons)</label>
+                                        <input name="minTankSize" type="number" class="form-control" placeholder="e.g., 20" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Swimming Region</label>
+                                        <select name="swimmingRegion" class="form-select">
+                                            <option value="">-- Select --</option>
+                                            <option value="Top">Top</option>
+                                            <option value="Middle">Middle</option>
+                                            <option value="Bottom">Bottom</option>
+                                            <option value="All">All Levels</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check mt-4">
+                                            <input name="isSchooling" type="checkbox" class="form-check-input" id="isSchooling" />
+                                            <label class="form-check-label" for="isSchooling">Schooling Fish</label>
                                         </div>
                                     </div>
+                                    <div class="col-md-6" id="schoolSizeField" style="display: none;">
+                                        <label class="form-label fw-bold">Recommended School Size</label>
+                                        <input name="recommendedSchoolSize" type="number" class="form-control" placeholder="e.g., 6" />
+                                    </div>
                                 `;
+                        if (type === 'SaltwaterFish') {
+                            html += `
+                                        <div class="col-md-6">
+                                            <div class="form-check mt-2">
+                                                <input name="isReefSafe" type="checkbox" class="form-check-input" id="isReefSafe" />
+                                                <label class="form-check-label" for="isReefSafe">Reef Safe</label>
+                                            </div>
+                                        </div>
+                                    `;
                         }
                         break;
 
                     case 'Coral':
                         html += `
-                                <div class="col-12"><h5 class="text-primary mt-3"><i class="bi bi-flower3"></i> Coral Details</h5></div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Colony Size (inches)</label>
-                                    <input name="colonySize" type="number" step="0.1" class="form-control" placeholder="e.g., 2.5" />
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Coloration</label>
-                                    <input name="coloration" type="text" class="form-control" placeholder="e.g., Green/Purple" />
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold">Lighting Needs</label>
-                                    <select name="lightingNeeds" class="form-select">
-                                        <option value="">-- Select --</option>
-                                        <option value="Low">Low</option>
-                                        <option value="Moderate">Moderate</option>
-                                        <option value="High">High</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold">Flow Needs</label>
-                                    <select name="flowNeeds" class="form-select">
-                                        <option value="">-- Select --</option>
-                                        <option value="Low">Low</option>
-                                        <option value="Moderate">Moderate</option>
-                                        <option value="High">High</option>
-                                        <option value="Turbulent">Turbulent</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold">Placement</label>
-                                    <select name="placement" class="form-select">
-                                        <option value="">-- Select --</option>
-                                        <option value="Bottom">Bottom</option>
-                                        <option value="Middle">Middle</option>
-                                        <option value="Top">Top</option>
-                                        <option value="Sand bed">Sand Bed</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Growth Rate</label>
-                                    <input name="growthRate" type="text" class="form-control" placeholder="e.g., Slow, 1 inch/year" />
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Care Level</label>
-                                    <select name="careLevel" class="form-select">
-                                        <option value="">-- Select --</option>
-                                        <option value="Easy">Easy</option>
-                                        <option value="Moderate">Moderate</option>
-                                        <option value="Difficult">Difficult</option>
-                                        <option value="Expert">Expert</option>
-                                    </select>
-                                </div>
-                            `;
+                                    <div class="col-12"><h5 class="text-primary mt-3"><i class="bi bi-flower3"></i> Coral Details</h5></div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Colony Size (inches)</label>
+                                        <input name="colonySize" type="number" step="0.1" class="form-control" placeholder="e.g., 2.5" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Coloration</label>
+                                        <input name="coloration" type="text" class="form-control" placeholder="e.g., Green/Purple" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold">Lighting Needs</label>
+                                        <select name="lightingNeeds" class="form-select">
+                                            <option value="">-- Select --</option>
+                                            <option value="Low">Low</option>
+                                            <option value="Moderate">Moderate</option>
+                                            <option value="High">High</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold">Flow Needs</label>
+                                        <select name="flowNeeds" class="form-select">
+                                            <option value="">-- Select --</option>
+                                            <option value="Low">Low</option>
+                                            <option value="Moderate">Moderate</option>
+                                            <option value="High">High</option>
+                                            <option value="Turbulent">Turbulent</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold">Placement</label>
+                                        <select name="placement" class="form-select">
+                                            <option value="">-- Select --</option>
+                                            <option value="Bottom">Bottom</option>
+                                            <option value="Middle">Middle</option>
+                                            <option value="Top">Top</option>
+                                            <option value="Sand bed">Sand Bed</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Growth Rate</label>
+                                        <input name="growthRate" type="text" class="form-control" placeholder="e.g., Slow, 1 inch/year" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Care Level</label>
+                                        <select name="careLevel" class="form-select">
+                                            <option value="">-- Select --</option>
+                                            <option value="Easy">Easy</option>
+                                            <option value="Moderate">Moderate</option>
+                                            <option value="Difficult">Difficult</option>
+                                            <option value="Expert">Expert</option>
+                                        </select>
+                                    </div>
+                                `;
                         break;
 
                     case 'Plant':
                         html += `
-                                <div class="col-12"><h5 class="text-primary mt-3"><i class="bi bi-flower1"></i> Plant Details</h5></div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Max Height (inches)</label>
-                                    <input name="maxHeight" type="number" step="0.1" class="form-control" placeholder="e.g., 12" />
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Growth Rate</label>
-                                    <select name="growthRate" class="form-select">
-                                        <option value="">-- Select --</option>
-                                        <option value="Slow">Slow</option>
-                                        <option value="Moderate">Moderate</option>
-                                        <option value="Fast">Fast</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Coloration</label>
-                                    <input name="coloration" type="text" class="form-control" placeholder="e.g., Deep Green" />
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Placement</label>
-                                    <select name="placement" class="form-select">
-                                        <option value="">-- Select --</option>
-                                        <option value="Foreground">Foreground</option>
-                                        <option value="Midground">Midground</option>
-                                        <option value="Background">Background</option>
-                                        <option value="Floating">Floating</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Lighting Requirement</label>
-                                    <select name="lightingRequirement" class="form-select">
-                                        <option value="">-- Select --</option>
-                                        <option value="Low">Low</option>
-                                        <option value="Medium">Medium</option>
-                                        <option value="High">High</option>
-                                        <option value="Very High">Very High</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Care Level</label>
-                                    <select name="careLevel" class="form-select">
-                                        <option value="">-- Select --</option>
-                                        <option value="Easy">Easy</option>
-                                        <option value="Moderate">Moderate</option>
-                                        <option value="Difficult">Difficult</option>
-                                        <option value="Expert">Expert</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-check mt-4">
-                                        <input name="requiresCO2" type="checkbox" class="form-check-input" id="requiresCO2" />
-                                        <label class="form-check-label" for="requiresCO2">Requires CO2</label>
+                                    <div class="col-12"><h5 class="text-primary mt-3"><i class="bi bi-flower1"></i> Plant Details</h5></div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Max Height (inches)</label>
+                                        <input name="maxHeight" type="number" step="0.1" class="form-control" placeholder="e.g., 12" />
                                     </div>
-                                </div>
-                            `;
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Growth Rate</label>
+                                        <select name="growthRate" class="form-select">
+                                            <option value="">-- Select --</option>
+                                            <option value="Slow">Slow</option>
+                                            <option value="Moderate">Moderate</option>
+                                            <option value="Fast">Fast</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Coloration</label>
+                                        <input name="coloration" type="text" class="form-control" placeholder="e.g., Deep Green" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Placement</label>
+                                        <select name="placement" class="form-select">
+                                            <option value="">-- Select --</option>
+                                            <option value="Foreground">Foreground</option>
+                                            <option value="Midground">Midground</option>
+                                            <option value="Background">Background</option>
+                                            <option value="Floating">Floating</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Lighting Requirement</label>
+                                        <select name="lightingRequirement" class="form-select">
+                                            <option value="">-- Select --</option>
+                                            <option value="Low">Low</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="High">High</option>
+                                            <option value="Very High">Very High</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Care Level</label>
+                                        <select name="careLevel" class="form-select">
+                                            <option value="">-- Select --</option>
+                                            <option value="Easy">Easy</option>
+                                            <option value="Moderate">Moderate</option>
+                                            <option value="Difficult">Difficult</option>
+                                            <option value="Expert">Expert</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check mt-4">
+                                            <input name="requiresCO2" type="checkbox" class="form-check-input" id="requiresCO2" />
+                                            <label class="form-check-label" for="requiresCO2">Requires CO2</label>
+                                        </div>
+                                    </div>
+                                `;
                         break;
 
                     case 'FreshwaterInvertebrate':
                     case 'SaltwaterInvertebrate':
                         html += `
-                                <div class="col-12"><h5 class="text-primary mt-3"><i class="bi bi-bug"></i> Invertebrate Details</h5></div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Adult Size (inches)</label>
-                                    <input name="adultSize" type="number" step="0.1" class="form-control" placeholder="e.g., 2.0" />
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Coloration</label>
-                                    <input name="coloration" type="text" class="form-control" placeholder="e.g., Red with white dots" />
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Behavior</label>
-                                    <input name="behavior" type="text" class="form-control" placeholder="e.g., Peaceful, Nocturnal" />
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Minimum Tank Size (gallons)</label>
-                                    <input name="minTankSize" type="number" class="form-control" placeholder="e.g., 10" />
-                                </div>
-                            `;
-                        if (type === 'FreshwaterInvertebrate') {
-                            html += `
+                                    <div class="col-12"><h5 class="text-primary mt-3"><i class="bi bi-bug"></i> Invertebrate Details</h5></div>
                                     <div class="col-md-6">
-                                        <div class="form-check mt-2">
-                                            <input name="isPlantSafe" type="checkbox" class="form-check-input" id="isPlantSafe" />
-                                            <label class="form-check-label" for="isPlantSafe">Plant Safe</label>
-                                        </div>
+                                        <label class="form-label fw-bold">Adult Size (inches)</label>
+                                        <input name="adultSize" type="number" step="0.1" class="form-control" placeholder="e.g., 2.0" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Coloration</label>
+                                        <input name="coloration" type="text" class="form-control" placeholder="e.g., Red with white dots" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Behavior</label>
+                                        <input name="behavior" type="text" class="form-control" placeholder="e.g., Peaceful, Nocturnal" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Minimum Tank Size (gallons)</label>
+                                        <input name="minTankSize" type="number" class="form-control" placeholder="e.g., 10" />
                                     </div>
                                 `;
+                        if (type === 'FreshwaterInvertebrate') {
+                            html += `
+                                        <div class="col-md-6">
+                                            <div class="form-check mt-2">
+                                                <input name="isPlantSafe" type="checkbox" class="form-check-input" id="isPlantSafe" />
+                                                <label class="form-check-label" for="isPlantSafe">Plant Safe</label>
+                                            </div>
+                                        </div>
+                                    `;
                         }
                         if (type === 'SaltwaterInvertebrate') {
                             html += `
-                                    <div class="col-md-6">
-                                        <div class="form-check mt-2">
-                                            <input name="isReefSafe" type="checkbox" class="form-check-input" id="isReefSafe" />
-                                            <label class="form-check-label" for="isReefSafe">Reef Safe</label>
+                                        <div class="col-md-6">
+                                            <div class="form-check mt-2">
+                                                <input name="isReefSafe" type="checkbox" class="form-check-input" id="isReefSafe" />
+                                                <label class="form-check-label" for="isReefSafe">Reef Safe</label>
+                                            </div>
                                         </div>
-                                    </div>
-                                `;
+                                    `;
                         }
                         break;
                 }
