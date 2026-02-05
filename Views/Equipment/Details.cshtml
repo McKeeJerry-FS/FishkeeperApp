@@ -1,0 +1,218 @@
+@model AquaHub.MVC.Models.Equipment
+
+@{
+    ViewData["Title"] = "Equipment Details";
+    var equipmentType = Model.GetType().Name;
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-6">
+            @if (Model is Filter)
+            {
+                <i class="bi bi-funnel text-info"></i>
+            }
+            else if (Model is Heater)
+            {
+                <i class="bi bi-thermometer-high text-danger"></i>
+            }
+            else if (Model is Light)
+            {
+                <i class="bi bi-lightbulb text-warning"></i>
+            }
+            else if (Model is ProteinSkimmer)
+            {
+                <i class="bi bi-water text-primary"></i>
+            }
+            else if (Model is Pump)
+            {
+                <i class="bi bi-arrow-repeat text-primary"></i>
+            }
+            else if (Model is Chiller)
+            {
+                <i class="bi bi-snow text-info"></i>
+            }
+            else if (Model is WaveMaker)
+            {
+                <i class="bi bi-tsunami text-primary"></i>
+            }
+            else
+            {
+                <i class="bi bi-gear text-secondary"></i>
+            }
+            @equipmentType Details
+        </h1>
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Edit
+            </a>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Basic Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Brand:</strong></div>
+                        <div class="col-md-8">@Model.Brand</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Model:</strong></div>
+                        <div class="col-md-8">@Model.Model</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Tank:</strong></div>
+                        <div class="col-md-8">
+                            <a asp-controller="Tank" asp-action="Dashboard" asp-route-id="@Model.TankId">
+                                @Model.Tank?.Name
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Installed On:</strong></div>
+                        <div class="col-md-8">@Model.InstalledOn.ToString("MMMM dd, yyyy")</div>
+                    </div>
+                </div>
+            </div>
+
+            @if (Model is Filter filter)
+            {
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">Filter Specifications</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-4"><strong>Type:</strong></div>
+                            <div class="col-md-8">@filter.Type</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4"><strong>Flow Rate:</strong></div>
+                            <div class="col-md-8">@filter.FlowRate GPH</div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(filter.Media))
+                        {
+                            <div class="row mb-3">
+                                <div class="col-md-4"><strong>Media:</strong></div>
+                                <div class="col-md-8">@filter.Media</div>
+                            </div>
+                        }
+                        <div class="row mb-3">
+                            <div class="col-md-4"><strong>Last Maintenance:</strong></div>
+                            <div class="col-md-8">@filter.LastMaintenanceDate.ToString("MMMM dd, yyyy")</div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (Model is Heater heater)
+            {
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">Heater Specifications</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-4"><strong>Temperature Range:</strong></div>
+                            <div class="col-md-8">@heater.MinTemperature°F - @heater.MaxTemperature°F</div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (Model is Light light)
+            {
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">Light Specifications</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-4"><strong>Wattage:</strong></div>
+                            <div class="col-md-8">@light.Wattage W</div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(light.Spectrum))
+                        {
+                            <div class="row mb-3">
+                                <div class="col-md-4"><strong>Spectrum:</strong></div>
+                                <div class="col-md-8">@light.Spectrum</div>
+                            </div>
+                        }
+                        <div class="row mb-3">
+                            <div class="col-md-4"><strong>Dimmable:</strong></div>
+                            <div class="col-md-8">@(light.IsDimmable ? "Yes" : "No")</div>
+                        </div>
+                        @if (light.IsDimmable)
+                        {
+                            <div class="row mb-3">
+                                <div class="col-md-4"><strong>Intensity:</strong></div>
+                                <div class="col-md-8">@light.IntensityPercent%</div>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(light.Schedule))
+                        {
+                            <div class="row mb-3">
+                                <div class="col-md-4"><strong>Schedule:</strong></div>
+                                <div class="col-md-8">@light.Schedule</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else if (Model is ProteinSkimmer skimmer)
+            {
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Protein Skimmer Specifications</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-4"><strong>Capacity:</strong></div>
+                            <div class="col-md-8">@skimmer.Capacity gallons</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4"><strong>Type:</strong></div>
+                            <div class="col-md-8">@skimmer.Type</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4"><strong>Air Intake:</strong></div>
+                            <div class="col-md-8">@skimmer.AirIntake L/hr</div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body d-grid gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                        <i class="bi bi-pencil"></i> Edit Equipment
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Delete Equipment
+                    </a>
+                    <a asp-controller="Tank" asp-action="Dashboard" asp-route-id="@Model.TankId" class="btn btn-info">
+                        <i class="bi bi-droplet"></i> View Tank
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

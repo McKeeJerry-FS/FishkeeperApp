@@ -14,22 +14,24 @@
                     </h3>
                 </div>
                 <div class="card-body p-4">
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @TempData["Error"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
                     <form asp-action="Create" method="post">
-                        <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-                        
+                        <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+
                         <div class="row g-3">
                             <div class="col-12">
-                                <label class="form-label fw-bold">Tank</label>
-                                <select name="tankId" class="form-select" required>
-                                    @if (ViewBag.Tanks != null)
-                                    {
-                                        @foreach (var tank in ViewBag.Tanks)
-                                        {
-                                            <option value="@tank.Value" selected="@(tank.Value == ViewBag.SelectedTankId?.ToString())">@tank.Text</option>
-                                        }
-                                    }
+                                <label asp-for="TankId" class="form-label fw-bold">Tank</label>
+                                <select asp-for="TankId" class="form-select" asp-items="ViewBag.Tanks" required>
+                                    <option value="">-- Select a Tank --</option>
                                 </select>
+                                <span asp-validation-for="TankId" class="text-danger small"></span>
                             </div>
 
                             <div class="col-md-6">
@@ -44,7 +46,10 @@
                                 <span asp-validation-for="Temperature" class="text-danger small"></span>
                             </div>
 
-                            <div class="col-12"><hr><h5 class="text-primary">General Parameters</h5></div>
+                            <div class="col-12">
+                                <hr>
+                                <h5 class="text-primary">General Parameters</h5>
+                            </div>
 
                             <div class="col-md-4">
                                 <label asp-for="PH" class="form-label fw-bold">pH</label>
@@ -70,7 +75,10 @@
                                 <span asp-validation-for="Nitrate" class="text-danger small"></span>
                             </div>
 
-                            <div class="col-12"><hr><h5 class="text-success">Freshwater Parameters</h5></div>
+                            <div class="col-12">
+                                <hr>
+                                <h5 class="text-success">Freshwater Parameters</h5>
+                            </div>
 
                             <div class="col-md-4">
                                 <label asp-for="GH" class="form-label fw-bold">GH (°dH)</label>
@@ -90,7 +98,10 @@
                                 <span asp-validation-for="TDS" class="text-danger small"></span>
                             </div>
 
-                            <div class="col-12"><hr><h5 class="text-info">Saltwater Parameters</h5></div>
+                            <div class="col-12">
+                                <hr>
+                                <h5 class="text-info">Saltwater Parameters</h5>
+                            </div>
 
                             <div class="col-md-3">
                                 <label asp-for="Salinity" class="form-label fw-bold">Salinity (ppt)</label>
@@ -139,5 +150,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

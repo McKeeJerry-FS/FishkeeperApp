@@ -146,7 +146,7 @@ public class EquipmentController : Controller
     // POST: Equipment/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(int tankId, string equipmentType)
+    public async Task<IActionResult> Create(int tankId, string equipmentType, string? brand)
     {
         try
         {
@@ -154,6 +154,25 @@ public class EquipmentController : Controller
             if (string.IsNullOrEmpty(userId))
             {
                 return Unauthorized();
+            }
+
+            // If brand is null/empty, this is the first POST (equipment type selection)
+            // Just show the form with the equipment type
+            if (string.IsNullOrEmpty(brand))
+            {
+                await PopulateTanksDropdown(userId);
+                ViewBag.EquipmentType = equipmentType;
+                ViewBag.SelectedTankId = tankId > 0 ? tankId : (int?)null;
+                return View();
+            }
+
+            // Validate tankId for actual equipment creation
+            if (tankId <= 0)
+            {
+                ModelState.AddModelError("TankId", "Please select a tank");
+                await PopulateTanksDropdown(userId);
+                ViewBag.EquipmentType = equipmentType;
+                return View();
             }
 
             // Create the appropriate equipment type based on selection
@@ -176,6 +195,8 @@ public class EquipmentController : Controller
                 "UVSterilizer" => new UVSterilizer(),
                 _ => throw new ArgumentException("Invalid equipment type")
             };
+
+            equipment.TankId = tankId;
 
             // Bind common properties
             await TryUpdateModelAsync(equipment, "",
@@ -317,21 +338,44 @@ public class EquipmentController : Controller
 
             if (ModelState.IsValid)
             {
-                var createdEquipment = await _equipmentService.CreateEquipmentAsync(equipment, tankId, userId);
-                TempData["Success"] = $"{equipmentType} added successfully!";
-                return RedirectToAction(nameof(Details), new { id = createdEquipment.Id });
+                try
+                {
+                    var createdEquipment = await _equipmentService.CreateEquipmentAsync(equipment, tankId, userId);
+                    TempData["Success"] = $"{equipmentType} added successfully!";
+                    return RedirectToAction(nameof(Details), new { id = createdEquipment.Id });
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    _logger.LogError(ex, "Unauthorized tank access for equipment creation");
+                    TempData["Error"] = ex.Message;
+                    await PopulateTanksDropdown(userId);
+                    ViewBag.SelectedTankId = tankId;
+                    ViewBag.EquipmentType = equipmentType;
+                    return View();
+                }
+            }
+
+            // Log validation errors
+            foreach (var state in ModelState)
+            {
+                foreach (var error in state.Value.Errors)
+                {
+                    _logger.LogWarning($"Validation error in {state.Key}: {error.ErrorMessage}");
+                }
             }
 
             await PopulateTanksDropdown(userId);
             ViewBag.SelectedTankId = tankId;
             ViewBag.EquipmentType = equipmentType;
-            return View(equipment);
+            return View();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating equipment");
-            TempData["Error"] = "An error occurred while adding the equipment.";
+            _logger.LogError(ex, "Error creating equipment. Type: {EquipmentType}, TankId: {TankId}", equipmentType, tankId);
+            TempData["Error"] = $"An error occurred while adding the equipment: {ex.Message}";
             await PopulateTanksDropdown(_userManager.GetUserId(User)!);
+            ViewBag.EquipmentType = equipmentType;
+            ViewBag.SelectedTankId = tankId > 0 ? tankId : (int?)null;
             return View();
         }
     }

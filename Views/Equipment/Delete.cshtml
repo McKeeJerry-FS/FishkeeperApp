@@ -1,0 +1,166 @@
+@model AquaHub.MVC.Models.Equipment
+
+@{
+    ViewData["Title"] = "Delete Equipment";
+    var equipmentType = Model.GetType().Name;
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Delete Equipment
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <strong>Warning!</strong> Are you sure you want to delete this equipment? This action cannot be
+                        undone.
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Equipment Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-4"><strong>Type:</strong></div>
+                                <div class="col-md-8">
+                                    @if (Model is Filter)
+                                    {
+                                        <i class="bi bi-funnel text-info"></i>
+                                    
+                                        <text> Filter</text>
+                                    }
+                                    else if (Model is Heater)
+                                    {
+                                        <i class="bi bi-thermometer-high text-danger"></i>
+                                        
+                                        <text> Heater</text>
+                                    }
+                                    else if (Model is Light)
+                                    {
+                                        <i class="bi bi-lightbulb text-warning"></i>
+                                        
+                                        <text> Light</text>
+                                    }
+                                    else if (Model is ProteinSkimmer)
+                                    {
+                                        <i class="bi bi-water text-primary"></i>
+                                        
+                                        <text> Protein Skimmer</text>
+                                    }
+                                    else if (Model is Pump)
+                                    {
+                                        <i class="bi bi-arrow-repeat text-primary"></i>
+                                        
+                                        <text> Pump</text>
+                                    }
+                                    else if (Model is Chiller)
+                                    {
+                                        <i class="bi bi-snow text-info"></i>
+                                        
+                                        <text> Chiller</text>
+                                    }
+                                    else if (Model is WaveMaker)
+                                    {
+                                        <i class="bi bi-tsunami text-primary"></i>
+                                        
+                                        <text> Wave Maker</text>
+                                    }
+                                    else if (Model is AutoTopOff)
+                                    {
+                                        <i class="bi bi-water text-info"></i>
+                                        
+                                        <text> Auto Top Off</text>
+                                    }
+                                    else if (Model is DosingPump)
+                                    {
+                                        <i class="bi bi-droplet text-primary"></i>
+                                        
+                                        <text> Dosing Pump</text>
+                                    }
+                                    else if (Model is Reactor)
+                                    {
+                                        <i class="bi bi-gear text-secondary"></i>
+                                        
+                                        <text> Reactor</text>
+                                    }
+                                    else if (Model is AutoFeeder)
+                                    {
+                                        <i class="bi bi-alarm text-success"></i>
+                                        
+                                        <text> Auto Feeder</text>
+                                    }
+                                    else if (Model is CO2System)
+                                    {
+                                        <i class="bi bi-cloud text-secondary"></i>
+                                        
+                                        <text> CO2 System</text>
+                                    }
+                                    else if (Model is DigitalWaterTester)
+                                    {
+                                        <i class="bi bi-clipboard-data text-info"></i>
+                                        
+                                        <text> Digital Water Tester</text>
+                                    }
+                                    else if (Model is ReverseOsmosisSystem)
+                                    {
+                                        <i class="bi bi-filter-circle text-primary"></i>
+                                        
+                                        <text> RO System</text>
+                                    }
+                                    else if (Model is UVSterilizer)
+                                    {
+                                        <i class="bi bi-sun text-warning"></i>
+                                        
+                                        <text> UV Sterilizer</text>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-gear text-secondary"></i>
+                                        
+                                        <text> @equipmentType</text>
+                                    }
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-4"><strong>Brand:</strong></div>
+                                <div class="col-md-8">@Model.Brand</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-4"><strong>Model:</strong></div>
+                                <div class="col-md-8">@Model.Model</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-4"><strong>Tank:</strong></div>
+                                <div class="col-md-8">@Model.Tank?.Name</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-4"><strong>Installed On:</strong></div>
+                                <div class="col-md-8">@Model.InstalledOn.ToString("MMMM dd, yyyy")</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form asp-action="Delete" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-danger px-4">
+                                <i class="bi bi-trash"></i> Yes, Delete Equipment
+                            </button>
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary px-4">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -128,15 +128,11 @@ public class WaterTestController : Controller
 
             await PopulateTanksDropdown(userId);
 
-            if (tankId.HasValue)
-            {
-                ViewBag.SelectedTankId = tankId.Value;
-            }
-
-            // Pre-populate with current date
+            // Pre-populate with current date and selected tank
             var waterTest = new WaterTest
             {
-                Timestamp = DateTime.Now
+                Timestamp = DateTime.Now,
+                TankId = tankId ?? 0
             };
 
             return View(waterTest);
@@ -153,8 +149,7 @@ public class WaterTestController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-        [Bind("Timestamp,Temperature,PH,Ammonia,Nitrite,Nitrate,Phosphate,Alkalinity,Calcium,Magnesium,Salinity,GH,KH,TDS")] WaterTest waterTest,
-        int tankId)
+        [Bind("TankId,Timestamp,Temperature,PH,Ammonia,Nitrite,Nitrate,Phosphate,Alkalinity,Calcium,Magnesium,Salinity,GH,KH,TDS")] WaterTest waterTest)
     {
         try
         {
@@ -164,15 +159,36 @@ public class WaterTestController : Controller
                 return Unauthorized();
             }
 
+            // Additional validation for TankId
+            if (waterTest.TankId <= 0)
+            {
+                ModelState.AddModelError("TankId", "Please select a tank");
+            }
+
             if (ModelState.IsValid)
             {
-                var createdWaterTest = await _waterTestService.CreateWaterTestAsync(waterTest, tankId, userId);
+                var createdWaterTest = await _waterTestService.CreateWaterTestAsync(waterTest, waterTest.TankId, userId);
                 TempData["Success"] = "Water test recorded successfully!";
-                return RedirectToAction(nameof(Index), new { tankId });
+                return RedirectToAction(nameof(Index), new { tankId = waterTest.TankId });
+            }
+
+            // Log validation errors for debugging
+            foreach (var state in ModelState)
+            {
+                foreach (var error in state.Value.Errors)
+                {
+                    _logger.LogWarning($"Validation error in {state.Key}: {error.ErrorMessage}");
+                }
             }
 
             await PopulateTanksDropdown(userId);
-            ViewBag.SelectedTankId = tankId;
+            return View(waterTest);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogError(ex, "Unauthorized tank access attempt");
+            TempData["Error"] = "You don't have permission to add water tests to this tank.";
+            await PopulateTanksDropdown(_userManager.GetUserId(User)!);
             return View(waterTest);
         }
         catch (Exception ex)

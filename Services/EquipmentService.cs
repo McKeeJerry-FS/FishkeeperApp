@@ -19,25 +19,82 @@ public class EquipmentService : IEquipmentService
 
     public async Task<List<Equipment>> GetAllEquipmentAsync(string userId)
     {
-        var filters = await _context.Filters
-            .Include(e => e.Tank)
-            .Where(e => e.Tank!.UserId == userId)
-            .ToListAsync();
-
-        var lights = await _context.Lights
-            .Include(e => e.Tank)
-            .Where(e => e.Tank!.UserId == userId)
-            .ToListAsync();
-
-        var skimmers = await _context.ProteinSkimmers
-            .Include(e => e.Tank)
-            .Where(e => e.Tank!.UserId == userId)
-            .ToListAsync();
-
         var allEquipment = new List<Equipment>();
-        allEquipment.AddRange(filters);
-        allEquipment.AddRange(lights);
-        allEquipment.AddRange(skimmers);
+
+        allEquipment.AddRange(await _context.Filters
+            .Include(e => e.Tank)
+            .Where(e => e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.Lights
+            .Include(e => e.Tank)
+            .Where(e => e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.Heaters
+            .Include(e => e.Tank)
+            .Where(e => e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.ProteinSkimmers
+            .Include(e => e.Tank)
+            .Where(e => e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.Pumps
+            .Include(e => e.Tank)
+            .Where(e => e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.Chillers
+            .Include(e => e.Tank)
+            .Where(e => e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.WaveMakers
+            .Include(e => e.Tank)
+            .Where(e => e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.AutoTopOffs
+            .Include(e => e.Tank)
+            .Where(e => e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.DosingPumps
+            .Include(e => e.Tank)
+            .Where(e => e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.Reactors
+            .Include(e => e.Tank)
+            .Where(e => e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.AutoFeeders
+            .Include(e => e.Tank)
+            .Where(e => e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.CO2Systems
+            .Include(e => e.Tank)
+            .Where(e => e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.DigitalWaterTesters
+            .Include(e => e.Tank)
+            .Where(e => e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.ReverseOsmosisSystems
+            .Include(e => e.Tank)
+            .Where(e => e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.UVSterilizers
+            .Include(e => e.Tank)
+            .Where(e => e.Tank!.UserId == userId)
+            .ToListAsync());
 
         return allEquipment
             .OrderBy(e => e.Tank!.Name)
@@ -47,48 +104,164 @@ public class EquipmentService : IEquipmentService
 
     public async Task<List<Equipment>> GetEquipmentByTankAsync(int tankId, string userId)
     {
-        var filters = await _context.Filters
-            .Include(e => e.Tank)
-            .Where(e => e.TankId == tankId && e.Tank!.UserId == userId)
-            .ToListAsync();
-
-        var lights = await _context.Lights
-            .Include(e => e.Tank)
-            .Where(e => e.TankId == tankId && e.Tank!.UserId == userId)
-            .ToListAsync();
-
-        var skimmers = await _context.ProteinSkimmers
-            .Include(e => e.Tank)
-            .Where(e => e.TankId == tankId && e.Tank!.UserId == userId)
-            .ToListAsync();
-
         var allEquipment = new List<Equipment>();
-        allEquipment.AddRange(filters);
-        allEquipment.AddRange(lights);
-        allEquipment.AddRange(skimmers);
+
+        allEquipment.AddRange(await _context.Filters
+            .Include(e => e.Tank)
+            .Where(e => e.TankId == tankId && e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.Lights
+            .Include(e => e.Tank)
+            .Where(e => e.TankId == tankId && e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.Heaters
+            .Include(e => e.Tank)
+            .Where(e => e.TankId == tankId && e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.ProteinSkimmers
+            .Include(e => e.Tank)
+            .Where(e => e.TankId == tankId && e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.Pumps
+            .Include(e => e.Tank)
+            .Where(e => e.TankId == tankId && e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.Chillers
+            .Include(e => e.Tank)
+            .Where(e => e.TankId == tankId && e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.WaveMakers
+            .Include(e => e.Tank)
+            .Where(e => e.TankId == tankId && e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.AutoTopOffs
+            .Include(e => e.Tank)
+            .Where(e => e.TankId == tankId && e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.DosingPumps
+            .Include(e => e.Tank)
+            .Where(e => e.TankId == tankId && e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.Reactors
+            .Include(e => e.Tank)
+            .Where(e => e.TankId == tankId && e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.AutoFeeders
+            .Include(e => e.Tank)
+            .Where(e => e.TankId == tankId && e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.CO2Systems
+            .Include(e => e.Tank)
+            .Where(e => e.TankId == tankId && e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.DigitalWaterTesters
+            .Include(e => e.Tank)
+            .Where(e => e.TankId == tankId && e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.ReverseOsmosisSystems
+            .Include(e => e.Tank)
+            .Where(e => e.TankId == tankId && e.Tank!.UserId == userId)
+            .ToListAsync());
+
+        allEquipment.AddRange(await _context.UVSterilizers
+            .Include(e => e.Tank)
+            .Where(e => e.TankId == tankId && e.Tank!.UserId == userId)
+            .ToListAsync());
 
         return allEquipment.OrderBy(e => e.Brand).ToList();
     }
 
     public async Task<Equipment?> GetEquipmentByIdAsync(int id, string userId)
     {
-        // Try to find in Filters
-        var filter = await _context.Filters
-            .Include(e => e.Tank)
-            .FirstOrDefaultAsync(e => e.Id == id && e.Tank!.UserId == userId);
-        if (filter != null) return filter;
+        Equipment? equipment;
 
-        // Try to find in Lights
-        var light = await _context.Lights
+        equipment = await _context.Filters
             .Include(e => e.Tank)
             .FirstOrDefaultAsync(e => e.Id == id && e.Tank!.UserId == userId);
-        if (light != null) return light;
+        if (equipment != null) return equipment;
 
-        // Try to find in Protein Skimmers
-        var skimmer = await _context.ProteinSkimmers
+        equipment = await _context.Lights
             .Include(e => e.Tank)
             .FirstOrDefaultAsync(e => e.Id == id && e.Tank!.UserId == userId);
-        if (skimmer != null) return skimmer;
+        if (equipment != null) return equipment;
+
+        equipment = await _context.Heaters
+            .Include(e => e.Tank)
+            .FirstOrDefaultAsync(e => e.Id == id && e.Tank!.UserId == userId);
+        if (equipment != null) return equipment;
+
+        equipment = await _context.ProteinSkimmers
+            .Include(e => e.Tank)
+            .FirstOrDefaultAsync(e => e.Id == id && e.Tank!.UserId == userId);
+        if (equipment != null) return equipment;
+
+        equipment = await _context.Pumps
+            .Include(e => e.Tank)
+            .FirstOrDefaultAsync(e => e.Id == id && e.Tank!.UserId == userId);
+        if (equipment != null) return equipment;
+
+        equipment = await _context.Chillers
+            .Include(e => e.Tank)
+            .FirstOrDefaultAsync(e => e.Id == id && e.Tank!.UserId == userId);
+        if (equipment != null) return equipment;
+
+        equipment = await _context.WaveMakers
+            .Include(e => e.Tank)
+            .FirstOrDefaultAsync(e => e.Id == id && e.Tank!.UserId == userId);
+        if (equipment != null) return equipment;
+
+        equipment = await _context.AutoTopOffs
+            .Include(e => e.Tank)
+            .FirstOrDefaultAsync(e => e.Id == id && e.Tank!.UserId == userId);
+        if (equipment != null) return equipment;
+
+        equipment = await _context.DosingPumps
+            .Include(e => e.Tank)
+            .FirstOrDefaultAsync(e => e.Id == id && e.Tank!.UserId == userId);
+        if (equipment != null) return equipment;
+
+        equipment = await _context.Reactors
+            .Include(e => e.Tank)
+            .FirstOrDefaultAsync(e => e.Id == id && e.Tank!.UserId == userId);
+        if (equipment != null) return equipment;
+
+        equipment = await _context.AutoFeeders
+            .Include(e => e.Tank)
+            .FirstOrDefaultAsync(e => e.Id == id && e.Tank!.UserId == userId);
+        if (equipment != null) return equipment;
+
+        equipment = await _context.CO2Systems
+            .Include(e => e.Tank)
+            .FirstOrDefaultAsync(e => e.Id == id && e.Tank!.UserId == userId);
+        if (equipment != null) return equipment;
+
+        equipment = await _context.DigitalWaterTesters
+            .Include(e => e.Tank)
+            .FirstOrDefaultAsync(e => e.Id == id && e.Tank!.UserId == userId);
+        if (equipment != null) return equipment;
+
+        equipment = await _context.ReverseOsmosisSystems
+            .Include(e => e.Tank)
+            .FirstOrDefaultAsync(e => e.Id == id && e.Tank!.UserId == userId);
+        if (equipment != null) return equipment;
+
+        equipment = await _context.UVSterilizers
+            .Include(e => e.Tank)
+            .FirstOrDefaultAsync(e => e.Id == id && e.Tank!.UserId == userId);
+        if (equipment != null) return equipment;
 
         return null;
     }
@@ -106,22 +279,56 @@ public class EquipmentService : IEquipmentService
 
         equipment.TankId = tankId;
 
-        // Add to the appropriate DbSet
-        if (equipment is Filter filter)
+        // Add to the appropriate DbSet based on equipment type
+        switch (equipment)
         {
-            _context.Filters.Add(filter);
-        }
-        else if (equipment is Light light)
-        {
-            _context.Lights.Add(light);
-        }
-        else if (equipment is ProteinSkimmer skimmer)
-        {
-            _context.ProteinSkimmers.Add(skimmer);
-        }
-        else
-        {
-            throw new InvalidOperationException("Unknown equipment type");
+            case Filter filter:
+                _context.Filters.Add(filter);
+                break;
+            case Light light:
+                _context.Lights.Add(light);
+                break;
+            case Heater heater:
+                _context.Heaters.Add(heater);
+                break;
+            case ProteinSkimmer skimmer:
+                _context.ProteinSkimmers.Add(skimmer);
+                break;
+            case Pump pump:
+                _context.Pumps.Add(pump);
+                break;
+            case Chiller chiller:
+                _context.Chillers.Add(chiller);
+                break;
+            case WaveMaker waveMaker:
+                _context.WaveMakers.Add(waveMaker);
+                break;
+            case AutoTopOff autoTopOff:
+                _context.AutoTopOffs.Add(autoTopOff);
+                break;
+            case DosingPump dosingPump:
+                _context.DosingPumps.Add(dosingPump);
+                break;
+            case Reactor reactor:
+                _context.Reactors.Add(reactor);
+                break;
+            case AutoFeeder autoFeeder:
+                _context.AutoFeeders.Add(autoFeeder);
+                break;
+            case CO2System co2System:
+                _context.CO2Systems.Add(co2System);
+                break;
+            case DigitalWaterTester digitalWaterTester:
+                _context.DigitalWaterTesters.Add(digitalWaterTester);
+                break;
+            case ReverseOsmosisSystem reverseOsmosisSystem:
+                _context.ReverseOsmosisSystems.Add(reverseOsmosisSystem);
+                break;
+            case UVSterilizer uvSterilizer:
+                _context.UVSterilizers.Add(uvSterilizer);
+                break;
+            default:
+                throw new InvalidOperationException($"Unknown equipment type: {equipment.GetType().Name}");
         }
 
         await _context.SaveChangesAsync();
