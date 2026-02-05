@@ -1,0 +1,87 @@
+@model Expense
+
+@{
+    ViewData["Title"] = "Delete Expense";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-6 text-danger">
+            <i class="bi bi-exclamation-triangle"></i> Delete Expense
+        </h1>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle"></i> Cancel
+        </a>
+    </div>
+
+    <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">
+            <i class="bi bi-exclamation-triangle-fill"></i> Confirm Deletion
+        </h4>
+        <p>Are you sure you want to delete this expense? This action cannot be undone.</p>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">Expense to Delete</h5>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Date:</dt>
+                <dd class="col-sm-9">@Model.Date.ToString("MMMM d, yyyy")</dd>
+
+                <dt class="col-sm-3">Amount:</dt>
+                <dd class="col-sm-9">
+                    <span class="fs-5 fw-bold text-danger">@Model.Amount.ToString("C")</span>
+                </dd>
+
+                <dt class="col-sm-3">Category:</dt>
+                <dd class="col-sm-9">
+                    <span class="badge bg-info text-dark">@Model.Category</span>
+                </dd>
+
+                <dt class="col-sm-3">Item Name:</dt>
+                <dd class="col-sm-9">@Model.ItemName</dd>
+
+                @if (Model.TankId.HasValue && Model.Tank != null)
+                {
+                    <dt class="col-sm-3">Tank:</dt>
+                    <dd class="col-sm-9">@Model.Tank.Name</dd>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.Vendor))
+                {
+                    <dt class="col-sm-3">Vendor:</dt>
+                    <dd class="col-sm-9">@Model.Vendor</dd>
+                }
+
+                @if (Model.PaymentMethod.HasValue)
+                {
+                    <dt class="col-sm-3">Payment Method:</dt>
+                    <dd class="col-sm-9">@Model.PaymentMethod</dd>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.Notes))
+                {
+                    <dt class="col-sm-3">Notes:</dt>
+                    <dd class="col-sm-9">@Model.Notes</dd>
+                }
+            </dl>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <form asp-action="Delete" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Yes, Delete Expense
+                </button>
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> No, Go Back
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,15 +1,15 @@
 @model Expense
 
 @{
-    ViewData["Title"] = "Add Expense";
+    ViewData["Title"] = "Edit Expense";
 }
 
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="display-6">
-            <i class="bi bi-plus-circle text-success"></i> Add Expense
+            <i class="bi bi-pencil text-primary"></i> Edit Expense
         </h1>
-        <a asp-action="Index" class="btn btn-outline-secondary">
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">
             <i class="bi bi-x-circle"></i> Cancel
         </a>
     </div>
@@ -17,12 +17,13 @@
     <div class="row">
         <div class="col-md-8">
             <div class="card shadow-sm">
-                <div class="card-header bg-success text-white">
+                <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Expense Information</h5>
                 </div>
                 <div class="card-body">
-                    <form asp-action="Create" method="post">
+                    <form asp-action="Edit" method="post">
                         @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
                         <div class="mb-3">
@@ -58,7 +59,7 @@
 
                         <div class="mb-3">
                             <label asp-for="ItemName" class="form-label">
-                                <i class="bi bi-card-text"></i> ItemName <span class="text-danger">*</span>
+                                <i class="bi bi-card-text"></i> Item Name <span class="text-danger">*</span>
                             </label>
                             <input asp-for="ItemName" class="form-control" placeholder="e.g., 10 Neon Tetras" />
                             <span asp-validation-for="ItemName" class="text-danger small"></span>
@@ -107,11 +108,11 @@
                         </div>
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a asp-action="Index" class="btn btn-secondary">
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">
                                 <i class="bi bi-x-circle"></i> Cancel
                             </a>
-                            <button type="submit" class="btn btn-success">
-                                <i class="bi bi-save"></i> Save Expense
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Update Expense
                             </button>
                         </div>
                     </form>

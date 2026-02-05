@@ -133,6 +133,14 @@ public class LivestockController : Controller
                 ViewBag.SelectedTankId = tankId.Value;
             }
 
+            // Populate species enums for JavaScript
+            ViewBag.FreshwaterFishTypes = Enum.GetNames(typeof(AquaHub.MVC.Models.Enums.FreshwaterFishType));
+            ViewBag.SaltwaterFishTypes = Enum.GetNames(typeof(AquaHub.MVC.Models.Enums.SaltwaterFishType));
+            ViewBag.CoralTypes = Enum.GetNames(typeof(AquaHub.MVC.Models.Enums.CoralType));
+            ViewBag.PlantTypes = Enum.GetNames(typeof(AquaHub.MVC.Models.Enums.PlantType));
+            ViewBag.FreshwaterInvertebrateTypes = Enum.GetNames(typeof(AquaHub.MVC.Models.Enums.FreshwaterInvertebrateType));
+            ViewBag.InvertebrateTypes = Enum.GetNames(typeof(AquaHub.MVC.Models.Enums.InvertebrateType));
+
             return View();
         }
         catch (Exception ex)
