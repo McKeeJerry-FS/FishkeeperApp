@@ -17,6 +17,7 @@ public class MaintenanceLogController : Controller
     private readonly IEquipmentService _equipmentService;
     private readonly UserManager<AppUser> _userManager;
     private readonly ILogger<MaintenanceLogController> _logger;
+    private readonly IImageService _imageService;
 
     public MaintenanceLogController(
         IMaintenanceLogService maintenanceLogService,
@@ -25,7 +26,8 @@ public class MaintenanceLogController : Controller
         IReminderService reminderService,
         IEquipmentService equipmentService,
         UserManager<AppUser> userManager,
-        ILogger<MaintenanceLogController> logger)
+        ILogger<MaintenanceLogController> logger,
+        IImageService imageService)
     {
         _maintenanceLogService = maintenanceLogService;
         _tankService = tankService;
@@ -34,6 +36,7 @@ public class MaintenanceLogController : Controller
         _equipmentService = equipmentService;
         _userManager = userManager;
         _logger = logger;
+        _imageService = imageService;
     }
 
     // GET: MaintenanceLog
@@ -86,6 +89,15 @@ public class MaintenanceLogController : Controller
             {
                 return NotFound();
             }
+
+            // Convert image data to displayable format
+            var maintenanceImage = _imageService.ConvertByteArrayToFile(
+                maintenanceLog.ImageData,
+                maintenanceLog.ImageType,
+                Models.Enums.DefaultImage.MaintenanceLogImage
+            );
+
+            ViewData["MaintenanceImage"] = maintenanceImage;
 
             return View(maintenanceLog);
         }

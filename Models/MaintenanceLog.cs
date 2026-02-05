@@ -1,6 +1,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using AquaHub.MVC.Models.Enums;
+using Microsoft.AspNetCore.Http;
 
 namespace AquaHub.MVC.Models;
 
@@ -21,4 +23,10 @@ public class MaintenanceLog
     [Range(0, double.MaxValue, ErrorMessage = "Amount used must be 0 or greater")]
     [Display(Name = "Amount Used")]
     public double? AmountUsed { get; set; }
+
+    // Image Properties
+    [NotMapped]
+    public IFormFile? ImageFile { get; set; }
+    public byte[]? ImageData { get; set; }
+    public string? ImageType { get; set; }
 }

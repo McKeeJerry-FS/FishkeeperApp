@@ -13,6 +13,18 @@
                         <i class="bi bi-tools"></i> Maintenance Log - @Model.Timestamp.ToString("MMMM dd, yyyy")
                     </h3>
                 </div>
+
+                @* Maintenance Image *@
+                <div class="text-center my-3">
+                    @{
+                        var maintenanceImage = ViewData["MaintenanceImage"] as string;
+                        var displayImage = !string.IsNullOrEmpty(maintenanceImage) ? maintenanceImage :
+                    Url.Content("~/img/maintenance_default.png");
+                    }
+                    <img src="@displayImage" alt="Maintenance Log Image"
+                         style="width: 400px; height: 400px; object-fit: cover; border-radius: 8px;">
+                </div>
+
                 <div class="card-body p-4">
                     <div class="row g-4">
                         <div class="col-md-6">
@@ -63,40 +75,41 @@
                                     }
 
                                     <dt class="col-sm-5">Current Stock:</dt>
-                                    <dd class="col-sm-7">@Model.SupplyItem.CurrentQuantity.ToString("F2") @Model.SupplyItem.Unit</dd>
-                                }
+                                    <dd class="col-sm-7">@Model.SupplyItem.CurrentQuantity.ToString("F2")
+                                        @Model.SupplyItem.Unit</dd>
+                                    }
                                 else
-                                {
-                                    <dd class="col-12 text-muted fst-italic">No supply item tracked</dd>
-                                }
-                            </dl>
-                        </div>
-
-                        @if (!string.IsNullOrWhiteSpace(Model.Notes))
-                        {
-                            <div class="col-12">
-                                <h5 class="text-secondary border-bottom pb-2">Notes</h5>
-                                <div class="bg-light p-3 rounded">
-                                    <p class="mb-0">@Model.Notes</p>
-                                </div>
+                                    {
+                                        <dd class="col-12 text-muted fst-italic">No supply item tracked</dd>
+                                    }
+                                </dl>
                             </div>
-                        }
+
+                            @if (!string.IsNullOrWhiteSpace(Model.Notes))
+                            {
+                                <div class="col-12">
+                                    <h5 class="text-secondary border-bottom pb-2">Notes</h5>
+                                    <div class="bg-light p-3 rounded">
+                                        <p class="mb-0">@Model.Notes</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     </div>
-                </div>
-                <div class="card-footer bg-transparent">
-                    <div class="d-flex gap-2">
-                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
-                            <i class="bi bi-pencil"></i> Edit
-                        </a>
-                        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
-                            <i class="bi bi-trash"></i> Delete
-                        </a>
-                        <a asp-action="Index" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-left"></i> Back to List
-                        </a>
+                    <div class="card-footer bg-transparent">
+                        <div class="d-flex gap-2">
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Delete
+                            </a>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to List
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
