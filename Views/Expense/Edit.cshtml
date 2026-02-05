@@ -28,10 +28,10 @@
 
                         <div class="mb-3">
                             <label asp-for="TankId" class="form-label">
-                                <i class="bi bi-droplet"></i> Tank <span class="text-danger">*</span>
+                                <i class="bi bi-droplet"></i> Tank (Optional)
                             </label>
                             <select asp-for="TankId" class="form-select" asp-items="ViewBag.Tanks">
-                                <option value="">-- Select Tank --</option>
+                                <option value="">-- Select Tank (or leave for general expense) --</option>
                             </select>
                             <span asp-validation-for="TankId" class="text-danger small"></span>
                         </div>
