@@ -13,98 +13,112 @@
                         <i class="bi bi-droplet-fill"></i> Water Test - @Model.Timestamp.ToString("MMMM dd, yyyy")
                     </h3>
                 </div>
+
+                @* Water Test Image *@
+                <div class="text-center my-3">
+                    @{
+                        var waterTestImage = ViewData["WaterTestImage"] as string;
+                        var displayImage = !string.IsNullOrEmpty(waterTestImage) ? waterTestImage :
+                    Url.Content("~/img/water_test.jpg");
+                    }
+                    <img src="@displayImage" alt="Water Test Image"
+                         style="width: 400px; height: 400px; object-fit: cover; border-radius: 8px;">
+                </div>
+
                 <div class="card-body p-4">
                     <div class="row g-4">
                         <div class="col-md-6">
                             <h5 class="text-primary border-bottom pb-2">General Parameters</h5>
                             <dl class="row">
                                 <dt class="col-sm-5">Temperature:</dt>
-                                <dd class="col-sm-7">@(Model.Temperature.HasValue ? $"{Model.Temperature.Value:F1}°F" : "Not recorded")</dd>
+                                <dd class="col-sm-7">@(Model.Temperature.HasValue ? $"{Model.Temperature.Value:F1}°F" :
+                                                                        "Not recorded")</dd>
 
-                                <dt class="col-sm-5">pH:</dt>
-                                <dd class="col-sm-7">@(Model.PH.HasValue ? Model.PH.Value.ToString("F2") : "Not recorded")</dd>
+                                    <dt class="col-sm-5">pH:</dt>
+                                    <dd class="col-sm-7">@(Model.PH.HasValue ? Model.PH.Value.ToString("F2") : "Not                            recorded")</dd>
 
-                                <dt class="col-sm-5">Ammonia:</dt>
-                                <dd class="col-sm-7">@(Model.Ammonia.HasValue ? $"{Model.Ammonia.Value:F2} ppm" : "Not recorded")</dd>
+                                    <dt class="col-sm-5">Ammonia:</dt>
+                                    <dd class="col-sm-7">@(Model.Ammonia.HasValue ? $"{Model.Ammonia.Value:F2} ppm" : "Not       recorded")</dd>
 
-                                <dt class="col-sm-5">Nitrite:</dt>
-                                <dd class="col-sm-7">@(Model.Nitrite.HasValue ? $"{Model.Nitrite.Value:F2} ppm" : "Not recorded")</dd>
+                                    <dt class="col-sm-5">Nitrite:</dt>
+                                    <dd class="col-sm-7">@(Model.Nitrite.HasValue ? $"{Model.Nitrite.Value:F2} ppm" : "Not              recorded")</dd>
 
-                                <dt class="col-sm-5">Nitrate:</dt>
-                                <dd class="col-sm-7">@(Model.Nitrate.HasValue ? $"{Model.Nitrate.Value:F1} ppm" : "Not recorded")</dd>
-                            </dl>
-                        </div>
+                                    <dt class="col-sm-5">Nitrate:</dt>
+                                    <dd class="col-sm-7">@(Model.Nitrate.HasValue ? $"{Model.Nitrate.Value:F1} ppm" : "Not                      recorded")</dd>
+                                </dl>
+                            </div>
 
-                        <div class="col-md-6">
-                            <h5 class="text-success border-bottom pb-2">Additional Parameters</h5>
-                            <dl class="row">
-                                @if (Model.GH.HasValue || Model.KH.HasValue || Model.TDS.HasValue)
-                                {
-                                    <dt class="col-12 fw-bold mt-2">Freshwater:</dt>
-                                    @if (Model.GH.HasValue)
+                            <div class="col-md-6">
+                                <h5 class="text-success border-bottom pb-2">Additional Parameters</h5>
+                                <dl class="row">
+                                    @if (Model.GH.HasValue || Model.KH.HasValue || Model.TDS.HasValue)
                                     {
-                                        <dt class="col-sm-5">GH:</dt>
-                                        <dd class="col-sm-7">@($"{Model.GH.Value:F1} °dH")</dd>
+                                        <dt class="col-12 fw-bold mt-2">Freshwater:</dt>
+                                        @if (Model.GH.HasValue)
+                                        {
+                                            <dt class="col-sm-5">GH:</dt>
+                                            <dd class="col-sm-7">@($"{Model.GH.Value:F1} °dH")</dd>
+                                        }
+                                        @if (Model.KH.HasValue)
+                                        {
+                                            <dt class="col-sm-5">KH:</dt>
+                                            <dd class="col-sm-7">@($"{Model.KH.Value:F1} °dH")</dd>
+                                        }
+                                        @if (Model.TDS.HasValue)
+                                        {
+                                            <dt class="col-sm-5">TDS:</dt>
+                                            <dd class="col-sm-7">@($"{Model.TDS.Value:F0} ppm")</dd>
+                                        }
                                     }
-                                    @if (Model.KH.HasValue)
-                                    {
-                                        <dt class="col-sm-5">KH:</dt>
-                                        <dd class="col-sm-7">@($"{Model.KH.Value:F1} °dH")</dd>
-                                    }
-                                    @if (Model.TDS.HasValue)
-                                    {
-                                        <dt class="col-sm-5">TDS:</dt>
-                                        <dd class="col-sm-7">@($"{Model.TDS.Value:F0} ppm")</dd>
-                                    }
-                                }
 
-                                @if (Model.Salinity.HasValue || Model.Alkalinity.HasValue || Model.Calcium.HasValue || Model.Magnesium.HasValue || Model.Phosphate.HasValue)
-                                {
-                                    <dt class="col-12 fw-bold mt-2">Saltwater:</dt>
-                                    @if (Model.Salinity.HasValue)
+                                    @if (Model.Salinity.HasValue || Model.Alkalinity.HasValue || Model.Calcium.HasValue ||
+                                                                    Model.Magnesium.HasValue || Model.Phosphate.HasValue)
                                     {
-                                        <dt class="col-sm-5">Salinity:</dt>
-                                        <dd class="col-sm-7">@($"{Model.Salinity.Value:F1} ppt")</dd>
+                                        <dt class="col-12 fw-bold mt-2">Saltwater:</dt>
+                                        @if (Model.Salinity.HasValue)
+                                        {
+                                            <dt class="col-sm-5">Salinity:</dt>
+                                            <dd class="col-sm-7">@($"{Model.Salinity.Value:F1} ppt")</dd>
+                                        }
+                                        @if (Model.Alkalinity.HasValue)
+                                        {
+                                            <dt class="col-sm-5">Alkalinity:</dt>
+                                            <dd class="col-sm-7">@($"{Model.Alkalinity.Value:F1} dKH")</dd>
+                                        }
+                                        @if (Model.Calcium.HasValue)
+                                        {
+                                            <dt class="col-sm-5">Calcium:</dt>
+                                            <dd class="col-sm-7">@($"{Model.Calcium.Value:F0} ppm")</dd>
+                                        }
+                                        @if (Model.Magnesium.HasValue)
+                                        {
+                                            <dt class="col-sm-5">Magnesium:</dt>
+                                            <dd class="col-sm-7">@($"{Model.Magnesium.Value:F0} ppm")</dd>
+                                        }
+                                        @if (Model.Phosphate.HasValue)
+                                        {
+                                            <dt class="col-sm-5">Phosphate:</dt>
+                                            <dd class="col-sm-7">@($"{Model.Phosphate.Value:F2} ppm")</dd>
+                                        }
                                     }
-                                    @if (Model.Alkalinity.HasValue)
-                                    {
-                                        <dt class="col-sm-5">Alkalinity:</dt>
-                                        <dd class="col-sm-7">@($"{Model.Alkalinity.Value:F1} dKH")</dd>
-                                    }
-                                    @if (Model.Calcium.HasValue)
-                                    {
-                                        <dt class="col-sm-5">Calcium:</dt>
-                                        <dd class="col-sm-7">@($"{Model.Calcium.Value:F0} ppm")</dd>
-                                    }
-                                    @if (Model.Magnesium.HasValue)
-                                    {
-                                        <dt class="col-sm-5">Magnesium:</dt>
-                                        <dd class="col-sm-7">@($"{Model.Magnesium.Value:F0} ppm")</dd>
-                                    }
-                                    @if (Model.Phosphate.HasValue)
-                                    {
-                                        <dt class="col-sm-5">Phosphate:</dt>
-                                        <dd class="col-sm-7">@($"{Model.Phosphate.Value:F2} ppm")</dd>
-                                    }
-                                }
-                            </dl>
+                                </dl>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="card-footer bg-transparent">
-                    <div class="btn-group" role="group">
-                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
-                            <i class="bi bi-pencil"></i> Edit
-                        </a>
-                        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
-                            <i class="bi bi-trash"></i> Delete
+                    <div class="card-footer bg-transparent">
+                        <div class="btn-group" role="group">
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Delete
+                            </a>
+                        </div>
+                        <a asp-action="Index" asp-route-tankId="@Model.TankId" class="btn btn-outline-secondary float-end">
+                            <i class="bi bi-arrow-left"></i> Back to List
                         </a>
                     </div>
-                    <a asp-action="Index" asp-route-tankId="@Model.TankId" class="btn btn-outline-secondary float-end">
-                        <i class="bi bi-arrow-left"></i> Back to List
-                    </a>
                 </div>
             </div>
         </div>
     </div>
-</div>

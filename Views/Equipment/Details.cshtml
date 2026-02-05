@@ -60,6 +60,17 @@
         </div>
     }
 
+    @* Equipment Image *@
+    <div class="text-center my-3">
+        @{
+            var equipmentImage = ViewData["EquipmentImage"] as string;
+            var displayImage = !string.IsNullOrEmpty(equipmentImage) ? equipmentImage :
+        Url.Content("~/img/aqua_equipment.jpg");
+        }
+        <img src="@displayImage" alt="Equipment Image"
+             style="width: 400px; height: 400px; object-fit: cover; border-radius: 8px;">
+    </div>
+
     <div class="row">
         <div class="col-lg-8">
             <div class="card shadow-sm mb-4">

@@ -1,5 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Http;
 
 namespace AquaHub.MVC.Models;
 
@@ -31,4 +33,10 @@ public class WaterTest
     public double? Magnesium { get; set; }
     public double? Phosphate { get; set; }
     public DateTime Timestamp { get; set; }
+
+    // Image Properties
+    [NotMapped]
+    public IFormFile? ImageFile { get; set; }
+    public byte[]? ImageData { get; set; }
+    public string? ImageType { get; set; }
 }

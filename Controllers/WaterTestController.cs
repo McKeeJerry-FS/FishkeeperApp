@@ -14,17 +14,20 @@ public class WaterTestController : Controller
     private readonly ITankService _tankService;
     private readonly UserManager<AppUser> _userManager;
     private readonly ILogger<WaterTestController> _logger;
+    private readonly IImageService _imageService;
 
     public WaterTestController(
         IWaterTestService waterTestService,
         ITankService tankService,
         UserManager<AppUser> userManager,
-        ILogger<WaterTestController> logger)
+        ILogger<WaterTestController> logger,
+        IImageService imageService)
     {
         _waterTestService = waterTestService;
         _tankService = tankService;
         _userManager = userManager;
         _logger = logger;
+        _imageService = imageService;
     }
 
     // GET: WaterTest
@@ -77,6 +80,15 @@ public class WaterTestController : Controller
             {
                 return NotFound();
             }
+
+            // Convert image data to displayable format
+            var waterTestImage = _imageService.ConvertByteArrayToFile(
+                waterTest.ImageData,
+                waterTest.ImageType,
+                Models.Enums.DefaultImage.WaterParameterImage
+            );
+
+            ViewData["WaterTestImage"] = waterTestImage;
 
             return View(waterTest);
         }

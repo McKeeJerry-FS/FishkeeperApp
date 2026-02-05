@@ -14,17 +14,20 @@ public class EquipmentController : Controller
     private readonly ITankService _tankService;
     private readonly UserManager<AppUser> _userManager;
     private readonly ILogger<EquipmentController> _logger;
+    private readonly IImageService _imageService;
 
     public EquipmentController(
         IEquipmentService equipmentService,
         ITankService tankService,
         UserManager<AppUser> userManager,
-        ILogger<EquipmentController> logger)
+        ILogger<EquipmentController> logger,
+        IImageService imageService)
     {
         _equipmentService = equipmentService;
         _tankService = tankService;
         _userManager = userManager;
         _logger = logger;
+        _imageService = imageService;
     }
 
     // GET: Equipment
@@ -77,6 +80,15 @@ public class EquipmentController : Controller
             {
                 return NotFound();
             }
+
+            // Convert image data to displayable format
+            var equipmentImage = _imageService.ConvertByteArrayToFile(
+                equipment.ImageData,
+                equipment.ImageType,
+                Models.Enums.DefaultImage.EquipmentImage
+            );
+
+            ViewData["EquipmentImage"] = equipmentImage;
 
             return View(equipment);
         }
