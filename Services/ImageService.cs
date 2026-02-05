@@ -7,11 +7,12 @@ namespace AquaHub.MVC.Services;
 public class ImageService : IImageService
 {
     private readonly string _defaultProfileImage = "/img/profile.jpg";
-    private readonly string _defaultPlantImage = "/img/plant_Image";
-    private readonly string _defaultEquipmentImage = "/img/equipment.jpg";
+    private readonly string _defaultPlantImage = "/img/plant_image.jpg";
+    private readonly string _defaultEquipmentImage = "/img/aqua_equipment.jpg";
     private readonly string _defaultTankImage = "/img/journal.jpg";
     private readonly string _defaultNutrientImage = "/img/fertilizer.jpg";
-
+    private readonly string _defaultMaintenanceImage = "/img/maintenance_default.jpg";
+    private readonly string _defaultWaterTestImage = "/img/water_test.jpg";
 
 
     public string? ConvertByteArrayToFile(byte[]? fileData, string? extension, DefaultImage defaultImage)
