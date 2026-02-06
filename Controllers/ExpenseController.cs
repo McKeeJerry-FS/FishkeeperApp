@@ -13,17 +13,20 @@ public class ExpenseController : Controller
 {
     private readonly IExpenseService _expenseService;
     private readonly ITankService _tankService;
+    private readonly ISupplyService _supplyService;
     private readonly UserManager<AppUser> _userManager;
     private readonly ILogger<ExpenseController> _logger;
 
     public ExpenseController(
         IExpenseService expenseService,
         ITankService tankService,
+        ISupplyService supplyService,
         UserManager<AppUser> userManager,
         ILogger<ExpenseController> logger)
     {
         _expenseService = expenseService;
         _tankService = tankService;
+        _supplyService = supplyService;
         _userManager = userManager;
         _logger = logger;
     }
@@ -163,7 +166,11 @@ public class ExpenseController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-        [Bind("Date,Amount,Category,Description,Vendor,PaymentMethod,TankId")] Expense expense)
+        [Bind("Date,Amount,Category,Description,Vendor,PaymentMethod,TankId,ItemName,Brand,Quantity,UnitPrice,Notes")] Expense expense,
+        bool addToInventory = false,
+        string? supplyUnit = "units",
+        double? supplyMinQuantity = 0,
+        SupplyCategory? supplyCategory = null)
     {
         try
         {
@@ -176,7 +183,42 @@ public class ExpenseController : Controller
             if (ModelState.IsValid)
             {
                 var createdExpense = await _expenseService.AddExpenseAsync(expense, userId);
-                TempData["Success"] = "Expense recorded successfully!";
+
+                // If user wants to add to inventory, create a supply item
+                if (addToInventory && !string.IsNullOrEmpty(expense.ItemName))
+                {
+                    try
+                    {
+                        var supplyItem = new SupplyItem
+                        {
+                            UserId = userId,
+                            Name = expense.ItemName,
+                            Brand = expense.Brand,
+                            Category = supplyCategory ?? MapExpenseCategoryToSupplyCategory(expense.Category),
+                            TankId = expense.TankId,
+                            CurrentQuantity = expense.Quantity,
+                            MinimumQuantity = supplyMinQuantity ?? 0,
+                            Unit = supplyUnit ?? "units",
+                            LastPurchasePrice = expense.UnitPrice ?? expense.Amount,
+                            LastPurchaseDate = expense.Date,
+                            PreferredVendor = expense.Vendor,
+                            Description = $"Added from expense on {expense.Date:MM/dd/yyyy}"
+                        };
+
+                        await _supplyService.CreateSupplyAsync(supplyItem);
+                        TempData["Success"] = "Expense recorded and item added to inventory successfully!";
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error adding supply item from expense");
+                        TempData["Success"] = "Expense recorded successfully, but there was an issue adding to inventory.";
+                    }
+                }
+                else
+                {
+                    TempData["Success"] = "Expense recorded successfully!";
+                }
+
                 return RedirectToAction(nameof(Details), new { id = createdExpense.Id });
             }
 
@@ -190,6 +232,20 @@ public class ExpenseController : Controller
             await PopulateTanksDropdown(_userManager.GetUserId(User)!);
             return View(expense);
         }
+    }
+
+    // Helper method to map expense category to supply category
+    private SupplyCategory MapExpenseCategoryToSupplyCategory(ExpenseCategory expenseCategory)
+    {
+        return expenseCategory switch
+        {
+            ExpenseCategory.FoodAndSupplements => SupplyCategory.Food,
+            ExpenseCategory.WaterTreatment => SupplyCategory.WaterTreatment,
+            ExpenseCategory.Testing => SupplyCategory.TestKits,
+            ExpenseCategory.Medications => SupplyCategory.Medications,
+            ExpenseCategory.Maintenance => SupplyCategory.Cleaning,
+            _ => SupplyCategory.Other
+        };
     }
 
     // GET: Expense/Edit/5

@@ -106,50 +106,113 @@
                             <span asp-validation-for="Notes" class="text-danger small"></span>
                         </div>
 
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a asp-action="Index" class="btn btn-secondary">
-                                <i class="bi bi-x-circle"></i> Cancel
-                            </a>
-                            <button type="submit" class="btn btn-success">
-                                <i class="bi bi-save"></i> Save Expense
-                            </button>
-                        </div>
-                    </form>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="addToInventory"
+                                       name="addToInventory" value="true" />
+                                <label class="form-check-label" for="addToInventory">
+                                    <i class="bi bi-box-seam"></i> <strong>Add this item to inventory</strong>
+                                    <small class="text-muted d-block">Automatically create a supply item for
+                                        tracking</small>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div id="inventoryFields" class="border rounded p-3 mb-3"
+                                 style="display: none; background-color: #f8f9fa;">
+                                <h6 class="text-primary mb-3">
+                                    <i class="bi bi-box-seam"></i> Inventory Details
+                                </h6>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="supplyCategory" class="form-label">Supply Category</label>
+                                        <select id="supplyCategory" name="supplyCategory" class="form-select">
+                                            <option value="">-- Auto-detect from expense --</option>
+                                            <option value="1">Food</option>
+                                            <option value="2">Water Treatment</option>
+                                            <option value="3">Test Kits</option>
+                                            <option value="4">Medications</option>
+                                            <option value="5">Supplements</option>
+                                            <option value="6">Filter Media</option>
+                                            <option value="7">Chemicals</option>
+                                            <option value="8">Cleaning</option>
+                                            <option value="99">Other</option>
+                                        </select>
+                                        <small class="text-muted">Category for inventory tracking</small>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="supplyUnit" class="form-label">Unit of Measurement</label>
+                                        <input type="text" id="supplyUnit" name="supplyUnit" class="form-control"
+                                               value="units" placeholder="units, ml, grams, oz" />
+                                        <small class="text-muted">How quantity is measured</small>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="supplyMinQuantity" class="form-label">Minimum Quantity Alert</label>
+                                    <input type="number" id="supplyMinQuantity" name="supplyMinQuantity"
+                                           class="form-control" value="0" step="0.01" min="0" />
+                                    <small class="text-muted">Get notified when stock falls below this level</small>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a asp-action="Index" class="btn btn-secondary">
+                                    <i class="bi bi-x-circle"></i> Cancel
+                                </a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-save"></i> Save Expense
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-4">
-            <div class="card shadow-sm bg-light">
-                <div class="card-header bg-info text-white">
-                    <i class="bi bi-info-circle"></i> Expense Categories
+            <div class="col-md-4">
+                <div class="card shadow-sm bg-light">
+                    <div class="card-header bg-info text-white">
+                        <i class="bi bi-info-circle"></i> Expense Categories
+                    </div>
+                    <div class="card-body">
+                        <p class="small mb-2"><strong>Livestock:</strong> Fish, coral, invertebrates</p>
+                        <p class="small mb-2"><strong>Food:</strong> Fish food and supplements</p>
+                        <p class="small mb-2"><strong>Equipment:</strong> Filters, heaters, lights</p>
+                        <p class="small mb-2"><strong>Maintenance:</strong> Water conditioners, cleaning supplies</p>
+                        <p class="small mb-2"><strong>Medication:</strong> Treatments and medications</p>
+                        <p class="small mb-2"><strong>Decor:</strong> Rocks, driftwood, ornaments</p>
+                        <p class="small mb-2"><strong>Plants:</strong> Live aquatic plants</p>
+                        <p class="small mb-0"><strong>Testing:</strong> Test kits and supplies</p>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <p class="small mb-2"><strong>Livestock:</strong> Fish, coral, invertebrates</p>
-                    <p class="small mb-2"><strong>Food:</strong> Fish food and supplements</p>
-                    <p class="small mb-2"><strong>Equipment:</strong> Filters, heaters, lights</p>
-                    <p class="small mb-2"><strong>Maintenance:</strong> Water conditioners, cleaning supplies</p>
-                    <p class="small mb-2"><strong>Medication:</strong> Treatments and medications</p>
-                    <p class="small mb-2"><strong>Decor:</strong> Rocks, driftwood, ornaments</p>
-                    <p class="small mb-2"><strong>Plants:</strong> Live aquatic plants</p>
-                    <p class="small mb-0"><strong>Testing:</strong> Test kits and supplies</p>
-                </div>
-            </div>
 
-            <div class="card shadow-sm bg-light mt-3">
-                <div class="card-header bg-secondary text-white">
-                    <i class="bi bi-credit-card"></i> Payment Methods
-                </div>
-                <div class="card-body">
-                    <p class="small mb-1">Cash, Credit Card, Debit Card, Check, PayPal, Other</p>
+                <div class="card shadow-sm bg-light mt-3">
+                    <div class="card-header bg-secondary text-white">
+                        <i class="bi bi-credit-card"></i> Payment Methods
+                    </div>
+                    <div class="card-body">
+                        <p class="small mb-1">Cash, Credit Card, Debit Card, Check, PayPal, Other</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+        <script>
+                // Toggle inventory fields when checkbox is checked
+                document.getElementById('addToInventory').addEventListener('change', function () {
+                    const inventoryFields = document.getElementById('inventoryFields');
+                    if (this.checked) {
+                        inventoryFields.style.display = 'block';
+                    } else {
+                        inventoryFields.style.display = 'none';
+                    }
+                });
+        </script>
     }
-}
