@@ -88,6 +88,9 @@ builder.Services.AddScoped<IExpenseService, ExpenseService>();
 // Supply & Inventory Services
 builder.Services.AddScoped<ISupplyService, SupplyService>();
 
+// Feeding Services
+builder.Services.AddScoped<IFeedingService, FeedingService>();
+
 // Notification & Reminder Services
 builder.Services.AddScoped<IReminderService, ReminderService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();

@@ -1,0 +1,206 @@
+@{
+    ViewData["Title"] = "Feeding Dashboard";
+    var tanks = ViewBag.Tanks as SelectList;
+    var selectedTank = ViewBag.SelectedTank as AquaHub.MVC.Models.Tank;
+    var activeSchedules = ViewBag.ActiveSchedules as IEnumerable<AquaHub.MVC.Models.FeedingSchedule>;
+    var todaysFeedings = ViewBag.TodaysFeedings as IEnumerable<AquaHub.MVC.Models.FeedingRecord>;
+    var feedingStreaks = ViewBag.FeedingStreaks as Dictionary<int, int>;
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold">
+                <i class="bi bi-speedometer2 text-primary"></i> Feeding Dashboard
+            </h1>
+            <p class="text-muted">Monitor your feeding schedules and activities</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a asp-action="Index" class="btn btn-outline-primary">
+                <i class="bi bi-calendar-check"></i> Schedules
+            </a>
+            <a asp-action="Records" class="btn btn-outline-success">
+                <i class="bi bi-journal-check"></i> Records
+            </a>
+        </div>
+    </div>
+
+    <!-- Tank Selector -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" asp-action="Dashboard">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <label class="form-label fw-bold">Select Tank</label>
+                        <select name="tankId" class="form-select" onchange="this.form.submit()">
+                            @if (tanks != null)
+                            {
+                                foreach (var tank in tanks)
+                                {
+                                    <option value="@tank.Value" selected="@(tank.Selected ? "selected" : null)">@tank.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4 mt-3">
+                        @if (selectedTank != null && feedingStreaks?.ContainsKey(selectedTank.Id) == true)
+                        {
+                            <div class="text-center">
+                                <h2 class="display-4 text-success mb-0">@feedingStreaks[selectedTank.Id]</h2>
+                                <p class="text-muted mb-0">Day Streak 🔥</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (selectedTank != null)
+    {
+        <!-- Today's Feeding Status -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="bi bi-calendar-day"></i> Today's Feedings for @selectedTank.Name
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        @if (todaysFeedings != null && todaysFeedings.Any())
+                        {
+                            <div class="row">
+                                @foreach (var feeding in todaysFeedings.OrderBy(f => f.FedDateTime))
+                                {
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card h-100 border-success">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h5 class="card-title">@feeding.FeedName</h5>
+                                                        <p class="card-text text-muted mb-1">
+                                                            <i class="bi bi-clock"></i> @feeding.FedDateTime.ToString("hh:mm tt")
+                                                        </p>
+                                                        <p class="card-text">
+                                                            <span class="badge bg-info">@feeding.FeedType</span>
+                                                            <span class="badge bg-secondary">@feeding.Amount @feeding.Unit</span>
+                                                        </p>
+                                                    </div>
+                                                    <i class="bi bi-check-circle-fill text-success" style="font-size: 2rem;"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-4">
+                                <i class="bi bi-exclamation-circle display-4 text-warning"></i>
+                                <p class="mt-3">No feedings recorded today for this tank.</p>
+                                <a asp-action="RecordFeeding" asp-route-tankId="@selectedTank.Id" class="btn btn-success">
+                                    <i class="bi bi-plus-circle"></i> Record Feeding Now
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Schedules -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0">
+                            <i class="bi bi-calendar-check"></i> Active Feeding Schedules
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        @if (activeSchedules != null && activeSchedules.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Feed Name</th>
+                                            <th>Type</th>
+                                            <th>Amount</th>
+                                            <th>Scheduled Times</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var schedule in activeSchedules)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <strong>@schedule.FeedName</strong>
+                                                    @if (!string.IsNullOrEmpty(schedule.Brand))
+                                                    {
+                                                        <br /><small class="text-muted">@schedule.Brand</small>
+                                                    }
+                                                </td>
+                                                <td><span class="badge bg-info">@schedule.FeedType</span></td>
+                                                <td>@schedule.Amount @schedule.Unit</td>
+                                                <td>
+                                                    @foreach (var time in schedule.ParsedFeedingTimes)
+                                                    {
+                                                        var isPast = DateTime.UtcNow.TimeOfDay > time;
+                                                        var isFed = todaysFeedings?.Any(f => 
+                                                            f.FeedingScheduleId == schedule.Id && 
+                                                            f.ScheduledTime == time) == true;
+                                                        
+                                                        <span class="badge @(isFed ? "bg-success" : isPast ? "bg-secondary" : "bg-warning") me-1">
+                                                            @time.ToString(@"hh\:mm")
+                                                            @if (isFed)
+                                                            {
+                                                                <i class="bi bi-check"></i>
+                                                            }
+                                                        </span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <a asp-action="RecordFeeding" asp-route-scheduleId="@schedule.Id" class="btn btn-sm btn-success">
+                                                        <i class="bi bi-check-lg"></i> Feed Now
+                                                    </a>
+                                                    <a asp-action="EditSchedule" asp-route-id="@schedule.Id" class="btn btn-sm btn-outline-primary">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-4">
+                                <i class="bi bi-calendar-x display-4 text-muted"></i>
+                                <p class="mt-3">No active feeding schedules for this tank.</p>
+                                <a asp-action="CreateSchedule" asp-route-tankId="@selectedTank.Id" class="btn btn-success">
+                                    <i class="bi bi-plus-circle"></i> Create Schedule
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-droplet-half display-1 text-muted"></i>
+            <h3 class="mt-3">No Tanks Found</h3>
+            <p class="text-muted">Create a tank first to start managing feeding schedules.</p>
+            <a asp-controller="Tank" asp-action="Create" class="btn btn-primary btn-lg mt-3">
+                <i class="bi bi-plus-circle"></i> Create Tank
+            </a>
+        </div>
+    }
+</div>

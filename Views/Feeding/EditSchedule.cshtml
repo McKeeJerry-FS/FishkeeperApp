@@ -1,0 +1,152 @@
+@model AquaHub.MVC.Models.FeedingSchedule
+
+@{
+    ViewData["Title"] = "Edit Feeding Schedule";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="bi bi-pencil"></i> Edit Feeding Schedule</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="EditSchedule" method="post" id="scheduleForm">
+                        <input type="hidden" asp-for="Id" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="TankId" class="form-label"></label>
+                            <select asp-for="TankId" class="form-select" asp-items="ViewBag.Tanks" disabled>
+                            </select>
+                            <input type="hidden" asp-for="TankId" />
+                            <span asp-validation-for="TankId" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FeedType" class="form-label"></label>
+                                <select asp-for="FeedType" class="form-select"
+                                        asp-items="Html.GetEnumSelectList<AquaHub.MVC.Models.Enums.FeedType>()">
+                                </select>
+                                <span asp-validation-for="FeedType" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FeedName" class="form-label"></label>
+                                <input asp-for="FeedName" class="form-control" />
+                                <span asp-validation-for="FeedName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Brand" class="form-label"></label>
+                                <input asp-for="Brand" class="form-control" />
+                                <span asp-validation-for="Brand" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label asp-for="Amount" class="form-label"></label>
+                                <input asp-for="Amount" class="form-control" type="number" step="0.01" />
+                                <span asp-validation-for="Amount" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label asp-for="Unit" class="form-label"></label>
+                                <select asp-for="Unit" class="form-select">
+                                    <option value="grams">grams</option>
+                                    <option value="ml">ml</option>
+                                    <option value="pinch">pinch</option>
+                                    <option value="cube">cube</option>
+                                    <option value="tablet">tablet</option>
+                                </select>
+                                <span asp-validation-for="Unit" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Feeding Times</label>
+                            <div id="feedingTimesContainer">
+                                @foreach (var time in Model.ParsedFeedingTimes)
+                                {
+                                    <div class="input-group mb-2">
+                                        <input type="time" class="form-control feeding-time"
+                                               value="@time.ToString(@"hh\:mm")" />
+                                        <button type="button" class="btn btn-outline-danger"
+                                                onclick="removeFeedingTime(this)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-success" onclick="addFeedingTime()">
+                                <i class="bi bi-plus-circle"></i> Add Feeding Time
+                            </button>
+                            <input type="hidden" id="feedingTimesJson" name="feedingTimesJson" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label"></label>
+                            <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input asp-for="IsActive" class="form-check-input" type="checkbox" />
+                            <label asp-for="IsActive" class="form-check-label"></label>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+            function addFeedingTime() {
+                const container = document.getElementById('feedingTimesContainer');
+                const div = document.createElement('div');
+                div.className = 'input-group mb-2';
+                div.innerHTML = `
+                    <input type="time" class="form-control feeding-time" value="18:00" />
+                    <button type="button" class="btn btn-outline-danger" onclick="removeFeedingTime(this)">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                `;
+                container.appendChild(div);
+            }
+
+            function removeFeedingTime(button) {
+                const container = document.getElementById('feedingTimesContainer');
+                if (container.children.length > 1) {
+                    button.closest('.input-group').remove();
+                } else {
+                    alert('You must have at least one feeding time');
+                }
+            }
+
+            document.getElementById('scheduleForm').addEventListener('submit', function (e) {
+                const times = Array.from(document.querySelectorAll('.feeding-time'))
+                    .map(input => input.value)
+                    .filter(val => val !== '');
+
+                document.getElementById('feedingTimesJson').value = JSON.stringify(times);
+            });
+    </script>
+}

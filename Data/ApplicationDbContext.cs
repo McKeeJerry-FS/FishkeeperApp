@@ -50,6 +50,8 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>
     public DbSet<JournalEntry> JournalEntries { get; set; }
     public DbSet<JournalMaintenanceLink> JournalMaintenanceLinks { get; set; }
     public DbSet<JournalWaterTestLink> JournalWaterTestLinks { get; set; }
+    public DbSet<FeedingSchedule> FeedingSchedules { get; set; }
+    public DbSet<FeedingRecord> FeedingRecords { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

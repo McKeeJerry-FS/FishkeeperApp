@@ -1,0 +1,165 @@
+@model IEnumerable<AquaHub.MVC.Models.FeedingSchedule>
+
+@{
+    ViewData["Title"] = "Feeding Schedules";
+    var upcomingFeedings = ViewBag.UpcomingFeedings as Dictionary<int, List<TimeSpan>>;
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold">
+                <i class="bi bi-calendar-check text-success"></i> Feeding Schedules
+            </h1>
+            <p class="text-muted">Manage automatic feeding schedules for your tanks</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a asp-action="CreateSchedule" class="btn btn-success btn-lg">
+                <i class="bi bi-plus-circle"></i> New Schedule
+            </a>
+            <a asp-action="Dashboard" class="btn btn-primary btn-lg">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-calendar-x display-1 text-muted"></i>
+            <h3 class="mt-3">No Feeding Schedules Yet</h3>
+            <p class="text-muted">Create your first feeding schedule to start tracking your tank's feeding routine.</p>
+            <a asp-action="CreateSchedule" class="btn btn-success btn-lg mt-3">
+                <i class="bi bi-plus-circle"></i> Create First Schedule
+            </a>
+        </div>
+    }
+    else
+    {
+        @* Group schedules by tank *@
+        var schedulesByTank = Model.GroupBy(s => s.Tank);
+
+        @foreach (var tankGroup in schedulesByTank)
+        {
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-droplet-fill"></i> @tankGroup.Key?.Name
+                        @if (upcomingFeedings?.ContainsKey(tankGroup.Key!.Id) == true)
+                        {
+                            <span class="badge bg-warning float-end">
+                                <i class="bi bi-clock"></i> Next: @upcomingFeedings[tankGroup.Key.Id].First().ToString(@"hh\:mm")
+                            </span>
+                        }
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Feed Name</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Feeding Times</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var schedule in tankGroup.OrderBy(s => s.FeedName))
+                                {
+                                    <tr class="@(schedule.IsActive ? "" : "table-secondary")">
+                                        <td>
+                                            <button type="button"
+                                                    class="btn btn-sm @(schedule.IsActive ? "btn-success" : "btn-secondary")"
+                                                    onclick="toggleSchedule(@schedule.Id)">
+                                                <i class="bi @(schedule.IsActive ? "bi-check-circle" : "bi-x-circle")"></i>
+                                                @(schedule.IsActive ? "Active" : "Inactive")
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <strong>@schedule.FeedName</strong>
+                                            @if (!string.IsNullOrEmpty(schedule.Brand))
+                                            {
+                                                <br />
+                                            
+                                                <small class="text-muted">@schedule.Brand</small>
+                                            }
+                                        </td>
+                                        <td><span class="badge bg-info">@schedule.FeedType</span></td>
+                                        <td>@schedule.Amount @schedule.Unit</td>
+                                        <td>
+                                            @foreach (var time in schedule.ParsedFeedingTimes)
+                                            {
+                                                <span class="badge bg-secondary me-1">@time.ToString(@"hh\:mm")</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a asp-action="EditSchedule" asp-route-id="@schedule.Id"
+                                                       class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a asp-action="RecordFeeding" asp-route-scheduleId="@schedule.Id"
+                                                       class="btn btn-sm btn-outline-success">
+                                                    <i class="bi bi-check-lg"></i> Feed
+                                                </a>
+                                                <a asp-action="DeleteSchedule" asp-route-id="@schedule.Id"
+                                                       class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@section Scripts {
+    <script>
+            function toggleSchedule(scheduleId) {
+                fetch('@Url.Action("ToggleSchedule", "Feeding")/' + scheduleId, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Failed to toggle schedule status');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred');
+                });
+            }
+    </script>
+}

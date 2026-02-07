@@ -1,0 +1,157 @@
+@model IEnumerable<AquaHub.MVC.Models.FeedingRecord>
+
+@{
+    ViewData["Title"] = "Feeding Records";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold">
+                <i class="bi bi-journal-check text-success"></i> Feeding Records
+            </h1>
+            <p class="text-muted">Track and review all feeding activities</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a asp-action="RecordFeeding" class="btn btn-success btn-lg">
+                <i class="bi bi-plus-circle"></i> Record Feeding
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Controls -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" asp-action="Records" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Tank</label>
+                    <select name="tankId" class="form-select" onchange="this.form.submit()">
+                        <option value="">All Tanks</option>
+                        @foreach (var tank in (ViewBag.Tanks as SelectList) ?? Enumerable.Empty<SelectListItem>())
+                        {
+                            <option value="@tank.Value" selected="@(tank.Selected ? "selected" : null)">@tank.Text</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Start Date</label>
+                    <input type="date" name="startDate" class="form-control" value="@ViewBag.StartDate" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">End Date</label>
+                    <input type="date" name="endDate" class="form-control" value="@ViewBag.EndDate" />
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-funnel"></i> Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-journal-x display-1 text-muted"></i>
+            <h3 class="mt-3">No Feeding Records Found</h3>
+            <p class="text-muted">Start recording your tank feedings to track feeding history.</p>
+            <a asp-action="RecordFeeding" class="btn btn-success btn-lg mt-3">
+                <i class="bi bi-plus-circle"></i> Record First Feeding
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Tank</th>
+                                <th>Feed Name</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Fed By</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var record in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>@record.FedDateTime.ToString("MMM dd, yyyy")</strong><br />
+                                        <small class="text-muted">@record.FedDateTime.ToString("hh:mm tt")</small>
+                                    </td>
+                                    <td>
+                                        <i class="bi bi-droplet-fill text-primary"></i> @record.Tank?.Name
+                                    </td>
+                                    <td>
+                                        <strong>@record.FeedName</strong>
+                                        @if (!string.IsNullOrEmpty(record.Brand))
+                                        {
+                                            <br />
+
+                                            <small class="text-muted">@record.Brand</small>
+                                        }
+                                    </td>
+                                    <td><span class="badge bg-info">@record.FeedType</span></td>
+                                    <td>@record.Amount @record.Unit</td>
+                                    <td>
+                                        @if (record.WasScheduled)
+                                        {
+                                            <span class="badge @(record.WasLate ? "bg-warning" : "bg-success")">
+                                                <i class="bi bi-calendar-check"></i> Scheduled
+                                            </span>
+                                            <br />
+                                            <small class="text-muted">@record.TimeDifference</small>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                <i class="bi bi-hand-index"></i> Manual
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <small>@record.User?.FirstName @record.User?.LastName</small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="EditRecord" asp-route-id="@record.Id"
+                                                   class="btn btn-sm btn-outline-primary" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a asp-action="DeleteRecord" asp-route-id="@record.Id"
+                                                   class="btn btn-sm btn-outline-danger" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-3">
+                    <p class="text-muted">
+                        <strong>Total Records:</strong> @Model.Count()
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
