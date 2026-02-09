@@ -31,56 +31,86 @@
                                 <i class="bi bi-house-door"></i> Home
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Tank" asp-action="Index">
-                                <i class="bi bi-droplet"></i> Tanks
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Livestock" asp-action="Index">
-                                <i class="bi bi-fish"></i> Livestock
-                            </a>
-                        </li>
+                        
+                        <!-- Aquarium Dropdown -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-light" href="#" role="button"
                                    data-bs-toggle="dropdown">
-                                <i class="bi bi-speedometer"></i> Monitoring
+                                <i class="bi bi-droplet"></i> Aquarium
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="Tank" asp-action="Index">
+                                    <i class="bi bi-droplet text-info"></i> Tanks
+                                </a></li>
+                                <li><a class="dropdown-item" asp-controller="Livestock" asp-action="Index">
+                                    <i class="bi bi-fish text-success"></i> Livestock
+                                </a></li>
+                                @if (User.Identity?.IsAuthenticated == true)
+                                {
+                                    @inject AquaHub.MVC.Services.Interfaces.ITankService TankService
+                                    @inject Microsoft.AspNetCore.Identity.UserManager<AquaHub.MVC.Models.AppUser> UserManager
+                                    var userId = UserManager.GetUserId(User);
+                                    var userTanks = userId != null ? await TankService.GetAllTanksAsync(userId) : new
+                                    List<AquaHub.MVC.Models.Tank>();
+                                    var hasReefTanks = userTanks.Any(t => t.Type == AquaHub.MVC.Models.Enums.AquariumType.Saltwater
+                                    ||
+                                    t.Type == AquaHub.MVC.Models.Enums.AquariumType.Reef ||
+                                    t.Type == AquaHub.MVC.Models.Enums.AquariumType.NanoReef);
+                                    if (hasReefTanks)
+                                    {
+                                        <li><a class="dropdown-item" asp-controller="Fragging" asp-action="Index">
+                                            <i class="bi bi-scissors text-warning"></i> Coral Fragging
+                                        </a></li>
+                                    }
+                                }
+                                <li><a class="dropdown-item" asp-controller="Equipment" asp-action="Index">
+                                    <i class="bi bi-gear text-secondary"></i> Equipment
+                                </a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Maintenance Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-light" href="#" role="button"
+                                   data-bs-toggle="dropdown">
+                                <i class="bi bi-wrench"></i> Maintenance
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" asp-controller="WaterTest" asp-action="Index">
                                     <i class="bi bi-droplet-fill text-info"></i> Water Tests
                                 </a></li>
                                 <li><a class="dropdown-item" asp-controller="MaintenanceLog" asp-action="Index">
-                                    <i class="bi bi-wrench text-success"></i> Maintenance Logs
+                                    <i class="bi bi-tools text-success"></i> Maintenance Logs
+                                </a></li>
+                                <li><a class="dropdown-item" asp-controller="Supply" asp-action="Index">
+                                    <i class="bi bi-box-seam text-warning"></i> Supplies
+                                </a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Care & Tracking Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-light" href="#" role="button"
+                                   data-bs-toggle="dropdown">
+                                <i class="bi bi-heart-pulse"></i> Care
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="Feeding" asp-action="Dashboard">
+                                    <i class="bi bi-egg-fried text-success"></i> Feeding
                                 </a></li>
                                 <li><a class="dropdown-item" asp-controller="GrowthRecord" asp-action="Index">
                                     <i class="bi bi-graph-up text-primary"></i> Growth Records
                                 </a></li>
+                                <li><a class="dropdown-item" asp-controller="Reminder" asp-action="Index">
+                                    <i class="bi bi-bell text-warning"></i> Reminders
+                                </a></li>
                             </ul>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Equipment" asp-action="Index">
-                                <i class="bi bi-gear"></i> Equipment
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Feeding" asp-action="Dashboard">
-                                <i class="bi bi-egg-fried"></i> Feeding
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Supply" asp-action="Index">
-                                <i class="bi bi-box-seam"></i> Supplies
-                            </a>
-                        </li>
+
+                        <!-- Expenses -->
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Expense" asp-action="Index">
                                 <i class="bi bi-cash"></i> Expenses
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Reminder" asp-action="Index">
-                                <i class="bi bi-bell"></i> Reminders
                             </a>
                         </li>
                     </ul>

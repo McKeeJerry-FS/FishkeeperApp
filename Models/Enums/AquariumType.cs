@@ -14,5 +14,6 @@ public enum AquariumType
     Goldfish = 8,
     Shrimp = 9,
     Turtle = 10,
-    Other = 99
+    Other = 99,
+    NanoReef = 100
 }

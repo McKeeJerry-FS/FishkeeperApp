@@ -1,0 +1,335 @@
+@model CoralFrag
+
+@{
+    ViewData["Title"] = Model.FragName;
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-6">
+            <i class="bi bi-scissors text-primary"></i> @Model.FragName
+        </h1>
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Edit
+            </a>
+            <a asp-action="Index" asp-route-tankId="@Model.TankId" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Main Information Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Frag Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Status</h6>
+                            <span class="badge @(Model.Status switch {
+                                "Growing" => "bg-success",
+                                "Encrusted" => "bg-info",
+                                "Ready" => "bg-primary",
+                                "Sold" => "bg-warning",
+                                "Traded" => "bg-secondary",
+                                "Lost" => "bg-danger",
+                                _ => "bg-secondary"
+                            }) fs-6">@Model.Status</span>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Tank</h6>
+                            <p>
+                                <i class="bi bi-droplet text-primary"></i>
+                                <a asp-controller="Tank" asp-action="Details" asp-route-id="@Model.TankId">
+                                    @Model.Tank?.Name
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+
+                    @if (Model.ParentCoral != null)
+                    {
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h6 class="text-muted">Parent Coral</h6>
+                                <p>
+                                    <i class="bi bi-diagram-3 text-info"></i>
+                                    <a asp-controller="Livestock" asp-action="Details" asp-route-id="@Model.ParentCoralId">
+                                        @Model.ParentCoral.Name
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.CoralSpecies))
+                    {
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h6 class="text-muted">Species</h6>
+                                <p><i class="bi bi-flower3"></i> @Model.CoralSpecies</p>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Frag Date</h6>
+                            <p><i class="bi bi-calendar-event"></i> @Model.FragDate.ToString("MMMM dd, yyyy")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Days Since Fragged</h6>
+                            <p><i class="bi bi-clock"></i> @((DateTime.Now - Model.FragDate).Days) days</p>
+                        </div>
+                    </div>
+
+                    <!-- Size Information -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Initial Size</h6>
+                            <p><i class="bi bi-rulers"></i> @Model.InitialSize.ToString("F1") inches</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Current Size</h6>
+                            <p>
+                                <i class="bi bi-rulers"></i>
+                                @if (Model.CurrentSize.HasValue)
+                                {
+                                    <span>@Model.CurrentSize.Value.ToString("F1") inches</span>
+                                    @if (Model.CurrentSize.Value > Model.InitialSize)
+                                    {
+                                        var growth = Model.CurrentSize.Value - Model.InitialSize;
+                                        <span class="badge bg-success ms-2">+@growth.ToString("F1")"</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Not measured</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+
+                    @if (Model.NumberOfPolyps.HasValue)
+                    {
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Number of Polyps</h6>
+                                <p><i class="bi bi-gem"></i> @Model.NumberOfPolyps</p>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.Coloration))
+                    {
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h6 class="text-muted">Coloration</h6>
+                                <p><i class="bi bi-palette"></i> @Model.Coloration</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Fragging Details Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-scissors"></i> Fragging Information</h5>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.FraggingMethod))
+                    {
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h6 class="text-muted">Method Used</h6>
+                                <p><i class="bi bi-tools"></i> @Model.FraggingMethod</p>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.MountedOn))
+                    {
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Mounted On</h6>
+                                <p><i class="bi bi-usb-plug"></i> @Model.MountedOn</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Location in Tank</h6>
+                                <p><i class="bi bi-pin-map"></i> @(string.IsNullOrEmpty(Model.LocationInTank) ? "Not specified" : Model.LocationInTank)</p>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.FraggingNotes))
+                    {
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h6 class="text-muted">Fragging Notes</h6>
+                                <p>@Model.FraggingNotes</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Encrustation & Sale Info -->
+            @if (Model.IsEncrusted || Model.IsReadyForSale || Model.SaleDate.HasValue)
+            {
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-cash-coin"></i> Growth & Sale Information</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.IsEncrusted)
+                        {
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <h6 class="text-muted">Encrusted</h6>
+                                    <p><i class="bi bi-check-circle text-success"></i> Yes</p>
+                                </div>
+                                @if (Model.EncrustmentDate.HasValue)
+                                {
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted">Encrusted Date</h6>
+                                        <p><i class="bi bi-calendar-check"></i> @Model.EncrustmentDate.Value.ToString("MMM dd, yyyy")</p>
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        @if (Model.IsReadyForSale)
+                        {
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <div class="alert alert-success mb-0">
+                                        <i class="bi bi-check-circle-fill"></i> This frag is ready for sale or trade!
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        @if (Model.SaleDate.HasValue)
+                        {
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <h6 class="text-muted">Sale Date</h6>
+                                    <p><i class="bi bi-calendar-event"></i> @Model.SaleDate.Value.ToString("MMM dd, yyyy")</p>
+                                </div>
+                                @if (Model.SalePrice.HasValue)
+                                {
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted">Sale Price</h6>
+                                        <p><i class="bi bi-currency-dollar"></i> @Model.SalePrice.Value.ToString("C")</p>
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.SoldTo))
+                        {
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <h6 class="text-muted">Sold/Traded To</h6>
+                                    <p><i class="bi bi-person"></i> @Model.SoldTo</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- Notes -->
+            @if (!string.IsNullOrEmpty(Model.Notes))
+            {
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0"><i class="bi bi-journal-text"></i> Additional Notes</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>@Model.Notes</p>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Image Card -->
+            @if (!string.IsNullOrEmpty(Model.ImagePath))
+            {
+                <div class="card shadow-sm mb-4">
+                    <img src="~/@Model.ImagePath" class="card-img-top" alt="@Model.FragName" />
+                    <div class="card-body">
+                        <p class="text-muted small mb-0">Frag Image</p>
+                    </div>
+                </div>
+            }
+
+            <!-- Quick Stats Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-graph-up"></i> Quick Stats</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <strong>Created:</strong><br />
+                            <small class="text-muted">@Model.CreatedDate.ToString("MMM dd, yyyy h:mm tt")</small>
+                        </li>
+                        @if (Model.LastUpdated.HasValue)
+                        {
+                            <li class="mb-2">
+                                <strong>Last Updated:</strong><br />
+                                <small class="text-muted">@Model.LastUpdated.Value.ToString("MMM dd, yyyy h:mm tt")</small>
+                            </li>
+                        }
+                        @if (Model.LastMeasurementDate.HasValue)
+                        {
+                            <li class="mb-2">
+                                <strong>Last Measured:</strong><br />
+                                <small class="text-muted">@Model.LastMeasurementDate.Value.ToString("MMM dd, yyyy")</small>
+                            </li>
+                        }
+                        <li>
+                            <strong>Age:</strong><br />
+                            <small class="text-muted">@((DateTime.Now - Model.FragDate).Days) days old</small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Actions Card -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-lightning"></i> Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                            <i class="bi bi-pencil"></i> Edit Frag
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">
+                            <i class="bi bi-trash"></i> Delete Frag
+                        </a>
+                        <a asp-action="Index" asp-route-tankId="@Model.TankId" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Frags
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

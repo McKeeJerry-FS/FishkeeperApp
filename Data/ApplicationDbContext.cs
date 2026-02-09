@@ -52,6 +52,7 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>
     public DbSet<JournalWaterTestLink> JournalWaterTestLinks { get; set; }
     public DbSet<FeedingSchedule> FeedingSchedules { get; set; }
     public DbSet<FeedingRecord> FeedingRecords { get; set; }
+    public DbSet<CoralFrag> CoralFrags { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

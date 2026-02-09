@@ -1,0 +1,252 @@
+@model CoralFrag
+
+@{
+    ViewData["Title"] = "New Coral Frag";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-6">
+            <i class="bi bi-plus-circle text-primary"></i> New Coral Frag
+        </h1>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle"></i> Cancel
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-scissors"></i> Frag Information</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <!-- Basic Information -->
+                        <h6 class="border-bottom pb-2 mb-3"><i class="bi bi-info-circle"></i> Basic Details</h6>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="TankId" class="form-label">
+                                    <i class="bi bi-droplet"></i> Tank <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="TankId" class="form-select" asp-items="ViewBag.TankId">
+                                    <option value="">-- Select Tank --</option>
+                                </select>
+                                <span asp-validation-for="TankId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ParentCoralId" class="form-label">
+                                    <i class="bi bi-diagram-3"></i> Parent Coral (Optional)
+                                </label>
+                                <select asp-for="ParentCoralId" class="form-select" asp-items="ViewBag.ParentCoralId">
+                                    <option value="">-- No Parent Coral --</option>
+                                </select>
+                                <span asp-validation-for="ParentCoralId" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FragName" class="form-label">
+                                    <i class="bi bi-tag"></i> Frag Name/ID <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="FragName" class="form-control"
+                                       placeholder="e.g., WWC Rainbow Frag #1" />
+                                <span asp-validation-for="FragName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CoralSpecies" class="form-label">
+                                    <i class="bi bi-flower3"></i> Coral Species
+                                </label>
+                                <input asp-for="CoralSpecies" class="form-control"
+                                       placeholder="e.g., Acropora millepora" />
+                                <span asp-validation-for="CoralSpecies" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="FragDate" class="form-label">
+                                    <i class="bi bi-calendar-event"></i> Frag Date <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="FragDate" type="date" class="form-control" />
+                                <span asp-validation-for="FragDate" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="InitialSize" class="form-label">
+                                    <i class="bi bi-rulers"></i> Initial Size (inches) <span
+                                    class="text-danger">*</span>
+                                </label>
+                                <input asp-for="InitialSize" type="number" step="0.1" class="form-control"
+                                       placeholder="1.0" />
+                                <span asp-validation-for="InitialSize" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="NumberOfPolyps" class="form-label">
+                                    <i class="bi bi-gem"></i> Number of Polyps
+                                </label>
+                                <input asp-for="NumberOfPolyps" type="number" class="form-control" placeholder="3" />
+                                <span asp-validation-for="NumberOfPolyps" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Fragging Details -->
+                        <h6 class="border-bottom pb-2 mb-3 mt-4"><i class="bi bi-scissors"></i> Fragging Details</h6>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FraggingMethod" class="form-label">
+                                    <i class="bi bi-tools"></i> Fragging Method
+                                </label>
+                                <select asp-for="FraggingMethod" class="form-select">
+                                    <option value="">-- Select Method --</option>
+                                    @foreach (var method in ViewBag.FraggingMethods as List<string>)
+                                    {
+                                        <option value="@method">@method</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="FraggingMethod" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Coloration" class="form-label">
+                                    <i class="bi bi-palette"></i> Coloration
+                                </label>
+                                <input asp-for="Coloration" class="form-control"
+                                       placeholder="e.g., Green with Purple Tips" />
+                                <span asp-validation-for="Coloration" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="FraggingNotes" class="form-label">
+                                <i class="bi bi-journal-text"></i> Fragging Notes
+                            </label>
+                            <textarea asp-for="FraggingNotes" class="form-control" rows="3"
+                                      placeholder="Any notes about the fragging process..."></textarea>
+                            <span asp-validation-for="FraggingNotes" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Placement -->
+                        <h6 class="border-bottom pb-2 mb-3 mt-4"><i class="bi bi-geo-alt"></i> Placement</h6>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="MountedOn" class="form-label">
+                                    <i class="bi bi-usb-plug"></i> Mounted On
+                                </label>
+                                <select asp-for="MountedOn" class="form-select">
+                                    <option value="">-- Select Mount Type --</option>
+                                    @foreach (var mount in ViewBag.MountingOptions as List<string>)
+                                    {
+                                        <option value="@mount">@mount</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="MountedOn" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LocationInTank" class="form-label">
+                                    <i class="bi bi-pin-map"></i> Location in Tank
+                                </label>
+                                <input asp-for="LocationInTank" class="form-control"
+                                       placeholder="e.g., Top right corner, Middle rock" />
+                                <span asp-validation-for="LocationInTank" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Status -->
+                        <h6 class="border-bottom pb-2 mb-3 mt-4"><i class="bi bi-activity"></i> Status</h6>
+
+                        <div class="mb-3">
+                            <label asp-for="Status" class="form-label">
+                                <i class="bi bi-flag"></i> Current Status
+                            </label>
+                            <select asp-for="Status" class="form-select">
+                                @foreach (var status in ViewBag.StatusOptions as List<string>)
+                                {
+                                    <option value="@status" selected="@(status == "Growing")">@status</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Image Upload -->
+                        <h6 class="border-bottom pb-2 mb-3 mt-4"><i class="bi bi-image"></i> Image (Optional)</h6>
+
+                        <div class="mb-3">
+                            <label for="imageFile" class="form-label">
+                                <i class="bi bi-camera"></i> Upload Frag Image
+                            </label>
+                            <input type="file" id="imageFile" name="imageFile" class="form-control" accept="image/*" />
+                            <div class="form-text">Upload a photo of your frag (optional)</div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label">
+                                <i class="bi bi-journal-text"></i> Additional Notes
+                            </label>
+                            <textarea asp-for="Notes" class="form-control" rows="3"
+                                      placeholder="Any additional notes..."></textarea>
+                            <span asp-validation-for="Notes" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Create Frag
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-lightbulb"></i> Tips</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success"></i>
+                            <strong>Frag Name:</strong> Use a unique identifier for easy tracking
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success"></i>
+                            <strong>Parent Coral:</strong> Link to the original coral if fragged from your tank
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success"></i>
+                            <strong>Size:</strong> Measure the largest dimension of the frag
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success"></i>
+                            <strong>Method:</strong> Document your fragging technique for future reference
+                        </li>
+                        <li>
+                            <i class="bi bi-check-circle text-success"></i>
+                            <strong>Photos:</strong> Track growth by taking photos at regular intervals
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

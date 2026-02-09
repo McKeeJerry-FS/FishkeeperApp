@@ -1,0 +1,223 @@
+@model IEnumerable<AquaHub.MVC.Models.CoralFrag>
+
+@{
+    ViewData["Title"] = ViewBag.TankName != null ? $"{ViewBag.TankName} - Coral Frags" : "Coral Fragging";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold">
+                <i class="bi bi-scissors text-primary"></i>
+                @if (ViewBag.TankName != null)
+                {
+                    <text>@ViewBag.TankName - Coral Frags</text>
+                }
+                else
+                {
+                    <text>Coral Fragging</text>
+                }
+            </h1>
+            <p class="text-muted">Track your coral propagation and frag sales</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a asp-action="Create" asp-route-tankId="@ViewBag.TankId" class="btn btn-primary btn-lg">
+                <i class="bi bi-plus-circle"></i> New Frag
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Info"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="bi bi-info-circle-fill me-2"></i>@TempData["Info"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Filter by Tank -->
+    @if (ViewBag.Tanks != null)
+    {
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-10">
+                        <label class="form-label fw-bold">Filter by Tank</label>
+                        <select name="tankId" class="form-select" onchange="this.form.submit()">
+                            <option value="">All Reef Tanks</option>
+                            @foreach (var tank in (IEnumerable<SelectListItem>)ViewBag.Tanks)
+                            {
+                                <option value="@tank.Value" selected="@(tank.Value == ViewBag.TankId?.ToString())">@tank.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary w-100">Clear</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-scissors display-1 text-muted"></i>
+                <h3 class="mt-3">No Frags Yet</h3>
+                <p class="text-muted">Start tracking your coral propagation by creating your first frag.</p>
+                <a asp-action="Create" asp-route-tankId="@ViewBag.TankId" class="btn btn-primary mt-3">
+                    <i class="bi bi-plus-circle"></i> Create Your First Frag
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Summary Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body">
+                        <h3 class="text-primary mb-0">@Model.Count()</h3>
+                        <p class="text-muted small mb-0">Total Frags</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body">
+                        <h3 class="text-success mb-0">@Model.Count(f => f.Status == "Growing")</h3>
+                        <p class="text-muted small mb-0">Growing</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body">
+                        <h3 class="text-info mb-0">@Model.Count(f => f.IsReadyForSale)</h3>
+                        <p class="text-muted small mb-0">Ready for Sale</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body">
+                        <h3 class="text-warning mb-0">@(Model.Where(f => f.SalePrice.HasValue).Sum(f => f.SalePrice.GetValueOrDefault()).ToString("C"))</h3>
+                        <p class="text-muted small mb-0">Total Sales</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Frags Grid -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+            @foreach (var frag in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm hover-shadow">
+                        @if (!string.IsNullOrEmpty(frag.ImagePath))
+                        {
+                            <img src="~/@frag.ImagePath" class="card-img-top" alt="@frag.FragName" style="height: 200px; object-fit: cover;">
+                        }
+                        else
+                        {
+                            <div class="card-img-top bg-gradient" 
+                                 style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <div class="d-flex align-items-center justify-content-center h-100">
+                                    <i class="bi bi-scissors text-white" style="font-size: 3rem;"></i>
+                                </div>
+                            </div>
+                        }
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title fw-bold mb-0">@frag.FragName</h5>
+                                <span class="badge @(frag.Status switch {
+                                    "Growing" => "bg-success",
+                                    "Encrusted" => "bg-info",
+                                    "Ready" => "bg-primary",
+                                    "Sold" => "bg-warning",
+                                    "Traded" => "bg-secondary",
+                                    "Lost" => "bg-danger",
+                                    _ => "bg-secondary"
+                                })">@frag.Status</span>
+                            </div>
+                            
+                            @if (!string.IsNullOrEmpty(frag.CoralSpecies))
+                            {
+                                <p class="text-muted small mb-1"><i class="bi bi-flower3"></i> @frag.CoralSpecies</p>
+                            }
+                            
+                            <p class="text-muted small mb-1">
+                                <i class="bi bi-droplet"></i> @frag.Tank?.Name
+                            </p>
+                            
+                            <p class="text-muted small mb-1">
+                                <i class="bi bi-rulers"></i> 
+                                @if (frag.CurrentSize.HasValue)
+                                {
+                                    <text>@frag.CurrentSize.Value.ToString("F1")" (was @frag.InitialSize.ToString("F1")")</text>
+                                }
+                                else
+                                {
+                                    <text>@frag.InitialSize.ToString("F1")"</text>
+                                }
+                            </p>
+                            
+                            <p class="text-muted small mb-0">
+                                <i class="bi bi-calendar-event"></i>
+                                Fragged: @frag.FragDate.ToString("MMM dd, yyyy")
+                            </p>
+                            
+                            @if (frag.IsReadyForSale)
+                            {
+                                <div class="badge bg-success mt-2">
+                                    <i class="bi bi-check-circle"></i> Ready for Sale
+                                </div>
+                            }
+                        </div>
+                        <div class="card-footer bg-transparent border-top-0">
+                            <div class="btn-group w-100" role="group">
+                                <a asp-action="Details" asp-route-id="@frag.Id" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@frag.Id" class="btn btn-outline-warning btn-sm">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        .hover-shadow {
+            transition: all 0.3s ease;
+        }
+
+        .hover-shadow:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+        }
+    </style>
+}

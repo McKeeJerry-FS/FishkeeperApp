@@ -1,0 +1,334 @@
+@model CoralFrag
+
+@{
+    ViewData["Title"] = $"Edit {Model.FragName}";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-6">
+            <i class="bi bi-pencil text-warning"></i> Edit @Model.FragName
+        </h1>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle"></i> Cancel
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-scissors"></i> Edit Frag Information</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="UserId" />
+                        <input type="hidden" asp-for="CreatedDate" />
+                        <input type="hidden" asp-for="ImagePath" />
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <!-- Basic Information -->
+                        <h6 class="border-bottom pb-2 mb-3"><i class="bi bi-info-circle"></i> Basic Details</h6>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="TankId" class="form-label">
+                                    <i class="bi bi-droplet"></i> Tank <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="TankId" class="form-select" asp-items="ViewBag.TankId">
+                                    <option value="">-- Select Tank --</option>
+                                </select>
+                                <span asp-validation-for="TankId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ParentCoralId" class="form-label">
+                                    <i class="bi bi-diagram-3"></i> Parent Coral (Optional)
+                                </label>
+                                <select asp-for="ParentCoralId" class="form-select" asp-items="ViewBag.ParentCoralId">
+                                    <option value="">-- No Parent Coral --</option>
+                                </select>
+                                <span asp-validation-for="ParentCoralId" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FragName" class="form-label">
+                                    <i class="bi bi-tag"></i> Frag Name/ID <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="FragName" class="form-control" />
+                                <span asp-validation-for="FragName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CoralSpecies" class="form-label">
+                                    <i class="bi bi-flower3"></i> Coral Species
+                                </label>
+                                <input asp-for="CoralSpecies" class="form-control" />
+                                <span asp-validation-for="CoralSpecies" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="FragDate" class="form-label">
+                                    <i class="bi bi-calendar-event"></i> Frag Date <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="FragDate" type="date" class="form-control" />
+                                <span asp-validation-for="FragDate" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="InitialSize" class="form-label">
+                                    <i class="bi bi-rulers"></i> Initial Size (inches) <span
+                                    class="text-danger">*</span>
+                                </label>
+                                <input asp-for="InitialSize" type="number" step="0.1" class="form-control" />
+                                <span asp-validation-for="InitialSize" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="NumberOfPolyps" class="form-label">
+                                    <i class="bi bi-gem"></i> Number of Polyps
+                                </label>
+                                <input asp-for="NumberOfPolyps" type="number" class="form-control" />
+                                <span asp-validation-for="NumberOfPolyps" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Fragging Details -->
+                        <h6 class="border-bottom pb-2 mb-3 mt-4"><i class="bi bi-scissors"></i> Fragging Details</h6>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FraggingMethod" class="form-label">
+                                    <i class="bi bi-tools"></i> Fragging Method
+                                </label>
+                                <select asp-for="FraggingMethod" class="form-select">
+                                    <option value="">-- Select Method --</option>
+                                    @foreach (var method in ViewBag.FraggingMethods as List<string>)
+                                    {
+                                        <option value="@method">@method</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="FraggingMethod" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Coloration" class="form-label">
+                                    <i class="bi bi-palette"></i> Coloration
+                                </label>
+                                <input asp-for="Coloration" class="form-control" />
+                                <span asp-validation-for="Coloration" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="FraggingNotes" class="form-label">
+                                <i class="bi bi-journal-text"></i> Fragging Notes
+                            </label>
+                            <textarea asp-for="FraggingNotes" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="FraggingNotes" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Placement -->
+                        <h6 class="border-bottom pb-2 mb-3 mt-4"><i class="bi bi-geo-alt"></i> Placement</h6>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="MountedOn" class="form-label">
+                                    <i class="bi bi-usb-plug"></i> Mounted On
+                                </label>
+                                <select asp-for="MountedOn" class="form-select">
+                                    <option value="">-- Select Mount Type --</option>
+                                    @foreach (var mount in ViewBag.MountingOptions as List<string>)
+                                    {
+                                        <option value="@mount">@mount</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="MountedOn" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LocationInTank" class="form-label">
+                                    <i class="bi bi-pin-map"></i> Location in Tank
+                                </label>
+                                <input asp-for="LocationInTank" class="form-control" />
+                                <span asp-validation-for="LocationInTank" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Growth Tracking -->
+                        <h6 class="border-bottom pb-2 mb-3 mt-4"><i class="bi bi-graph-up"></i> Growth Tracking</h6>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CurrentSize" class="form-label">
+                                    <i class="bi bi-rulers"></i> Current Size (inches)
+                                </label>
+                                <input asp-for="CurrentSize" type="number" step="0.1" class="form-control" />
+                                <span asp-validation-for="CurrentSize" class="text-danger small"></span>
+                                <div class="form-text">Update when measuring growth</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LastMeasurementDate" class="form-label">
+                                    <i class="bi bi-calendar-check"></i> Last Measurement Date
+                                </label>
+                                <input asp-for="LastMeasurementDate" type="date" class="form-control" />
+                                <span asp-validation-for="LastMeasurementDate" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Status & Encrustation -->
+                        <h6 class="border-bottom pb-2 mb-3 mt-4"><i class="bi bi-activity"></i> Status & Progress</h6>
+
+                        <div class="mb-3">
+                            <label asp-for="Status" class="form-label">
+                                <i class="bi bi-flag"></i> Current Status
+                            </label>
+                            <select asp-for="Status" class="form-select">
+                                @foreach (var status in ViewBag.StatusOptions as List<string>)
+                                {
+                                    <option value="@status">@status</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check">
+                                    <input asp-for="IsEncrusted" class="form-check-input" type="checkbox" />
+                                    <label asp-for="IsEncrusted" class="form-check-label">
+                                        Frag is Encrusted
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="EncrustmentDate" class="form-label">
+                                    <i class="bi bi-calendar-check"></i> Encrusted Date
+                                </label>
+                                <input asp-for="EncrustmentDate" type="date" class="form-control" />
+                                <span asp-validation-for="EncrustmentDate" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Sale Information -->
+                        <h6 class="border-bottom pb-2 mb-3 mt-4"><i class="bi bi-cash-coin"></i> Sale Information</h6>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input asp-for="IsReadyForSale" class="form-check-input" type="checkbox" />
+                                <label asp-for="IsReadyForSale" class="form-check-label">
+                                    Ready for Sale/Trade
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="SaleDate" class="form-label">
+                                    <i class="bi bi-calendar-event"></i> Sale Date
+                                </label>
+                                <input asp-for="SaleDate" type="date" class="form-control" />
+                                <span asp-validation-for="SaleDate" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="SalePrice" class="form-label">
+                                    <i class="bi bi-currency-dollar"></i> Sale Price
+                                </label>
+                                <input asp-for="SalePrice" type="number" step="0.01" class="form-control" />
+                                <span asp-validation-for="SalePrice" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="SoldTo" class="form-label">
+                                    <i class="bi bi-person"></i> Sold/Traded To
+                                </label>
+                                <input asp-for="SoldTo" class="form-control" />
+                                <span asp-validation-for="SoldTo" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Image Upload -->
+                        <h6 class="border-bottom pb-2 mb-3 mt-4"><i class="bi bi-image"></i> Image</h6>
+
+                        @if (!string.IsNullOrEmpty(Model.ImagePath))
+                        {
+                            <div class="mb-3">
+                                <p class="text-muted">Current image:</p>
+                                <img src="~/@Model.ImagePath" alt="@Model.FragName" class="img-thumbnail"
+                                     style="max-width: 200px;" />
+                            </div>
+                        }
+
+                        <div class="mb-3">
+                            <label for="imageFile" class="form-label">
+                                <i class="bi bi-camera"></i> Upload New Image
+                            </label>
+                            <input type="file" id="imageFile" name="imageFile" class="form-control" accept="image/*" />
+                            <div class="form-text">Leave empty to keep current image</div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label">
+                                <i class="bi bi-journal-text"></i> Additional Notes
+                            </label>
+                            <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Notes" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-check-circle"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-lightbulb"></i> Update Tips</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success"></i>
+                            <strong>Current Size:</strong> Update when measuring growth progress
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success"></i>
+                            <strong>Status:</strong> Change to "Encrusted" once the frag attaches
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success"></i>
+                            <strong>Ready for Sale:</strong> Mark when the frag is mature enough
+                        </li>
+                        <li>
+                            <i class="bi bi-check-circle text-success"></i>
+                            <strong>Photos:</strong> Update images regularly to track growth
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
