@@ -1,0 +1,229 @@
+@model IEnumerable<AquaHub.MVC.Models.BreedingPair>
+
+@{
+    ViewData["Title"] = ViewBag.TankName != null ? $"{ViewBag.TankName} - Breeding" : "Breeding Pairs";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold">
+                <i class="bi bi-hearts text-danger"></i>
+                @if (ViewBag.TankName != null)
+                {
+                    <text>@ViewBag.TankName - Breeding</text>
+                }
+                else
+                {
+                    <text>Breeding Pairs</text>
+                }
+            </h1>
+            <p class="text-muted">Track breeding pairs and attempts</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a asp-action="Create" asp-route-tankId="@ViewBag.TankId" class="btn btn-primary btn-lg">
+                <i class="bi bi-plus-circle"></i> New Breeding Pair
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Filters -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-5">
+                    <label class="form-label fw-bold">Filter by Tank</label>
+                    <select name="tankId" class="form-select" onchange="this.form.submit()">
+                        <option value="">All Tanks</option>
+                        @if (ViewBag.Tanks != null)
+                        {
+                            @foreach (var tank in (IEnumerable<SelectListItem>)ViewBag.Tanks)
+                            {
+                                <option value="@tank.Value" selected="@(tank.Value == ViewBag.TankId?.ToString())">@tank.Text
+                                </option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label fw-bold">Show</label>
+                    <select name="activeOnly" class="form-select" onchange="this.form.submit()">
+                        <option value="">All Pairs</option>
+                        <option value="true" selected="@(ViewBag.ActiveOnly == true)">Active Only</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary w-100">Clear</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-hearts display-1 text-muted"></i>
+                <h3 class="mt-3">No Breeding Pairs Yet</h3>
+                <p class="text-muted">Start tracking your breeding projects by creating your first breeding pair.</p>
+                <a asp-action="Create" asp-route-tankId="@ViewBag.TankId" class="btn btn-primary mt-3">
+                    <i class="bi bi-plus-circle"></i> Create Your First Breeding Pair
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Summary Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body">
+                        <h3 class="text-primary mb-0">@Model.Count()</h3>
+                        <p class="text-muted small mb-0">Total Pairs</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body">
+                        <h3 class="text-success mb-0">@Model.Count(p => p.IsActive)</h3>
+                        <p class="text-muted small mb-0">Active Pairs</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body">
+                        <h3 class="text-info mb-0">@Model.SelectMany(p => p.BreedingAttempts).Count()</h3>
+                        <p class="text-muted small mb-0">Total Attempts</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body">
+                        <h3 class="text-warning mb-0">@Model.SelectMany(p => p.BreedingAttempts).Count(a => a.Status ==
+                                                                                "Successful")</h3>
+                            <p class="text-muted small mb-0">Successful</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Breeding Pairs Grid -->
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                @foreach (var pair in Model)
+                {
+                    <div class="col">
+                        <div class="card h-100 border-0 shadow-sm hover-shadow">
+                            @if (!string.IsNullOrEmpty(pair.ImagePath))
+                            {
+                                <img src="~/@pair.ImagePath" class="card-img-top" alt="@pair.PairName"
+                                     style="height: 200px; object-fit: cover;">
+                                }
+                        else
+                                {
+                                    <div class="card-img-top bg-gradient"
+                                         style="height: 200px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                        <div class="d-flex align-items-center justify-content-center h-100">
+                                            <i class="bi bi-hearts text-white" style="font-size: 3rem;"></i>
+                                        </div>
+                                    </div>
+                                }
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title fw-bold mb-0">@pair.PairName</h5>
+                                        @if (pair.IsActive)
+                                        {
+                                            <span class="badge bg-success">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Inactive</span>
+                                        }
+                                    </div>
+
+                                    @if (!string.IsNullOrEmpty(pair.Species))
+                                    {
+                                        <p class="text-muted small mb-1"><i class="bi bi-flower3"></i> @pair.Species</p>
+                                    }
+
+                                    <p class="text-muted small mb-1">
+                                        <i class="bi bi-droplet"></i> @pair.Tank?.Name
+                                    </p>
+
+                                    @if (pair.Parent1 != null || pair.Parent2 != null)
+                                    {
+                                        <p class="text-muted small mb-1">
+                                            <i class="bi bi-fish"></i>
+                                            @if (pair.Parent1 != null && pair.Parent2 != null)
+                                            {
+                                                <text>@pair.Parent1.Name & @pair.Parent2.Name</text>
+                                            }
+                                            else if (pair.Parent1 != null)
+                                            {
+                                                <text>@pair.Parent1.Name</text>
+                                            }
+                                            else
+                                            {
+                                                <text>@pair.Parent2.Name</text>
+                                            }
+                                        </p>
+                                    }
+
+                                    <p class="text-muted small mb-1">
+                                        <i class="bi bi-calendar-event"></i>
+                                        Paired: @pair.DatePaired.ToString("MMM dd, yyyy")
+                                    </p>
+
+                                    <p class="text-muted small mb-0">
+                                        <i class="bi bi-graph-up"></i>
+                                        @pair.BreedingAttempts.Count attempts
+                                    </p>
+                                </div>
+                                <div class="card-footer bg-transparent border-top-0">
+                                    <div class="btn-group w-100" role="group">
+                                        <a asp-action="Details" asp-route-id="@pair.Id" class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-eye"></i> View
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@pair.Id" class="btn btn-outline-warning btn-sm">
+                                            <i class="bi bi-pencil"></i> Edit
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        @section Styles {
+            <style>
+                                .hover-shadow {
+                                    transition: all 0.3s ease;
+                                }
+
+                                .hover-shadow:hover {
+                                    transform: translateY(-5px);
+                                    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15) !important;
+                                }
+            </style>
+        }

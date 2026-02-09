@@ -53,6 +53,8 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>
     public DbSet<FeedingSchedule> FeedingSchedules { get; set; }
     public DbSet<FeedingRecord> FeedingRecords { get; set; }
     public DbSet<CoralFrag> CoralFrags { get; set; }
+    public DbSet<BreedingPair> BreedingPairs { get; set; }
+    public DbSet<BreedingAttempt> BreedingAttempts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

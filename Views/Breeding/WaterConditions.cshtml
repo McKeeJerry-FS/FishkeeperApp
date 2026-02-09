@@ -1,0 +1,255 @@
+@using AquaHub.MVC.Models.ViewModels
+@model BreedingWaterConditionViewModel
+
+@{
+    ViewData["Title"] = "Water Conditions Analysis";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2>
+                        <i class="bi bi-droplet-half"></i> Water Conditions Analysis
+                    </h2>
+                    <p class="text-muted mb-0">
+                        Breeding Pair: @Model.BreedingPair.Parent1?.Name - @Model.BreedingPair.Parent2?.Name
+                        <span class="ms-2 badge bg-secondary">@Model.BreedingPair.Tank?.Name</span>
+                    </p>
+                </div>
+                <div>
+                    <a asp-action="Details" asp-route-id="@Model.BreedingPair.Id" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Details
+                    </a>
+                    <a asp-controller="WaterTest" asp-action="Create" asp-route-tankId="@Model.BreedingPair.TankId" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> New Water Test
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.HasIdealParameters)
+    {
+        <div class="alert alert-info">
+            <h5><i class="bi bi-info-circle"></i> Set Ideal Water Parameters</h5>
+            <p class="mb-2">No ideal water parameters have been set for this breeding pair.</p>
+            <a asp-action="Edit" asp-route-id="@Model.BreedingPair.Id" class="btn btn-sm btn-info">
+                <i class="bi bi-pencil"></i> Edit Breeding Pair
+            </a>
+        </div>
+    }
+    else if (Model.LatestWaterTest == null)
+    {
+        <div class="alert alert-warning">
+            <h5><i class="bi bi-exclamation-triangle"></i> No Water Test Data Available</h5>
+            <p class="mb-2">Test the water parameters for Tank: @Model.BreedingPair.Tank?.Name to monitor breeding conditions.</p>
+            <a asp-controller="WaterTest" asp-action="Create" asp-route-tankId="@Model.BreedingPair.TankId" class="btn btn-sm btn-warning">
+                <i class="bi bi-droplet"></i> Test Water Now
+            </a>
+        </div>
+    }
+    else
+    {
+        <!-- Overall Status Card -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card @(Model.IsOptimal ? "border-success" : Model.ParametersOutOfRange > 2 ? "border-danger" : "border-warning")">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <h4 class="mb-2">
+                                    @if (Model.IsOptimal)
+                                    {
+                                        <span class="text-success"><i class="bi bi-check-circle-fill"></i> Optimal Breeding Conditions</span>
+                                    }
+                                    else if (Model.ParametersOutOfRange > 2)
+                                    {
+                                        <span class="text-danger"><i class="bi bi-x-circle-fill"></i> Critical - Not Ready for Breeding</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-warning"><i class="bi bi-exclamation-triangle-fill"></i> Needs Adjustment</span>
+                                    }
+                                </h4>
+                                <p class="text-muted mb-0">
+                                    Last tested: @Model.LatestWaterTest.Timestamp.ToString("MMM dd, yyyy 'at' h:mm tt")
+                                    <span class="ms-2">(@((DateTime.Now - Model.LatestWaterTest.Timestamp).TotalDays.ToString("F0")) days ago)</span>
+                                </p>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <div class="d-flex justify-content-end gap-3">
+                                    <div>
+                                        <h3 class="mb-0 @(Model.IsOptimal ? "text-success" : "text-muted")">
+                                            @(Model.ParameterStatuses.Count(p => p.Status == "Optimal"))
+                                        </h3>
+                                        <small class="text-muted">Optimal</small>
+                                    </div>
+                                    <div>
+                                        <h3 class="mb-0 @(Model.ParameterStatuses.Any(p => p.Status == "Warning") ? "text-warning" : "text-muted")">
+                                            @(Model.ParameterStatuses.Count(p => p.Status == "Warning"))
+                                        </h3>
+                                        <small class="text-muted">Warning</small>
+                                    </div>
+                                    <div>
+                                        <h3 class="mb-0 @(Model.ParameterStatuses.Any(p => p.Status == "Critical") ? "text-danger" : "text-muted")">
+                                            @(Model.ParameterStatuses.Count(p => p.Status == "Critical"))
+                                        </h3>
+                                        <small class="text-muted">Critical</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parameters Grid -->
+        <div class="row mb-4">
+            @foreach (var param in Model.ParameterStatuses)
+            {
+                var statusClass = param.Status switch
+                {
+                    "Optimal" => "success",
+                    "Warning" => "warning",
+                    "Critical" => "danger",
+                    _ => "secondary"
+                };
+                var statusIcon = param.Status switch
+                {
+                    "Optimal" => "check-circle-fill",
+                    "Warning" => "exclamation-triangle-fill",
+                    "Critical" => "x-circle-fill",
+                    _ => "question-circle"
+                };
+
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card border-@statusClass h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title mb-0">@param.ParameterName</h5>
+                                <span class="badge bg-@statusClass">
+                                    <i class="bi bi-@statusIcon"></i>
+                                </span>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-muted">Current:</span>
+                                    <strong>
+                                        @if (param.CurrentValue.HasValue)
+                                        {
+                                            <span class="text-@statusClass">
+                                                @param.CurrentValue.Value.ToString("F2") @param.Unit
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Not tested</span>
+                                        }
+                                    </strong>
+                                </div>
+
+                                @if (param.IdealMin.HasValue || param.IdealMax.HasValue)
+                                {
+                                    <div class="d-flex justify-content-between">
+                                        <span class="text-muted">Ideal Range:</span>
+                                        <span>
+                                            @if (param.IdealMin.HasValue && param.IdealMax.HasValue)
+                                            {
+                                                <text>@param.IdealMin.Value.ToString("F2") - @param.IdealMax.Value.ToString("F2") @param.Unit</text>
+                                            }
+                                            else if (param.IdealMax.HasValue)
+                                            {
+                                                <text>≤ @param.IdealMax.Value.ToString("F2") @param.Unit</text>
+                                            }
+                                            else if (param.IdealMin.HasValue)
+                                            {
+                                                <text>≥ @param.IdealMin.Value.ToString("F2") @param.Unit</text>
+                                            }
+                                        </span>
+                                    </div>
+                                }
+
+                                @if (param.CurrentValue.HasValue && (param.IdealMin.HasValue || param.IdealMax.HasValue))
+                                {
+                                    var rangeMin = param.IdealMin ?? 0;
+                                    var rangeMax = param.IdealMax ?? (param.IdealMin.HasValue ? param.IdealMin.Value * 2 : 100);
+                                    var rangeSpan = rangeMax - rangeMin;
+                                    var currentPosition = param.CurrentValue.Value;
+                                    
+                                    // Clamp position for display
+                                    var displayMin = Math.Min(rangeMin * 0.8, currentPosition * 0.9);
+                                    var displayMax = Math.Max(rangeMax * 1.2, currentPosition * 1.1);
+                                    var displaySpan = displayMax - displayMin;
+                                    var markerPosition = ((currentPosition - displayMin) / displaySpan) * 100;
+                                    var rangeStart = ((rangeMin - displayMin) / displaySpan) * 100;
+                                    var rangeWidth = ((rangeMax - rangeMin) / displaySpan) * 100;
+
+                                    <div class="mt-2 position-relative" style="height: 8px; background: #e0e0e0; border-radius: 4px;">
+                                        @if (param.IdealMin.HasValue || param.IdealMax.HasValue)
+                                        {
+                                            <div style="position: absolute; left: @(rangeStart)%; width: @(rangeWidth)%; height: 8px; background: #28a745; border-radius: 4px; opacity: 0.3;"></div>
+                                        }
+                                        <div style="position: absolute; left: @(markerPosition)%; transform: translateX(-50%); top: -4px;">
+                                            <div style="width: 16px; height: 16px; border-radius: 50%; background: var(--bs-@statusClass); border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(param.Recommendation))
+                            {
+                                <div class="alert alert-@statusClass alert-sm p-2 mb-0">
+                                    <small>@param.Recommendation</small>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Recommendations Section -->
+        @if (Model.Recommendations.Any())
+        {
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-lightbulb"></i> Recommendations</h5>
+                </div>
+                <div class="card-body">
+                    @foreach (var recommendation in Model.Recommendations)
+                    {
+                        <p class="mb-2">@recommendation</p>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- Water Test History Link -->
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">Need More Details?</h5>
+                        <p class="text-muted mb-0">View complete water test history and trends for this tank.</p>
+                    </div>
+                    <a asp-controller="WaterTest" asp-action="Index" asp-route-tankId="@Model.BreedingPair.TankId" class="btn btn-outline-primary">
+                        <i class="bi bi-graph-up"></i> View Test History
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-refresh if page is left open (every 5 minutes)
+        setTimeout(function() {
+            location.reload();
+        }, 300000);
+    </script>
+}

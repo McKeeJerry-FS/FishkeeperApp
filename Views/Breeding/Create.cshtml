@@ -1,0 +1,200 @@
+@model BreedingPair
+
+@{
+    ViewData["Title"] = "New Breeding Pair";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-6">
+            <i class="bi bi-plus-circle text-primary"></i> New Breeding Pair
+        </h1>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle"></i> Cancel
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-hearts"></i> Breeding Pair Information</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="TankId" class="form-label">
+                                    <i class="bi bi-droplet"></i> Tank <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="TankId" class="form-select" asp-items="ViewBag.TankId">
+                                    <option value="">-- Select Tank --</option>
+                                </select>
+                                <span asp-validation-for="TankId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PairName" class="form-label">
+                                    <i class="bi bi-tag"></i> Pair Name <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="PairName" class="form-control"
+                                       placeholder="e.g., Blue Gourami Pair #1" />
+                                <span asp-validation-for="PairName" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Parent1Id" class="form-label">
+                                    <i class="bi bi-fish"></i> Parent 1 (Optional)
+                                </label>
+                                <select asp-for="Parent1Id" class="form-select" asp-items="ViewBag.Parent1Id">
+                                    <option value="">-- No Parent 1 --</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Parent2Id" class="form-label">
+                                    <i class="bi bi-fish"></i> Parent 2 (Optional)
+                                </label>
+                                <select asp-for="Parent2Id" class="form-select" asp-items="ViewBag.Parent2Id">
+                                    <option value="">-- No Parent 2 --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Species" class="form-label">
+                                    <i class="bi bi-flower3"></i> Species
+                                </label>
+                                <input asp-for="Species" class="form-control" placeholder="e.g., Betta splendens" />
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="BreedingType" class="form-label">
+                                    <i class="bi bi-egg"></i> Breeding Type
+                                </label>
+                                <select asp-for="BreedingType" class="form-select">
+                                    <option value="">-- Select Type --</option>
+                                    @foreach (var type in ViewBag.BreedingTypes as List<string>)
+                                    {
+                                        <option value="@type">@type</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DatePaired" class="form-label">
+                                    <i class="bi bi-calendar-event"></i> Date Paired <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="DatePaired" type="date" class="form-control" />
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check mt-4 pt-2">
+                                    <input asp-for="IsActive" class="form-check-input" type="checkbox" checked />
+                                    <label asp-for="IsActive" class="form-check-label">
+                                        Active Breeding Pair
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="BreedingSetup" class="form-label">
+                                <i class="bi bi-gear"></i> Breeding Setup
+                            </label>
+                            <textarea asp-for="BreedingSetup" class="form-control" rows="3"
+                                      placeholder="Describe the breeding tank setup..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="WaterConditions" class="form-label">
+                                <i class="bi bi-droplet-fill"></i> Water Conditions
+                            </label>
+                            <textarea asp-for="WaterConditions" class="form-control" rows="2"
+                                      placeholder="Ideal water parameters for breeding..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DietConditioning" class="form-label">
+                                <i class="bi bi-egg-fried"></i> Diet & Conditioning
+                            </label>
+                            <textarea asp-for="DietConditioning" class="form-control" rows="2"
+                                      placeholder="Feeding regimen for conditioning..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="BehaviorNotes" class="form-label">
+                                <i class="bi bi-eye"></i> Breeding Behavior Notes
+                            </label>
+                            <textarea asp-for="BehaviorNotes" class="form-control" rows="3"
+                                      placeholder="Observed breeding behaviors..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="imageFile" class="form-label">
+                                <i class="bi bi-camera"></i> Upload Image (Optional)
+                            </label>
+                            <input type="file" id="imageFile" name="imageFile" class="form-control" accept="image/*" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label">
+                                <i class="bi bi-journal-text"></i> Additional Notes
+                            </label>
+                            <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Create Pair
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-lightbulb"></i> Tips</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success"></i>
+                            <strong>Tank Selection:</strong> Use a breeding or quarantine tank if available
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success"></i>
+                            <strong>Parent Selection:</strong> Link to parent livestock for tracking lineage
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success"></i>
+                            <strong>Conditioning:</strong> Document feeding and conditioning schedule
+                        </li>
+                        <li>
+                            <i class="bi bi-check-circle text-success"></i>
+                            <strong>Observations:</strong> Record all breeding behaviors and triggers
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

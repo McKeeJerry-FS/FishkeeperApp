@@ -91,6 +91,9 @@ builder.Services.AddScoped<ISupplyService, SupplyService>();
 // Feeding Services
 builder.Services.AddScoped<IFeedingService, FeedingService>();
 
+// Breeding Services
+builder.Services.AddScoped<IBreedingWaterAnalysisService, BreedingWaterAnalysisService>();
+
 // Notification & Reminder Services
 builder.Services.AddScoped<IReminderService, ReminderService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();

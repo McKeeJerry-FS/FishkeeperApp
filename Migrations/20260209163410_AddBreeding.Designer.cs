@@ -3,6 +3,7 @@ using System;
 using AquaHub.MVC.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AquaHub.MVC.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260209163410_AddBreeding")]
+    partial class AddBreeding
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -273,30 +276,6 @@ namespace AquaHub.MVC.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.Property<int?>("IdealGhMax")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("IdealGhMin")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("IdealKhMax")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("IdealKhMin")
-                        .HasColumnType("integer");
-
-                    b.Property<double?>("IdealPhMax")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("IdealPhMin")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("IdealTempMax")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("IdealTempMin")
-                        .HasColumnType("double precision");
-
                     b.Property<string>("ImagePath")
                         .HasColumnType("text");
 
@@ -305,15 +284,6 @@ namespace AquaHub.MVC.Migrations
 
                     b.Property<DateTime?>("LastUpdated")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<double?>("MaxAmmonia")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("MaxNitrate")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("MaxNitrite")
-                        .HasColumnType("double precision");
 
                     b.Property<string>("Notes")
                         .IsRequired()
