@@ -1,0 +1,412 @@
+@model AquaHub.MVC.Models.TankPredictionSummary
+
+@{
+    ViewData["Title"] = "Water Chemistry Predictions";
+}
+
+<!-- 
+    ======================================================================================
+    PREDICTION DASHBOARD VIEW
+    ======================================================================================
+    
+    This view displays machine learning predictions for water chemistry parameters.
+    
+    WHAT THIS PAGE SHOWS:
+    - Overall tank health forecast
+    - Individual parameter predictions (pH, ammonia, nitrate, etc.)
+    - Confidence scores for each prediction
+    - Warnings for parameters going out of safe range
+    - Trend indicators (increasing, decreasing, stable)
+    
+    RAZOR SYNTAX EXPLAINED:
+    
+    Razor is C# code mixed with HTML. The at symbol switches between HTML and C#:
+    - Model.TankName: Outputs the tank name
+    - if (condition): C# if statement in HTML
+    - foreach (var item in list): C# foreach loop
+    
+    Think of it as: HTML is the structure, Razor fills in the dynamic data.
+    ======================================================================================
+-->
+
+<div class="container mt-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="display-4">
+                <i class="fas fa-chart-line"></i> Water Chemistry Predictions
+            </h1>
+            <p class="lead text-muted">
+                Machine learning predictions for your aquarium's future water parameters
+            </p>
+        </div>
+    </div>
+
+    <!-- Tank Selector and Options -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <!-- 
+                Tank selection dropdown
+                Allows user to switch between different tanks
+            -->
+            @if (ViewBag.Tanks != null)
+            {
+                <form method="get" asp-action="Index" class="form-inline">
+                    <label class="mr-2">Select Tank:</label>
+                    <select name="tankId" class="form-control mr-2" onchange="this.form.submit()">
+                        @foreach (var item in (SelectList)ViewBag.Tanks)
+                        {
+                            <option value="@item.Value" selected="@item.Selected">@item.Text</option>
+                        }
+                    </select>
+
+                    <label class="mr-2">Days Ahead:</label>
+                    <select name="daysAhead" class="form-control mr-2" onchange="this.form.submit()">
+                        <option value="3" selected="@(ViewBag.DaysAhead == 3)">3 days</option>
+                        <option value="7" selected="@(ViewBag.DaysAhead == 7)">7 days</option>
+                        <option value="14" selected="@(ViewBag.DaysAhead == 14)">14 days</option>
+                        <option value="30" selected="@(ViewBag.DaysAhead == 30)">30 days</option>
+                    </select>
+                </form>
+            }
+        </div>
+        <div class="col-md-4 text-right">
+            <!-- 
+                Educational link - explains how ML predictions work
+                This helps users understand what they're seeing
+            -->
+            <a asp-action="HowItWorks" class="btn btn-info">
+                <i class="fas fa-question-circle"></i> How It Works
+            </a>
+            @if (ViewBag.SelectedTankId != null)
+            {
+                <a asp-action="Accuracy" asp-route-tankId="@ViewBag.SelectedTankId" class="btn btn-secondary">
+                    <i class="fas fa-check-circle"></i> View Accuracy
+                </a>
+            }
+        </div>
+    </div>
+
+    <!-- 
+        Check if we have enough data to make predictions
+        ML Note: Need minimum number of water tests to find patterns
+    -->
+    @if (!Model.HasSufficientData)
+    {
+        <div class="alert alert-warning" role="alert">
+            <h4 class="alert-heading">
+                <i class="fas fa-exclamation-triangle"></i> Insufficient Data
+            </h4>
+            <p>@Model.InsufficientDataMessage</p>
+            <hr>
+            <p class="mb-0">
+                <strong>How to get predictions:</strong>
+                <ol>
+                    <li>Perform regular water tests (at least 10-15 tests)</li>
+                    <li>Test at consistent intervals (e.g., every 3 days)</li>
+                    <li>Return to this page once you have enough data</li>
+                </ol>
+            </p>
+        </div>
+
+        <!-- Show message if exists -->
+        @if (ViewBag.Message != null)
+        {
+            <div class="alert alert-info">@ViewBag.Message</div>
+        }
+    }
+    else
+    {
+        <!-- Overall Forecast Summary -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Overall Forecast for @ViewBag.SelectedTankName
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <h5>Forecast:</h5>
+                                <!-- 
+                                    Display overall forecast with color coding
+                                    Excellent = green, Good = blue, Fair = yellow, Concerning = red
+                                -->
+                                <h2>
+                                    @if (Model.OverallForecast == "Excellent")
+                                    {
+                                        <span class="badge badge-success">@Model.OverallForecast</span>
+                                    }
+                                    else if (Model.OverallForecast == "Good")
+                                    {
+                                        <span class="badge badge-info">@Model.OverallForecast</span>
+                                    }
+                                    else if (Model.OverallForecast == "Fair")
+                                    {
+                                        <span class="badge badge-warning">@Model.OverallForecast</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-danger">@Model.OverallForecast</span>
+                                    }
+                                </h2>
+                            </div>
+                            <div class="col-md-3">
+                                <h5>Warnings:</h5>
+                                <h2>
+                                    @if (Model.WarningCount > 0)
+                                    {
+                                        <span class="badge badge-danger">@Model.WarningCount</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-success">0</span>
+                                    }
+                                </h2>
+                            </div>
+                            <div class="col-md-3">
+                                <h5>Average Confidence:</h5>
+                                <!-- 
+                                    Confidence score shows how reliable predictions are
+                                    Higher = more reliable (based on R² from linear regression)
+                                -->
+                                <h2>
+                                    <span class="badge badge-secondary">@Model.AverageConfidence.ToString("F1")%</span>
+                                </h2>
+                            </div>
+                            <div class="col-md-3">
+                                <h5>Predictions:</h5>
+                                <h2>
+                                    <span class="badge badge-info">@Model.Predictions.Count</span>
+                                </h2>
+                            </div>
+                        </div>
+                        <hr>
+                        <p class="mb-0">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i>
+                                Forecast generated: @Model.GeneratedAt.ToLocalTime().ToString("g")
+                                | Looking ahead: @ViewBag.DaysAhead days
+                            </small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Individual Parameter Predictions -->
+        @if (Model.Predictions.Any())
+        {
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h3>
+                        <i class="fas fa-flask"></i> Parameter Predictions
+                    </h3>
+                    <p class="text-muted">
+                        Machine learning analysis of each water parameter
+                    </p>
+                </div>
+            </div>
+
+            <!-- 
+                Loop through each prediction and display as a card
+                Each card shows:
+                - Current value vs predicted value
+                - Trend (increasing/decreasing/stable)
+                - Confidence score
+                - Warning if outside safe range
+            -->
+            <div class="row">
+                @foreach (var prediction in Model.Predictions)
+                {
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <!-- 
+                            Card color based on alert level:
+                            - success (green): Parameter is stable and safe
+                            - warning (yellow): Minor concern
+                            - danger (red): Parameter predicted to go out of safe range
+                        -->
+                        <div class="card h-100 border-@prediction.AlertLevel">
+                            <div class="card-header bg-@prediction.AlertLevel text-white">
+                                <h5 class="mb-0">
+                                    @prediction.ParameterName
+                                    @if (prediction.IsWarning)
+                                    {
+                                        <i class="fas fa-exclamation-triangle float-right"></i>
+                                    }
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Current vs Predicted Values -->
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <small class="text-muted">Current</small>
+                                        <h4>@prediction.CurrentValue</h4>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Predicted</small>
+                                        <h4>
+                                            @prediction.PredictedValue
+                                            <!-- 
+                                                Show trend arrow:
+                                                ↑ Increasing
+                                                ↓ Decreasing
+                                                → Stable
+                                            -->
+                                            @if (prediction.Trend == "Increasing")
+                                            {
+                                                <i class="fas fa-arrow-up text-danger"></i>
+                                            }
+                                            else if (prediction.Trend == "Decreasing")
+                                            {
+                                                <i class="fas fa-arrow-down text-primary"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-arrow-right text-success"></i>
+                                            }
+                                        </h4>
+                                    </div>
+                                </div>
+
+                                <!-- Change Information -->
+                                <div class="mb-3">
+                                    <small class="text-muted">Change</small>
+                                    <p class="mb-1">
+                                        <strong>
+                                            @(prediction.Change >= 0 ? "+" : "")@prediction.Change
+                                            (@(prediction.ChangePercentage >= 0 ? "+" : "")@prediction.ChangePercentage%)
+                                        </strong>
+                                    </p>
+                                    <small class="text-muted">Rate: @prediction.RateOfChange per day</small>
+                                </div>
+
+                                <!-- Confidence Score -->
+                                <!-- 
+                                    ML Note: Confidence comes from R² (R-squared)
+                                    High confidence (>0.7): Strong pattern in data
+                                    Low confidence (<0.5): Data is erratic or insufficient
+                                -->
+                                <div class="mb-3">
+                                    <small class="text-muted">Confidence</small>
+                                    <div class="progress" style="height: 25px;">
+                                        <div class="progress-bar @(prediction.ConfidenceScore >= 0.7 ? "bg-success" : prediction.ConfidenceScore >= 0.5 ? "bg-warning" : "bg-danger")"
+                                             role="progressbar" style="width: @((prediction.ConfidenceScore * 100))%"
+                                             aria-valuenow="@((prediction.ConfidenceScore * 100))" aria-valuemin="0"
+                                             aria-valuemax="100">
+                                            @((prediction.ConfidenceScore * 100).ToString("F0"))%
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Prediction Message -->
+                                @if (!string.IsNullOrEmpty(prediction.Message))
+                                {
+                                    <div class="alert alert-@(prediction.IsWarning ? "danger" : "info") mb-0 p-2">
+                                        <small>@prediction.Message</small>
+                                    </div>
+                                }
+
+                                <!-- Metadata -->
+                                <hr>
+                                <small class="text-muted">
+                                    <i class="fas fa-database"></i> @prediction.DataPointsUsed data points
+                                    <br>
+                                    <i class="fas fa-brain"></i> @prediction.PredictionMethod
+                                    <br>
+                                    <i class="fas fa-calendar"></i> @prediction.PredictedDate.ToLocalTime().ToString("d")
+                                </small>
+                            </div>
+                            <div class="card-footer">
+                                <!-- Link to detailed view for this parameter -->
+                                <a asp-action="Detail" asp-route-tankId="@Model.TankId"
+                                       asp-route-parameterName="@prediction.ParameterName" asp-route-daysAhead="@ViewBag.DaysAhead"
+                                       class="btn btn-sm btn-outline-primary btn-block">
+                                    <i class="fas fa-chart-area"></i> View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <p>No predictions available. This could mean:</p>
+                <ul>
+                    <li>Not enough historical data for any parameters</li>
+                    <li>Data is too irregular to identify patterns</li>
+                    <li>Recent water tests haven't been recorded</li>
+                </ul>
+            </div>
+        }
+
+        <!-- Educational Footer -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5>
+                            <i class="fas fa-lightbulb"></i> Understanding Your Predictions
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h6>Trend</h6>
+                                <p class="small">
+                                    Shows the direction of change:
+                                    <br>↑ Increasing | ↓ Decreasing | → Stable
+                                </p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>Confidence Score</h6>
+                                <p class="small">
+                                    How reliable the prediction is based on data quality and consistency.
+                                    Higher is better!
+                                </p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>Rate of Change</h6>
+                                <p class="small">
+                                    How much the parameter changes per day on average.
+                                    Used to calculate future values.
+                                </p>
+                            </div>
+                        </div>
+                        <hr>
+                        <p class="mb-0 small text-muted">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Note:</strong> Predictions are based on historical patterns and assume current
+                            conditions continue.
+                            Changes in bioload, feeding, maintenance, or equipment can affect actual results.
+                            Use predictions as a guide, not a guarantee. Always test your water regularly!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- 
+    Optional: Add JavaScript for dynamic features
+    This could include:
+    - AJAX refresh without page reload
+    - Interactive charts
+    - Real-time updates
+-->
+@section Scripts {
+    <script>
+                // Example: Auto-refresh predictions every 5 minutes
+                // (commented out by default - enable if desired)
+                /*
+                setInterval(function() {
+                    console.log("Auto-refreshing predictions...");
+                    // Implement AJAX call to refresh data
+                }, 300000); // 5 minutes
+                */
+    </script>
+}

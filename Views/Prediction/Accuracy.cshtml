@@ -1,0 +1,381 @@
+@model AquaHub.MVC.Services.Interfaces.PredictionAccuracyReport
+
+@{
+    ViewData["Title"] = "Prediction Accuracy Report";
+}
+
+<!-- 
+    ======================================================================================
+    PREDICTION ACCURACY REPORT VIEW
+    ======================================================================================
+    
+    This view displays how accurate our machine learning predictions have been.
+    
+    WHAT IT SHOWS:
+    - Average error percentage across all predictions
+    - Number of predictions evaluated
+    - Accuracy within 10% threshold
+    - Per-parameter accuracy breakdown
+    - Overall quality rating
+    
+    WHY THIS MATTERS:
+    In machine learning, validation is crucial. We need to know if our model is working!
+    This page compares past predictions with actual results to measure accuracy.
+    ======================================================================================
+-->
+
+<div class="container mt-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="display-4">
+                <i class="fas fa-check-circle"></i> Prediction Accuracy Report
+            </h1>
+            <p class="lead text-muted">
+                Validation of machine learning model performance for @ViewBag.TankName
+            </p>
+        </div>
+    </div>
+
+    @if (Model.PredictionsEvaluated == 0)
+    {
+        <!-- No Data Available -->
+        <div class="alert alert-info" role="alert">
+            <h4 class="alert-heading">
+                <i class="fas fa-info-circle"></i> No Accuracy Data Available
+            </h4>
+            <p>
+                There are no past predictions to evaluate yet. Accuracy reports become available after:
+            </p>
+            <ol>
+                <li>You generate predictions for this tank</li>
+                <li>The predicted date has passed</li>
+                <li>You've recorded actual water tests on or near the predicted dates</li>
+            </ol>
+            <hr>
+            <p class="mb-0">
+                <strong>What to do:</strong> Continue recording water tests regularly and generating predictions.
+                After a few weeks, return to this page to see how accurate the predictions have been!
+            </p>
+        </div>
+    }
+    else
+    {
+        <!-- Overall Accuracy Summary -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-chart-bar"></i> Overall Accuracy
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <h5>Average Error:</h5>
+                                <h2>
+                                    @if (Model.AverageErrorPercentage < 5)
+                                    {
+                                        <span class="badge badge-success">@Model.AverageErrorPercentage%</span>
+                                    }
+                                    else if (Model.AverageErrorPercentage < 10)
+                                    {
+                                        <span class="badge badge-info">@Model.AverageErrorPercentage%</span>
+                                    }
+                                    else if (Model.AverageErrorPercentage < 15)
+                                    {
+                                        <span class="badge badge-warning">@Model.AverageErrorPercentage%</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-danger">@Model.AverageErrorPercentage%</span>
+                                    }
+                                </h2>
+                                <small class="text-muted">Lower is better</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h5>Predictions Evaluated:</h5>
+                                <h2>
+                                    <span class="badge badge-secondary">@Model.PredictionsEvaluated</span>
+                                </h2>
+                                <small class="text-muted">Past predictions checked</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h5>Within 10%:</h5>
+                                <h2>
+                                    @if (Model.AccuracyWithin10Percent >= 80)
+                                    {
+                                        <span class="badge badge-success">@Model.AccuracyWithin10Percent%</span>
+                                    }
+                                    else if (Model.AccuracyWithin10Percent >= 60)
+                                    {
+                                        <span class="badge badge-info">@Model.AccuracyWithin10Percent%</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-warning">@Model.AccuracyWithin10Percent%</span>
+                                    }
+                                </h2>
+                                <small class="text-muted">Predictions within ±10%</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h5>Overall Rating:</h5>
+                                <h2>
+                                    @if (Model.OverallRating.Contains("Excellent"))
+                                    {
+                                        <span class="badge badge-success">Excellent</span>
+                                    }
+                                    else if (Model.OverallRating.Contains("Good"))
+                                    {
+                                        <span class="badge badge-info">Good</span>
+                                    }
+                                    else if (Model.OverallRating.Contains("Fair"))
+                                    {
+                                        <span class="badge badge-warning">Fair</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-secondary">@Model.OverallRating</span>
+                                    }
+                                </h2>
+                            </div>
+                        </div>
+                        <hr>
+                        <p class="mb-0">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Interpretation:</strong> @Model.OverallRating
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Per-Parameter Accuracy Breakdown -->
+        @if (Model.AccuracyByParameter.Any())
+        {
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h4 class="mb-0">
+                                <i class="fas fa-flask"></i> Accuracy by Parameter
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted mb-3">
+                                Different water parameters may have different prediction accuracies.
+                                Some parameters are more stable and easier to predict than others.
+                            </p>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Parameter</th>
+                                            <th>Average Error</th>
+                                            <th>Accuracy Bar</th>
+                                            <th>Rating</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var param in Model.AccuracyByParameter.OrderBy(p => p.Value))
+                                        {
+                                            <tr>
+                                                <td><strong>@param.Key</strong></td>
+                                                <td>@param.Value%</td>
+                                                <td>
+                                                    <!-- Visual accuracy bar (inverted - less error is better) -->
+                                                    <div class="progress" style="height: 25px;">
+                                                        @{
+                                                            var accuracy = Math.Max(0, 100 - param.Value);
+                                                            var barClass = param.Value < 5 ? "bg-success" :
+                                                                          param.Value < 10 ? "bg-info" :
+                                                                          param.Value < 15 ? "bg-warning" : "bg-danger";
+                                                        }
+                                                        <div class="progress-bar @barClass"                        role="progressbar"
+                                                             style="width: @accuracy%"                                         aria-valuenow="@accuracy"                                            aria-valuemin="0"
+                                                             aria-valuemax="100">
+                                                            @accuracy.ToString("F0")% Accurate
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    @if (param.Value < 5)
+                                                    {
+                                                        <span class="badge badge-success">Excellent</span>
+                                                    }
+                                                    else if (param.Value < 10)
+                                                    {
+                                                        <span class="badge badge-info">Good</span>
+                                                    }
+                                                    else if (param.Value < 15)
+                                                    {
+                                                        <span class="badge badge-warning">Fair</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge badge-danger">Needs Improvement</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Understanding the Numbers -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5>
+                            <i class="fas fa-question-circle"></i> Understanding These Numbers
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h6>Average Error Percentage</h6>
+                                <p class="small">
+                                    The average difference between predicted and actual values.
+                                    <br>
+                                    <strong>Example:</strong> 5% error means predictions are typically within 5% of actual
+                                    results.
+                                </p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>Within 10% Threshold</h6>
+                                <p class="small">
+                                    What percentage of predictions were within ±10% of actual values.
+                                    <br>
+                                    <strong>Goal:</strong> 80% or higher indicates reliable predictions.
+                                </p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>Overall Rating</h6>
+                                <p class="small">
+                                    General quality assessment of the prediction model.
+                                    <br>
+                                    <strong>Excellent:</strong> &lt; 5% error
+                                    <br>
+                                    <strong>Good:</strong> 5-10% error
+                                    <br>
+                                    <strong>Fair:</strong> 10-15% error
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Improving Accuracy Tips -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card border-success">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-lightbulb"></i> Tips for Improving Accuracy
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Better Data Quality</h6>
+                                <ul class="small">
+                                    <li>Test at consistent times and intervals</li>
+                                    <li>Use the same test kit and method</li>
+                                    <li>Follow test kit instructions precisely</li>
+                                    <li>Record results immediately after testing</li>
+                                    <li>Verify unusual readings with a second test</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>More Stable Conditions</h6>
+                                <ul class="small">
+                                    <li>Maintain consistent feeding schedules</li>
+                                    <li>Avoid frequent equipment changes</li>
+                                    <li>Keep bioload stable</li>
+                                    <li>Allow tank to stabilize after changes</li>
+                                    <li>Monitor room temperature/humidity</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- What This Means Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-graduation-cap"></i> Machine Learning Validation Explained
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6>Why Validation Matters</h6>
+                    <p>
+                        In machine learning, <strong>validation</strong> is the process of checking if your model
+                        actually works.
+                        We do this by comparing old predictions with what actually happened.
+                    </p>
+
+                    <h6 class="mt-3">How We Validate</h6>
+                    <ol>
+                        <li>Get old predictions from the database (ones that have reached their predicted date)</li>
+                        <li>Find the actual water test results that occurred on those dates</li>
+                        <li>Calculate the error: <code>|predicted_value - actual_value|</code></li>
+                        <li>Calculate percentage error: <code>(error / actual_value) × 100</code></li>
+                        <li>Average all errors to get overall accuracy</li>
+                    </ol>
+
+                    <h6 class="mt-3">Example</h6>
+                    <div class="bg-light p-3">
+                        <strong>Prediction made on Jan 1:</strong> pH will be 7.8 on Jan 8
+                        <br>
+                        <strong>Actual result on Jan 8:</strong> pH was 7.9
+                        <br>
+                        <strong>Error:</strong> |7.8 - 7.9| = 0.1
+                        <br>
+                        <strong>Percentage error:</strong> (0.1 / 7.9) × 100 = 1.27%
+                        <br>
+                        <strong>Rating:</strong> <span class="badge badge-success">Excellent accuracy!</span>
+                    </div>
+
+                    <hr>
+                    <p class="mb-0">
+                        <strong>Remember:</strong> This validation helps us understand how reliable our predictions are.
+                        If accuracy is low, it doesn't mean the system is broken - it may mean tank conditions are
+                        changing too rapidly or unpredictably for simple linear regression to model effectively.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <a asp-action="Index" asp-route-tankId="@ViewBag.TankId" class="btn btn-primary btn-lg">
+                <i class="fas fa-arrow-left"></i> Back to Predictions
+            </a>
+            <a asp-action="HowItWorks" class="btn btn-info btn-lg">
+                <i class="fas fa-question-circle"></i> How It Works
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+            // Optional: Add any interactive features here
+            console.log("Prediction Accuracy Report loaded");
+    </script>
+}

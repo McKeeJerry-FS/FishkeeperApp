@@ -103,6 +103,11 @@ builder.Services.AddScoped<IPredictiveReminderService, PredictiveReminderService
 builder.Services.AddScoped<ITankHealthService, TankHealthService>();
 builder.Services.AddScoped<IParameterAlertService, ParameterAlertService>();
 
+// Machine Learning & Prediction Services
+// ML Note: This registers the Water Chemistry Prediction Service for dependency injection
+// It will be available to controllers that need to generate predictions
+builder.Services.AddScoped<IWaterChemistryPredictionService, WaterChemistryPredictionService>();
+
 
 // Add Identity services
 builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = false)

@@ -55,6 +55,7 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>
     public DbSet<CoralFrag> CoralFrags { get; set; }
     public DbSet<BreedingPair> BreedingPairs { get; set; }
     public DbSet<BreedingAttempt> BreedingAttempts { get; set; }
+    public DbSet<WaterChemistryPrediction> WaterChemistryPredictions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
