@@ -184,13 +184,13 @@ var slope = denominator != 0 ? numerator / denominator : 0;
 - Negative slope: Value is decreasing
 - Zero slope: Value is stable
 
-2. **Intercept (b)** - Starting point
+1. **Intercept (b)** - Starting point
 
 ```csharp
 var intercept = yMean - (slope * xMean);
 ```
 
-3. **R² (R-squared)** - Confidence measure
+1. **R² (R-squared)** - Confidence measure
 
 ```csharp
 var rSquared = ssTotal != 0 ? 1 - (ssResidual / ssTotal) : 0;
@@ -257,7 +257,7 @@ double? value = parameterName switch
 };
 ```
 
-3. **Add safe range in `GetSafeRange()` method:**
+1. **Add safe range in `GetSafeRange()` method:**
 
 ```csharp
 return parameterName switch
@@ -267,7 +267,7 @@ return parameterName switch
 };
 ```
 
-4. **Update `GetRelevantParameters()` to include it:**
+1. **Update `GetRelevantParameters()` to include it:**
 
 ```csharp
 parameters.Add("YourNewParameter");
@@ -303,7 +303,7 @@ private ExponentialSmoothingResult PerformExponentialSmoothing(
 }
 ```
 
-2. **Update prediction generation:**
+1. **Update prediction generation:**
 
 ```csharp
 // Choose algorithm based on parameter characteristics
@@ -485,7 +485,7 @@ _logger.LogInformation(
     tankId, daysAhead);
 ```
 
-2. **Handle Edge Cases**
+1. **Handle Edge Cases**
 
 ```csharp
 // Check for insufficient data
@@ -496,7 +496,7 @@ if (parameterData.Count < MINIMUM_DATA_POINTS)
 }
 ```
 
-3. **Validate User Input**
+1. **Validate User Input**
 
 ```csharp
 // Ensure daysAhead is reasonable
@@ -506,7 +506,7 @@ if (daysAhead < 1 || daysAhead > 30)
 }
 ```
 
-4. **Use Descriptive Variable Names**
+1. **Use Descriptive Variable Names**
 
 ```csharp
 // Good
@@ -583,14 +583,14 @@ for (int i = 0; i < 15; i++)
 await context.SaveChangesAsync();
 ```
 
-2. **Generate Predictions**
+1. **Generate Predictions**
 
 ```csharp
 var predictions = await _predictionService.GeneratePredictionsForTankAsync(
     testTankId, userId, daysAhead: 7);
 ```
 
-3. **Verify Results**
+1. **Verify Results**
 
 ```csharp
 // Expected: pH should be predicted to drop further
@@ -759,7 +759,7 @@ var average = values.Sum() / values.Count;
 
 ---
 
-## 🎉 Congratulations!
+## 🎉 Congratulations
 
 You now have a working machine learning feature in your aquarium app!
 
