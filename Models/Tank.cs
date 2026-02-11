@@ -35,6 +35,30 @@ public class Tank : NewBaseType
     [StringLength(500, ErrorMessage = "Notes cannot exceed 500 characters")]
     public string Notes { get; set; } = string.Empty;
 
+    // Quarantine Tank Properties
+    [Display(Name = "Is Quarantine Tank")]
+    public bool IsQuarantineTank { get; set; } = false;
+
+    [Display(Name = "Quarantine Start Date")]
+    [DataType(DataType.Date)]
+    public DateTime? QuarantineStartDate { get; set; }
+
+    [Display(Name = "Expected Quarantine End Date")]
+    [DataType(DataType.Date)]
+    public DateTime? QuarantineEndDate { get; set; }
+
+    [Display(Name = "Quarantine Purpose")]
+    [StringLength(500)]
+    public string QuarantinePurpose { get; set; } = string.Empty; // Treatment, Observation, Acclimation
+
+    [Display(Name = "Quarantine Status")]
+    [StringLength(50)]
+    public string QuarantineStatus { get; set; } = string.Empty; // Active, Completed, Monitoring
+
+    [Display(Name = "Treatment Protocol")]
+    [StringLength(1000)]
+    public string TreatmentProtocol { get; set; } = string.Empty;
+
     // Image path stored relative to wwwroot
     public string? ImagePath { get; set; }
 

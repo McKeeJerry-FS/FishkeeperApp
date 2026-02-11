@@ -70,6 +70,37 @@
                             <dt class="col-sm-3">Notes:</dt>
                             <dd class="col-sm-9">@Model.Notes</dd>
                         }
+
+                        @if (Model.IsQuarantineTank)
+                        {
+                            <dt class="col-sm-3">Quarantine Status:</dt>
+                            <dd class="col-sm-9">
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-shield-exclamation"></i> Quarantine Tank
+                                </span>
+                                @if (!string.IsNullOrEmpty(Model.QuarantineStatus))
+                                {
+                                    <span class="badge bg-info">@Model.QuarantineStatus</span>
+                                }
+                            </dd>
+
+                            @if (Model.QuarantineStartDate.HasValue)
+                            {
+                                <dt class="col-sm-3">Quarantine Start:</dt>
+                                <dd class="col-sm-9">
+                                    @Model.QuarantineStartDate.Value.ToString("MMMM dd, yyyy")
+                                    <small class="text-muted">
+                                        (@((DateTime.Now - Model.QuarantineStartDate.Value).Days) days)
+                                    </small>
+                                </dd>
+                            }
+
+                            @if (!string.IsNullOrEmpty(Model.QuarantinePurpose))
+                            {
+                                <dt class="col-sm-3">Purpose:</dt>
+                                <dd class="col-sm-9">@Model.QuarantinePurpose</dd>
+                            }
+                        }
                     </dl>
                 </div>
                 <div class="card-footer bg-transparent">
@@ -81,14 +112,44 @@
                             <i class="bi bi-trash"></i> Delete
                         </a>
                     </div>
-                    <a asp-action="Dashboard" asp-route-id="@Model.Id" class="btn btn-primary float-end">
-                        <i class="bi bi-speedometer2"></i> View Dashboard
-                    </a>
+                    <div class="float-end">
+                        @if (Model.IsQuarantineTank)
+                        {
+                            <a asp-action="QuarantineDashboard" asp-route-id="@Model.Id" class="btn btn-warning me-2">
+                                <i class="bi bi-shield-exclamation"></i> Quarantine Dashboard
+                            </a>
+                        }
+                        <a asp-action="Dashboard" asp-route-id="@Model.Id" class="btn btn-primary">
+                            <i class="bi bi-speedometer2"></i> View Dashboard
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="col-lg-4">
+            @if (Model.IsQuarantineTank)
+            {
+                <div class="card border-warning shadow-sm mb-3">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">
+                            <i class="bi bi-shield-exclamation"></i> Quarantine Monitoring
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            <strong>AI-Powered Care Dashboard</strong><br>
+                            <small class="text-muted">
+                                Get intelligent recommendations for water chemistry, dosing protocols, and treatment monitoring.
+                            </small>
+                        </p>
+                        <a asp-action="QuarantineDashboard" asp-route-id="@Model.Id" class="btn btn-warning w-100">
+                            <i class="bi bi-shield-exclamation"></i> Open Quarantine Dashboard
+                        </a>
+                    </div>
+                </div>
+            }
+
             <div class="card border-0 shadow-sm mb-3">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0"><i class="bi bi-speedometer"></i> Quick Actions</h5>

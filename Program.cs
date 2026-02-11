@@ -108,6 +108,9 @@ builder.Services.AddScoped<IParameterAlertService, ParameterAlertService>();
 // It will be available to controllers that need to generate predictions
 builder.Services.AddScoped<IWaterChemistryPredictionService, WaterChemistryPredictionService>();
 
+// Quarantine & AI Care Services
+builder.Services.AddScoped<IQuarantineCareAdvisorService, QuarantineCareAdvisorService>();
+
 
 // Add Identity services
 builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = false)

@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using AquaHub.MVC.Data;
 using AquaHub.MVC.Models;
+using AquaHub.MVC.Models.Enums;
 using AquaHub.MVC.Services.Interfaces;
 
 namespace AquaHub.MVC.Controllers;
@@ -10,20 +13,26 @@ namespace AquaHub.MVC.Controllers;
 public class TankController : Controller
 {
     private readonly ITankService _tankService;
+    private readonly ApplicationDbContext _context;
     private readonly UserManager<AppUser> _userManager;
     private readonly ILogger<TankController> _logger;
     private readonly IImageService _imageService;
+    private readonly IQuarantineCareAdvisorService _quarantineCareAdvisor;
 
     public TankController(
         ITankService tankService,
+        ApplicationDbContext context,
         UserManager<AppUser> userManager,
         ILogger<TankController> logger,
-        IImageService imageService)
+        IImageService imageService,
+        IQuarantineCareAdvisorService quarantineCareAdvisor)
     {
         _tankService = tankService;
+        _context = context;
         _userManager = userManager;
         _logger = logger;
         _imageService = imageService;
+        _quarantineCareAdvisor = quarantineCareAdvisor;
     }
 
     // GET: Tank
@@ -349,6 +358,170 @@ public class TankController : Controller
         {
             _logger.LogError(ex, "Error deleting tank ID: {TankId}", id);
             TempData["Error"] = "An error occurred while deleting the tank.";
+            return RedirectToAction(nameof(Index));
+        }
+    }
+
+    // GET: Tank/QuarantineDashboard/5
+    public async Task<IActionResult> QuarantineDashboard(int id)
+    {
+        try
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var tank = await _context.Tanks
+                .Include(t => t.Livestock)
+                .Include(t => t.WaterTests)
+                .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+
+            if (tank == null)
+            {
+                TempData["Error"] = "Tank not found.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Calculate quarantine progress
+            var daysInQuarantine = tank.QuarantineStartDate.HasValue
+                ? (DateTime.Now - tank.QuarantineStartDate.Value).Days
+                : 0;
+
+            var remainingDays = 0;
+            var progressPercentage = 0.0;
+            var isOverdue = false;
+
+            if (tank.QuarantineEndDate.HasValue && tank.QuarantineStartDate.HasValue)
+            {
+                var totalDays = (tank.QuarantineEndDate.Value - tank.QuarantineStartDate.Value).Days;
+                remainingDays = (tank.QuarantineEndDate.Value - DateTime.Now).Days;
+                progressPercentage = totalDays > 0 ? Math.Min(100, (daysInQuarantine * 100.0 / totalDays)) : 0;
+                isOverdue = remainingDays < 0;
+            }
+
+            // Get recent water tests (last 14 days for quarantine monitoring)
+            var recentWaterTests = tank.WaterTests
+                .Where(wt => wt.Timestamp >= DateTime.Now.AddDays(-14))
+                .OrderByDescending(wt => wt.Timestamp)
+                .ToList();
+
+            var latestTest = recentWaterTests.FirstOrDefault();
+
+            // Check for critical water parameters
+            var waterQualityAlerts = new List<string>();
+            var hasCriticalParameters = false;
+
+            if (latestTest != null)
+            {
+                if (latestTest.Ammonia > 0.25)
+                {
+                    waterQualityAlerts.Add($"Ammonia is elevated at {latestTest.Ammonia} ppm (should be 0)");
+                    hasCriticalParameters = true;
+                }
+                if (latestTest.Nitrite > 0.25)
+                {
+                    waterQualityAlerts.Add($"Nitrite is elevated at {latestTest.Nitrite} ppm (should be 0)");
+                    hasCriticalParameters = true;
+                }
+                if (latestTest.Nitrate > 40)
+                {
+                    waterQualityAlerts.Add($"Nitrate is high at {latestTest.Nitrate} ppm (recommended < 40)");
+                }
+                if (latestTest.Temperature < 72 || latestTest.Temperature > 82)
+                {
+                    waterQualityAlerts.Add($"Temperature is {latestTest.Temperature}°F (recommended 74-80°F)");
+                }
+            }
+            else
+            {
+                waterQualityAlerts.Add("No recent water tests - testing recommended");
+            }
+
+            // Get recent dosing records
+            var recentDosing = await _context.DosingRecords
+                .Where(d => d.TankId == id && d.Timestamp >= DateTime.Now.AddDays(-14))
+                .OrderByDescending(d => d.Timestamp)
+                .Take(20)
+                .ToListAsync();
+
+            // Get feeding schedules
+            var feedingSchedules = await _context.FeedingSchedules
+                .Where(fs => fs.TankId == id)
+                .ToListAsync();
+
+            // Get recent feeding records
+            var recentFeedings = await _context.FeedingRecords
+                .Where(fr => fr.TankId == id && fr.FedDateTime >= DateTime.Now.AddDays(-7))
+                .OrderByDescending(fr => fr.FedDateTime)
+                .Take(20)
+                .ToListAsync();
+
+            // Get recent maintenance
+            var recentMaintenance = await _context.MaintenanceLogs
+                .Where(ml => ml.TankId == id && ml.Timestamp >= DateTime.Now.AddDays(-14))
+                .OrderByDescending(ml => ml.Timestamp)
+                .Take(10)
+                .ToListAsync();
+
+            var lastWaterChange = recentMaintenance
+                .FirstOrDefault(ml => ml.Type == MaintenanceType.WaterChange);
+
+            var daysSinceWaterChange = lastWaterChange != null
+                ? (DateTime.Now - lastWaterChange.Timestamp).Days
+                : 999;
+
+            // Prepare chart data
+            var chartData = recentWaterTests.OrderBy(wt => wt.Timestamp).ToList();
+            var chartLabels = chartData.Select(wt => wt.Timestamp.ToString("MM/dd")).ToList();
+
+            // Generate AI-powered care recommendations
+            var aiRecommendations = await _quarantineCareAdvisor.AnalyzeQuarantineConditionsAsync(
+                tank,
+                recentWaterTests,
+                recentDosing,
+                recentMaintenance,
+                tank.Livestock.ToList());
+
+            var viewModel = new Models.ViewModels.QuarantineDashboardViewModel
+            {
+                Tank = tank,
+                DaysInQuarantine = daysInQuarantine,
+                RemainingDays = remainingDays,
+                ProgressPercentage = progressPercentage,
+                IsOverdue = isOverdue,
+                QuarantinedLivestock = tank.Livestock.ToList(),
+                LatestWaterTest = latestTest,
+                RecentWaterTests = recentWaterTests,
+                HasCriticalParameters = hasCriticalParameters,
+                WaterQualityAlerts = waterQualityAlerts,
+                ChartLabels = chartLabels,
+                PHData = chartData.Select(wt => wt.PH).ToList(),
+                TemperatureData = chartData.Select(wt => wt.Temperature).ToList(),
+                AmmoniaData = chartData.Select(wt => wt.Ammonia).ToList(),
+                NitriteData = chartData.Select(wt => wt.Nitrite).ToList(),
+                NitrateData = chartData.Select(wt => wt.Nitrate).ToList(),
+                SalinityData = chartData.Select(wt => wt.Salinity).ToList(),
+                ActiveTreatments = recentDosing.Where(d => d.Timestamp >= DateTime.Now.AddDays(-7)).ToList(),
+                RecentDosing = recentDosing,
+                FeedingSchedules = feedingSchedules,
+                RecentFeedings = recentFeedings,
+                RecentMaintenance = recentMaintenance,
+                LastWaterChange = lastWaterChange,
+                DaysSinceWaterChange = daysSinceWaterChange,
+                NeedsWaterTest = !recentWaterTests.Any() || recentWaterTests.First().Timestamp < DateTime.Now.AddDays(-3),
+                NeedsWaterChange = daysSinceWaterChange > 7,
+                HasMissedDosing = recentDosing.Any(d => d.Timestamp < DateTime.Now.AddDays(-1)),
+                AIRecommendations = aiRecommendations
+            };
+
+            return View(viewModel);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving quarantine dashboard for tank ID: {TankId}", id);
+            TempData["Error"] = "An error occurred while loading the quarantine dashboard.";
             return RedirectToAction(nameof(Index));
         }
     }

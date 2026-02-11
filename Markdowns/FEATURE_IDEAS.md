@@ -17,9 +17,9 @@
 ## 🐠 Livestock Management
 
 - [ ] **Compatibility Checker** - Before adding livestock, check if compatible with existing inhabitants
-- [ ] **Feeding Schedule** - Track different feeding requirements for different species
-- [ ] **Breeding Log** - Track breeding pairs, fry survival rates
-- [ ] **Quarantine Tank Manager** - Separate tracking for quarantine periods
+- [x] **Feeding Schedule** - Track different feeding requirements for different species ✅ _Added January 29, 2026_
+- [x] **Breeding Log** - Track breeding pairs, fry survival rates, and water conditions ✅ _Added February 9, 2026_
+- [x] **Quarantine Tank Manager** - Separate tracking for quarantine periods with water chemistry, dosing, and feeding schedules ✅ _Added February 10, 2026_
 
 ## 🌊 Advanced Water Testing
 
