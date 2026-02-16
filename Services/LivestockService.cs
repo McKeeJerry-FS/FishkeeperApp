@@ -149,7 +149,13 @@ public class LivestockService : ILivestockService
 
         if (tank == null)
         {
-            throw new UnauthorizedAccessException("You don't have permission to add livestock to this tank.");
+            // Debug: Check if tank exists at all
+            var anyTank = await _context.Tanks.FirstOrDefaultAsync(t => t.Id == tankId);
+            if (anyTank != null)
+            {
+                throw new UnauthorizedAccessException($"Tank exists but UserId mismatch. Expected: '{userId}', Actual: '{anyTank.UserId}'");
+            }
+            throw new UnauthorizedAccessException($"Tank with ID {tankId} not found.");
         }
 
         livestock.TankId = tankId;

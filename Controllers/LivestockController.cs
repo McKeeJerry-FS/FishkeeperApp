@@ -156,13 +156,18 @@ public class LivestockController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(int tankId, string livestockType)
     {
+        _logger.LogInformation("Create POST called - TankId: {TankId}, LivestockType: {LivestockType}", tankId, livestockType);
+
         try
         {
             var userId = _userManager.GetUserId(User);
             if (string.IsNullOrEmpty(userId))
             {
+                _logger.LogWarning("Unauthorized access attempt - no userId");
                 return Unauthorized();
             }
+
+            _logger.LogInformation("User authenticated - UserId: {UserId}", userId);
 
             // Create the appropriate livestock type based on selection
             Livestock livestock = livestockType switch
@@ -176,12 +181,22 @@ public class LivestockController : Controller
                 _ => throw new ArgumentException("Invalid livestock type")
             };
 
+            // Set TankId before model binding to satisfy required field validation
+            livestock.TankId = tankId;
+            _logger.LogInformation("Livestock object created and TankId set: {TankId}", tankId);
+
+            // Remove tankId and livestockType from ModelState to prevent binding conflicts
+            ModelState.Remove("tankId");
+            ModelState.Remove("livestockType");
+
             // Bind common properties
             await TryUpdateModelAsync(livestock, "",
                 l => l.Name,
                 l => l.Species,
                 l => l.AddedOn,
                 l => l.Notes);
+
+            _logger.LogInformation("Model binding complete - Name: {Name}, Species: {Species}", livestock.Name, livestock.Species);
 
             // Bind type-specific properties
             switch (livestock)
@@ -252,22 +267,73 @@ public class LivestockController : Controller
                     break;
             }
 
+            _logger.LogInformation("About to validate ModelState. IsValid: {IsValid}", ModelState.IsValid);
+            
             if (ModelState.IsValid)
             {
+                _logger.LogInformation("ModelState is valid, creating livestock in database. TankId: {TankId}, UserId: {UserId}", tankId, userId);
+                
+                // Verify tank exists before calling service
+                var tankExists = await _tankService.GetTankByIdAsync(tankId, userId);
+                if (tankExists == null)
+                {
+                    _logger.LogError("Tank not found or doesn't belong to user. TankId: {TankId}, UserId: {UserId}", tankId, userId);
+                    TempData["Error"] = $"Tank with ID {tankId} not found or you don't have permission to access it.";
+                    await PopulateTanksDropdown(userId);
+                    ViewBag.SelectedTankId = tankId;
+                    return View(livestock);
+                }
+                _logger.LogInformation("Tank verified - Name: {TankName}, Owner: {OwnerId}", tankExists.Name, tankExists.UserId);
+                
                 var createdLivestock = await _livestockService.CreateLivestockAsync(livestock, tankId, userId);
+                _logger.LogInformation("Livestock created successfully with ID: {Id}", createdLivestock.Id);
                 TempData["Success"] = $"{livestockType} added successfully!";
                 return RedirectToAction(nameof(Details), new { id = createdLivestock.Id });
             }
 
+            // Log ModelState errors for debugging
+            _logger.LogWarning("ModelState validation failed for livestock creation");
+            var errorMessages = new List<string>();
+            foreach (var modelState in ModelState)
+            {
+                foreach (var error in modelState.Value.Errors)
+                {
+                    var errorMsg = !string.IsNullOrEmpty(error.ErrorMessage)
+                        ? error.ErrorMessage
+                        : error.Exception?.Message ?? "Unknown error";
+                    _logger.LogWarning("ModelState error for {Key}: {ErrorMessage}", modelState.Key, errorMsg);
+                    errorMessages.Add($"{modelState.Key}: {errorMsg}");
+                }
+            }
+            TempData["Error"] = "Validation failed: " + string.Join("; ", errorMessages);
+
             await PopulateTanksDropdown(userId);
             ViewBag.SelectedTankId = tankId;
+
+            // Repopulate species enums for JavaScript
+            ViewBag.FreshwaterFishTypes = Enum.GetNames(typeof(AquaHub.MVC.Models.Enums.FreshwaterFishType));
+            ViewBag.SaltwaterFishTypes = Enum.GetNames(typeof(AquaHub.MVC.Models.Enums.SaltwaterFishType));
+            ViewBag.CoralTypes = Enum.GetNames(typeof(AquaHub.MVC.Models.Enums.CoralType));
+            ViewBag.PlantTypes = Enum.GetNames(typeof(AquaHub.MVC.Models.Enums.PlantType));
+            ViewBag.FreshwaterInvertebrateTypes = Enum.GetNames(typeof(AquaHub.MVC.Models.Enums.FreshwaterInvertebrateType));
+            ViewBag.InvertebrateTypes = Enum.GetNames(typeof(AquaHub.MVC.Models.Enums.InvertebrateType));
+
             return View(livestock);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating livestock");
-            TempData["Error"] = "An error occurred while adding the livestock.";
+            TempData["Error"] = $"An error occurred while adding the livestock: {ex.Message}";
             await PopulateTanksDropdown(_userManager.GetUserId(User)!);
+
+            // Repopulate species enums for JavaScript
+            ViewBag.FreshwaterFishTypes = Enum.GetNames(typeof(AquaHub.MVC.Models.Enums.FreshwaterFishType));
+            ViewBag.SaltwaterFishTypes = Enum.GetNames(typeof(AquaHub.MVC.Models.Enums.SaltwaterFishType));
+            ViewBag.CoralTypes = Enum.GetNames(typeof(AquaHub.MVC.Models.Enums.CoralType));
+            ViewBag.PlantTypes = Enum.GetNames(typeof(AquaHub.MVC.Models.Enums.PlantType));
+            ViewBag.FreshwaterInvertebrateTypes = Enum.GetNames(typeof(AquaHub.MVC.Models.Enums.FreshwaterInvertebrateType));
+            ViewBag.InvertebrateTypes = Enum.GetNames(typeof(AquaHub.MVC.Models.Enums.InvertebrateType));
+
             return View();
         }
     }
