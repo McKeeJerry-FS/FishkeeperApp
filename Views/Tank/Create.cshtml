@@ -16,7 +16,7 @@
                 <div class="card-body p-4">
                     <form asp-action="Create" method="post" enctype="multipart/form-data">
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-                        
+
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label asp-for="Name" class="form-label fw-bold"></label>
@@ -26,7 +26,8 @@
 
                             <div class="col-md-6">
                                 <label asp-for="Type" class="form-label fw-bold"></label>
-                                <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<AquaHub.MVC.Models.Enums.AquariumType>()">
+                                <select asp-for="Type" class="form-select"
+                                        asp-items="Html.GetEnumSelectList<AquaHub.MVC.Models.Enums.AquariumType>()">
                                     <option value="">-- Select Type --</option>
                                 </select>
                                 <span asp-validation-for="Type" class="text-danger small"></span>
@@ -49,123 +50,153 @@
 
                             <div class="col-12">
                                 <label asp-for="ImageFile" class="form-label fw-bold">Tank Image</label>
-                                <input asp-for="ImageFile" class="form-control" type="file" accept="image/jpeg,image/jpg,image/png,image/heic,image/heif,image/*" capture="environment" />
+                                <input asp-for="ImageFile" class="form-control" type="file"
+                                       accept="image/jpeg,image/jpg,image/png,image/heic,image/heif,image/*"
+                                       capture="environment" />
                                 <span asp-validation-for="ImageFile" class="text-danger small"></span>
-                                <small class="form-text text-muted">Take a photo or upload an image of your tank (optional)</small>
-                            </div>
+                                <small class="form-text text-muted">Take a photo or upload an image of your tank
+                                    (optional)</small>
+                                </div>
 
-                            <div class="col-12">
-                                <label asp-for="Notes" class="form-label fw-bold"></label>
-                                <textarea asp-for="Notes" class="form-control" rows="4" placeholder="Add any notes about your tank setup..."></textarea>
-                                <span asp-validation-for="Notes" class="text-danger small"></span>
-                            </div>
+                                <div class="col-12">
+                                    <label asp-for="Notes" class="form-label fw-bold"></label>
+                                    <textarea asp-for="Notes" class="form-control" rows="4"
+                                              placeholder="Add any notes about your tank setup..."></textarea>
+                                    <span asp-validation-for="Notes" class="text-danger small"></span>
+                                </div>
 
-                            <!-- Quarantine Settings -->
-                            <div class="col-12 mt-3">
-                                <div class="card bg-warning-subtle border-warning">
-                                    <div class="card-header bg-warning bg-opacity-25">
-                                        <h5 class="mb-0">
-                                            <i class="bi bi-shield-exclamation"></i> Quarantine Settings
-                                        </h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="form-check mb-3">
-                                            <input asp-for="IsQuarantineTank" class="form-check-input" type="checkbox" id="isQuarantineTank" />
-                                            <label class="form-check-label fw-bold" for="isQuarantineTank">
-                                                This is a Quarantine Tank
-                                            </label>
-                                            <small class="form-text text-muted d-block mt-1">
-                                                Enable AI-powered monitoring and care recommendations for sick or new livestock
-                                            </small>
+                                <!-- Quarantine Settings -->
+                                <div class="col-12 mt-3">
+                                    <div class="card bg-warning-subtle border-warning">
+                                        <div class="card-header bg-warning bg-opacity-25">
+                                            <h5 class="mb-0">
+                                                <i class="bi bi-shield-exclamation"></i> Quarantine Settings
+                                            </h5>
                                         </div>
+                                        <div class="card-body">
+                                            <div class="form-check mb-3">
+                                                <input asp-for="IsQuarantineTank" class="form-check-input" type="checkbox"
+                                                       id="isQuarantineTank" />
+                                                <label class="form-check-label fw-bold" for="isQuarantineTank">
+                                                    This is a Quarantine Tank
+                                                </label>
+                                                <small class="form-text text-muted d-block mt-1">
+                                                    Enable AI-powered monitoring and care recommendations for sick or new
+                                                    livestock
+                                                </small>
+                                            </div>
 
-                                        <div id="quarantineFields" style="display: none;">
-                                            <div class="row g-3">
-                                                <div class="col-md-6">
-                                                    <label asp-for="QuarantineStartDate" class="form-label fw-bold"></label>
-                                                    <input asp-for="QuarantineStartDate" class="form-control" type="date" />
-                                                    <span asp-validation-for="QuarantineStartDate" class="text-danger small"></span>
-                                                </div>
+                                            <div id="quarantineFields" style="display: none;">
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <label asp-for="QuarantineStartDate"
+                                                               class="form-label fw-bold"></label>
+                                                        <input asp-for="QuarantineStartDate" class="form-control"
+                                                               type="date" />
+                                                        <span asp-validation-for="QuarantineStartDate"
+                                                              class="text-danger small"></span>
+                                                    </div>
 
-                                                <div class="col-md-6">
-                                                    <label asp-for="QuarantineEndDate" class="form-label fw-bold"></label>
-                                                    <input asp-for="QuarantineEndDate" class="form-control" type="date" />
-                                                    <span asp-validation-for="QuarantineEndDate" class="text-danger small"></span>
-                                                    <small class="form-text text-muted">Expected or actual end date</small>
-                                                </div>
+                                                    <div class="col-md-6">
+                                                        <label asp-for="QuarantineEndDate"
+                                                               class="form-label fw-bold"></label>
+                                                        <input asp-for="QuarantineEndDate" class="form-control"
+                                                               type="date" />
+                                                        <span asp-validation-for="QuarantineEndDate"
+                                                              class="text-danger small"></span>
+                                                        <small class="form-text text-muted">Expected or actual end
+                                                            date</small>
+                                                        </div>
 
-                                                <div class="col-md-6">
-                                                    <label asp-for="QuarantinePurpose" class="form-label fw-bold"></label>
-                                                    <select asp-for="QuarantinePurpose" class="form-select">
-                                                        <option value="">-- Select Purpose --</option>
-                                                        <option value="Treatment">Treatment - Treating sick fish</option>
-                                                        <option value="Observation">Observation - Monitoring new arrivals</option>
-                                                        <option value="Acclimation">Acclimation - Gradual adjustment</option>
-                                                        <option value="Prophylaxis">Prophylaxis - Preventive care</option>
-                                                        <option value="Recovery">Recovery - Post-treatment recovery</option>
-                                                    </select>
-                                                    <span asp-validation-for="QuarantinePurpose" class="text-danger small"></span>
-                                                </div>
+                                                        <div class="col-md-6">
+                                                            <label asp-for="QuarantinePurpose"
+                                                                   class="form-label fw-bold"></label>
+                                                            <select asp-for="QuarantinePurpose" class="form-select">
+                                                                <option value="">-- Select Purpose --</option>
+                                                                <option value="Treatment">Treatment - Treating sick fish
+                                                                </option>
+                                                                <option value="Observation">Observation - Monitoring new
+                                                                    arrivals</option>
+                                                                    <option value="Acclimation">Acclimation - Gradual adjustment
+                                                                    </option>
+                                                                    <option value="Prophylaxis">Prophylaxis - Preventive care
+                                                                    </option>
+                                                                    <option value="Recovery">Recovery - Post-treatment recovery
+                                                                    </option>
+                                                                </select>
+                                                                <span asp-validation-for="QuarantinePurpose"
+                                                                      class="text-danger small"></span>
+                                                            </div>
 
-                                                <div class="col-md-6">
-                                                    <label asp-for="QuarantineStatus" class="form-label fw-bold"></label>
-                                                    <select asp-for="QuarantineStatus" class="form-select">
-                                                        <option value="">-- Select Status --</option>
-                                                        <option value="Active" selected>Active - Currently in quarantine</option>
-                                                        <option value="Monitoring">Monitoring - Close observation</option>
-                                                        <option value="Completed">Completed - Ready to reintroduce</option>
-                                                    </select>
-                                                    <span asp-validation-for="QuarantineStatus" class="text-danger small"></span>
-                                                </div>
+                                                            <div class="col-md-6">
+                                                                <label asp-for="QuarantineStatus"
+                                                                       class="form-label fw-bold"></label>
+                                                                <select asp-for="QuarantineStatus" class="form-select">
+                                                                    <option value="">-- Select Status --</option>
+                                                                    <option value="Active" selected>Active - Currently in quarantine
+                                                                    </option>
+                                                                    <option value="Monitoring">Monitoring - Close observation
+                                                                    </option>
+                                                                    <option value="Completed">Completed - Ready to reintroduce
+                                                                    </option>
+                                                                </select>
+                                                                <span asp-validation-for="QuarantineStatus"
+                                                                      class="text-danger small"></span>
+                                                            </div>
 
-                                                <div class="col-12">
-                                                    <label asp-for="TreatmentProtocol" class="form-label fw-bold"></label>
-                                                    <textarea asp-for="TreatmentProtocol" class="form-control" rows="3" 
-                                                        placeholder="e.g., Copper treatment 0.15-0.25 ppm for 21 days, daily water changes 10%"></textarea>
-                                                    <span asp-validation-for="TreatmentProtocol" class="text-danger small"></span>
-                                                    <small class="form-text text-muted">Describe the treatment plan or observation protocol</small>
+                                                            <div class="col-12">
+                                                                <label asp-for="TreatmentProtocol"
+                                                                       class="form-label fw-bold"></label>
+                                                                <textarea asp-for="TreatmentProtocol" class="form-control" rows="3"
+                                                                          placeholder="e.g., Copper treatment 0.15-0.25 ppm for 21 days, daily water changes 10%"></textarea>
+                                                                <span asp-validation-for="TreatmentProtocol"
+                                                                      class="text-danger small"></span>
+                                                                <small class="form-text text-muted">Describe the treatment plan or
+                                                                    observation protocol</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+
+                                        <div class="d-flex gap-2 mt-4">
+                                            <button type="submit" class="btn btn-primary px-4">
+                                                <i class="bi bi-save"></i> Save Tank
+                                            </button>
+                                            <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                                                <i class="bi bi-x-circle"></i> Cancel
+                                            </a>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="d-flex gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary px-4">
-                                <i class="bi bi-save"></i> Save Tank
-                            </button>
-                            <a asp-action="Index" class="btn btn-outline-secondary px-4">
-                                <i class="bi bi-x-circle"></i> Cancel
-                            </a>
-                        </div>
-                    </form>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script>
-        // Show/hide quarantine fields based on checkbox
-        const quarantineCheckbox = document.getElementById('isQuarantineTank');
-        const quarantineFields = document.getElementById('quarantineFields');
+                @section Scripts {
+                    @{
+                        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+                    }
+                    <script>
+                            // Show/hide quarantine fields based on checkbox
+                            const quarantineCheckbox = document.getElementById('isQuarantineTank');
+                            const quarantineFields = document.getElementById('quarantineFields');
 
-        function toggleQuarantineFields() {
-            if (quarantineCheckbox.checked) {
-                quarantineFields.style.display = 'block';
-            } else {
-                quarantineFields.style.display = 'none';
-            }
-        }
+                            function toggleQuarantineFields() {
+                                if (quarantineCheckbox.checked) {
+                                    quarantineFields.style.display = 'block';
+                                } else {
+                                    quarantineFields.style.display = 'none';
+                                }
+                            }
 
-        // Initialize on page load
-        toggleQuarantineFields();
+                            // Initialize on page load
+                            toggleQuarantineFields();
 
-        // Toggle on checkbox change
-        quarantineCheckbox.addEventListener('change', toggleQuarantineFields);
-    </script>
-}
+                            // Toggle on checkbox change
+                            quarantineCheckbox.addEventListener('change', toggleQuarantineFields);
+                    </script>
+                }

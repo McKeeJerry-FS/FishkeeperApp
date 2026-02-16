@@ -179,7 +179,7 @@ public class TankController : Controller
     // POST: Tank/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Name,Type,VolumeGallons,StartDate,Notes,ImageFile")] Tank tank)
+    public async Task<IActionResult> Create([Bind("Name,Type,VolumeGallons,StartDate,Notes,ImageFile,IsQuarantineTank,QuarantineStartDate,QuarantineEndDate,QuarantinePurpose,QuarantineStatus,TreatmentProtocol")] Tank tank)
     {
         try
         {
@@ -248,7 +248,7 @@ public class TankController : Controller
     // POST: Tank/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Type,VolumeGallons,StartDate,Notes,ImageFile")] Tank tank)
+    public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Type,VolumeGallons,StartDate,Notes,ImageFile,IsQuarantineTank,QuarantineStartDate,QuarantineEndDate,QuarantinePurpose,QuarantineStatus,TreatmentProtocol")] Tank tank)
     {
         if (id != tank.Id)
         {
