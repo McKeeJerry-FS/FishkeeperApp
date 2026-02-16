@@ -268,11 +268,11 @@ public class LivestockController : Controller
             }
 
             _logger.LogInformation("About to validate ModelState. IsValid: {IsValid}", ModelState.IsValid);
-            
+
             if (ModelState.IsValid)
             {
                 _logger.LogInformation("ModelState is valid, creating livestock in database. TankId: {TankId}, UserId: {UserId}", tankId, userId);
-                
+
                 // Verify tank exists before calling service
                 var tankExists = await _tankService.GetTankByIdAsync(tankId, userId);
                 if (tankExists == null)
@@ -284,7 +284,7 @@ public class LivestockController : Controller
                     return View(livestock);
                 }
                 _logger.LogInformation("Tank verified - Name: {TankName}, Owner: {OwnerId}", tankExists.Name, tankExists.UserId);
-                
+
                 var createdLivestock = await _livestockService.CreateLivestockAsync(livestock, tankId, userId);
                 _logger.LogInformation("Livestock created successfully with ID: {Id}", createdLivestock.Id);
                 TempData["Success"] = $"{livestockType} added successfully!";

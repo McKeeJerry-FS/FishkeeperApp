@@ -138,7 +138,7 @@ public class WaterTestController : Controller
                 return Unauthorized();
             }
 
-            await PopulateTanksDropdown(userId);
+            await PopulateTanksDropdownWithTypes(userId);
 
             // Pre-populate with current date and selected tank
             var waterTest = new WaterTest
@@ -343,5 +343,15 @@ public class WaterTestController : Controller
     {
         var tanks = await _tankService.GetAllTanksAsync(userId);
         ViewBag.Tanks = new SelectList(tanks, "Id", "Name");
+    }
+
+    private async Task PopulateTanksDropdownWithTypes(string userId)
+    {
+        var tanks = await _tankService.GetAllTanksAsync(userId);
+        ViewBag.Tanks = new SelectList(tanks, "Id", "Name");
+
+        // Create a dictionary of tank ID to tank type for JavaScript
+        var tankTypes = tanks.ToDictionary(t => t.Id, t => t.Type.ToString());
+        ViewBag.TankTypes = System.Text.Json.JsonSerializer.Serialize(tankTypes);
     }
 }
