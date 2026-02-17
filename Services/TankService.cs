@@ -25,6 +25,7 @@ public class TankService : ITankService
             .Include(t => t.WaterTests)
             .Include(t => t.Livestock)
             .Include(t => t.MaintenanceLogs)
+            .Include(t => t.ShoppingListItems)
             .Include(t => t.Filters)
             .Include(t => t.Lights)
             .Include(t => t.Heaters)
@@ -34,12 +35,12 @@ public class TankService : ITankService
 
     public async Task<Tank?> GetTankByIdAsync(int id, string userId)
     {
-
         return await _context.Tanks
             .Where(t => t.UserId == userId)
             .Include(t => t.WaterTests)
             .Include(t => t.Livestock)
             .Include(t => t.MaintenanceLogs)
+            .Include(t => t.ShoppingListItems)
             .Include(t => t.Filters)
             .Include(t => t.Lights)
             .Include(t => t.Heaters)
@@ -49,8 +50,14 @@ public class TankService : ITankService
 
     public async Task<Tank> CreateTankAsync(Tank tank, string userId)
     {
-
         tank.UserId = userId;
+
+        // Ensure navigation properties are initialized
+        if (tank.ShoppingListItems == null)
+        {
+            tank.ShoppingListItems = new List<ShoppingListItem>();
+        }
+
         _context.Tanks.Add(tank);
         await _context.SaveChangesAsync();
         return tank;

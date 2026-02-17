@@ -56,6 +56,7 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>
     public DbSet<BreedingPair> BreedingPairs { get; set; }
     public DbSet<BreedingAttempt> BreedingAttempts { get; set; }
     public DbSet<WaterChemistryPrediction> WaterChemistryPredictions { get; set; }
+    public DbSet<ShoppingListItem> ShoppingListItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

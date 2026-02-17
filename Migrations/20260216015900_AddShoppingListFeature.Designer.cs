@@ -3,6 +3,7 @@ using System;
 using AquaHub.MVC.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AquaHub.MVC.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260216015900_AddShoppingListFeature")]
+    partial class AddShoppingListFeature
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1545,6 +1548,7 @@ namespace AquaHub.MVC.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("QuarantinePurpose")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
@@ -1552,6 +1556,7 @@ namespace AquaHub.MVC.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("QuarantineStatus")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
@@ -1559,6 +1564,7 @@ namespace AquaHub.MVC.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("TreatmentProtocol")
+                        .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 

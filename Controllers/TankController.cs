@@ -189,26 +189,52 @@ public class TankController : Controller
                 return Unauthorized();
             }
 
-            if (ModelState.IsValid)
+            // Remove UserId from ModelState since it's set by the service
+            ModelState.Remove("UserId");
+
+            // Remove quarantine-related fields from validation if not a quarantine tank
+            if (!tank.IsQuarantineTank)
             {
-                // Handle image upload
-                if (tank.ImageFile != null)
-                {
-                    _logger.LogInformation("Processing image upload. FileName: {FileName}, ContentType: {ContentType}, Size: {Size}",
-                        tank.ImageFile.FileName, tank.ImageFile.ContentType, tank.ImageFile.Length);
-
-                    tank.ImageData = await _imageService.ConvertFileToByteArrayAsync(tank.ImageFile);
-                    tank.ImageType = tank.ImageFile.ContentType;
-
-                    _logger.LogInformation("Image converted successfully. Data length: {Length}", tank.ImageData?.Length ?? 0);
-                }
-
-                var createdTank = await _tankService.CreateTankAsync(tank, userId);
-                TempData["Success"] = "Tank created successfully!";
-                return RedirectToAction(nameof(Details), new { id = createdTank.Id });
+                ModelState.Remove("QuarantinePurpose");
+                ModelState.Remove("TreatmentProtocol");
+                ModelState.Remove("QuarantineStatus");
+                ModelState.Remove("QuarantineStartDate");
+                ModelState.Remove("QuarantineEndDate");
             }
 
-            return View(tank);
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Tank creation failed - ModelState is invalid");
+                foreach (var key in ModelState.Keys)
+                {
+                    var modelState = ModelState[key];
+                    if (modelState != null)
+                    {
+                        foreach (var error in modelState.Errors)
+                        {
+                            _logger.LogWarning("Validation error for {Key}: {ErrorMessage}", key, error.ErrorMessage);
+                        }
+                    }
+                }
+                return View(tank);
+            }
+
+            // Handle image upload
+            if (tank.ImageFile != null)
+            {
+                _logger.LogInformation("Processing image upload. FileName: {FileName}, ContentType: {ContentType}, Size: {Size}",
+                    tank.ImageFile.FileName, tank.ImageFile.ContentType, tank.ImageFile.Length);
+
+                tank.ImageData = await _imageService.ConvertFileToByteArrayAsync(tank.ImageFile);
+                tank.ImageType = tank.ImageFile.ContentType;
+
+                _logger.LogInformation("Image converted successfully. Data length: {Length}", tank.ImageData?.Length ?? 0);
+            }
+
+            var createdTank = await _tankService.CreateTankAsync(tank, userId);
+            _logger.LogInformation("Tank created with ID: {TankId}", createdTank.Id);
+            TempData["Success"] = "Tank created successfully!";
+            return RedirectToAction(nameof(Details), new { id = createdTank.Id });
         }
         catch (Exception ex)
         {
@@ -262,6 +288,9 @@ public class TankController : Controller
             {
                 return Unauthorized();
             }
+
+            // Remove UserId from ModelState since it's set by the service
+            ModelState.Remove("UserId");
 
             if (ModelState.IsValid)
             {

@@ -35,7 +35,7 @@
                 {
                     <div class="alert alert-info">
                         <small>No image available. ImageData: @(Model.ImageData?.Length ?? 0) bytes, Type: @(Model.ImageType
-                                                                                ?? "null")</small>
+                                                                                                            ?? "null")</small>
                         </div>
                     }
                 else
@@ -168,6 +168,10 @@
                                class="list-group-item list-group-item-action">
                             <i class="bi bi-gear text-warning"></i> Equipment
                         </a>
+                        <a asp-controller="ShoppingList" asp-action="Index" asp-route-tankId="@Model.Id"
+                               class="list-group-item list-group-item-action">
+                            <i class="bi bi-cart text-primary"></i> Shopping List
+                        </a>
                         <a asp-controller="MaintenanceLog" asp-action="Index" asp-route-tankId="@Model.Id"
                                class="list-group-item list-group-item-action">
                             <i class="bi bi-wrench text-success"></i> Maintenance Logs
@@ -184,6 +188,10 @@
                         <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Add New</h5>
                     </div>
                     <div class="list-group list-group-flush">
+                        <a asp-controller="ShoppingList" asp-action="Create" asp-route-tankId="@Model.Id"
+                               class="list-group-item list-group-item-action">
+                            <i class="bi bi-cart-plus"></i> Add to Shopping List
+                        </a>
                         <a asp-controller="Livestock" asp-action="Create" asp-route-tankId="@Model.Id"
                                class="list-group-item list-group-item-action">
                             <i class="bi bi-fish"></i> Add Livestock

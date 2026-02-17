@@ -49,15 +49,15 @@ public class Tank : NewBaseType
 
     [Display(Name = "Quarantine Purpose")]
     [StringLength(500)]
-    public string QuarantinePurpose { get; set; } = string.Empty; // Treatment, Observation, Acclimation
+    public string? QuarantinePurpose { get; set; } // Treatment, Observation, Acclimation
 
     [Display(Name = "Quarantine Status")]
     [StringLength(50)]
-    public string QuarantineStatus { get; set; } = string.Empty; // Active, Completed, Monitoring
+    public string? QuarantineStatus { get; set; } // Active, Completed, Monitoring
 
     [Display(Name = "Treatment Protocol")]
     [StringLength(1000)]
-    public string TreatmentProtocol { get; set; } = string.Empty;
+    public string? TreatmentProtocol { get; set; }
 
     // Image path stored relative to wwwroot
     public string? ImagePath { get; set; }
@@ -69,6 +69,7 @@ public class Tank : NewBaseType
     public AppUser? User { get; set; }
     public ICollection<Livestock> Livestock { get; set; } = new List<Livestock>();
     public ICollection<MaintenanceLog> MaintenanceLogs { get; set; } = new List<MaintenanceLog>();
+    public ICollection<ShoppingListItem> ShoppingListItems { get; set; } = new List<ShoppingListItem>();
 
     // Equipment navigation properties
     public ICollection<Filter> Filters { get; set; } = new List<Filter>();

@@ -1,0 +1,174 @@
+@model AquaHub.MVC.Models.ShoppingListItem
+@using AquaHub.MVC.Models.Enums
+
+@{
+    ViewData["Title"] = "Add Shopping List Item";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-cart-plus"></i> Add Shopping List Item
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="TankId" class="form-label"></label>
+                            <select asp-for="TankId" asp-items="ViewBag.TankId" class="form-select">
+                                <option value="">-- Select Tank --</option>
+                            </select>
+                            <span asp-validation-for="TankId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ItemType" class="form-label"></label>
+                            <select asp-for="ItemType" class="form-select" id="itemTypeSelect">
+                                <option value="">-- Select Type --</option>
+                                <option value="@((int)ShoppingListItemType.Equipment)">Equipment</option>
+                                <option value="@((int)ShoppingListItemType.Supply)">Supply</option>
+                                <option value="@((int)ShoppingListItemType.Livestock)">Livestock</option>
+                            </select>
+                            <span asp-validation-for="ItemType" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label"></label>
+                            <input asp-for="Name" class="form-control" placeholder="e.g., Aquaclear 70 Filter" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Brand" class="form-label"></label>
+                                <input asp-for="Brand" class="form-control" placeholder="e.g., Fluval" />
+                                <span asp-validation-for="Brand" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ModelOrSpecies" class="form-label"></label>
+                                <input asp-for="ModelOrSpecies" class="form-control" placeholder="Model or Species" />
+                                <span asp-validation-for="ModelOrSpecies" class="text-danger"></span>
+                                <small class="form-text text-muted">Model for equipment, Species for livestock</small>
+                            </div>
+                        </div>
+
+                        <!-- Equipment-specific field -->
+                        <div class="mb-3" id="equipmentTypeField" style="display: none;">
+                            <label asp-for="EquipmentType" class="form-label"></label>
+                            <select asp-for="EquipmentType" class="form-select">
+                                <option value="">-- Select Equipment Type --</option>
+                                <option value="Filter">Filter</option>
+                                <option value="Heater">Heater</option>
+                                <option value="Light">Light</option>
+                                <option value="Pump">Pump</option>
+                                <option value="Skimmer">Protein Skimmer</option>
+                                <option value="Chiller">Chiller</option>
+                                <option value="WaveMaker">Wave Maker</option>
+                                <option value="AutoTopOff">Auto Top-Off</option>
+                                <option value="DosingPump">Dosing Pump</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <!-- Supply-specific field -->
+                        <div class="mb-3" id="supplyCategoryField" style="display: none;">
+                            <label asp-for="SupplyCategory" class="form-label"></label>
+                            <select asp-for="SupplyCategory" class="form-select">
+                                <option value="">-- Select Supply Category --</option>
+                                @foreach (var category in Enum.GetValues<SupplyCategory>())
+                                {
+                                    <option value="@((int)category)">@category.ToString()</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Quantity" class="form-label"></label>
+                                <input asp-for="Quantity" class="form-control" type="number" min="1" />
+                                <span asp-validation-for="Quantity" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="EstimatedCost" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input asp-for="EstimatedCost" class="form-control" type="number" step="0.01"
+                                           min="0" />
+                                </div>
+                                <span asp-validation-for="EstimatedCost" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Priority" class="form-label"></label>
+                                <select asp-for="Priority" class="form-select">
+                                    <option value="0">Low</option>
+                                    <option value="1" selected>Medium</option>
+                                    <option value="2">High</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="PurchaseLink" class="form-label"></label>
+                            <input asp-for="PurchaseLink" class="form-control"
+                                   placeholder="https://example.com/product" />
+                            <span asp-validation-for="PurchaseLink" class="text-danger"></span>
+                            <small class="form-text text-muted">Optional: Link to online store or product page</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label"></label>
+                            <textarea asp-for="Notes" class="form-control" rows="3"
+                                      placeholder="Additional notes..."></textarea>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Add to Shopping List
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+            document.getElementById('itemTypeSelect').addEventListener('change', function () {
+                var itemType = parseInt(this.value);
+                var equipmentField = document.getElementById('equipmentTypeField');
+                var supplyField = document.getElementById('supplyCategoryField');
+
+                // Hide all type-specific fields
+                equipmentField.style.display = 'none';
+                supplyField.style.display = 'none';
+
+                // Show relevant field based on type
+                if (itemType === @((int)ShoppingListItemType.Equipment)) {
+                    equipmentField.style.display = 'block';
+                } else if (itemType === @((int)ShoppingListItemType.Supply)) {
+                    supplyField.style.display = 'block';
+                }
+            });
+
+            // Trigger on page load if there's a pre-selected value
+            document.getElementById('itemTypeSelect').dispatchEvent(new Event('change'));
+    </script>
+}
