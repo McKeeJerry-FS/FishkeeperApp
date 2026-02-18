@@ -96,7 +96,7 @@ public static class LoggingExtensions
             properties["UserName"] = userName;
         }
 
-        return logger.BeginScope(properties);
+        return logger.BeginScope(properties) ?? new NoOpDisposable();
     }
 
     /// <summary>
@@ -114,7 +114,15 @@ public static class LoggingExtensions
             properties["TankName"] = tankName;
         }
 
-        return logger.BeginScope(properties);
+        return logger.BeginScope(properties) ?? new NoOpDisposable();
+    }
+
+    /// <summary>
+    /// No-operation disposable for cases where BeginScope returns null
+    /// </summary>
+    private sealed class NoOpDisposable : IDisposable
+    {
+        public void Dispose() { }
     }
 
     /// <summary>

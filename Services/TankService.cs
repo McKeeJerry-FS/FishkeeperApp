@@ -310,21 +310,21 @@ public class TankService : ITankService
                     };
 
                     // Get most recent water test
-                    viewModel.MostRecentWaterTest = tank.WaterTests
+                    viewModel.MostRecentWaterTest = tank.WaterTests?
                         .OrderByDescending(wt => wt.Timestamp)
                         .FirstOrDefault();
 
                     // Get recent water tests (last 10)
-                    viewModel.RecentWaterTests = tank.WaterTests
+                    viewModel.RecentWaterTests = tank.WaterTests?
                         .OrderByDescending(wt => wt.Timestamp)
                         .Take(10)
-                        .ToList();
+                        .ToList() ?? new List<WaterTest>();
 
                     // Get water tests for selected month
                     var startDate = new DateTime(year, month, 1);
                     var endDate = startDate.AddMonths(1);
 
-                    var monthTests = tank.WaterTests
+                    var monthTests = (tank.WaterTests ?? new List<WaterTest>())
                         .Where(wt => wt.Timestamp >= startDate && wt.Timestamp < endDate)
                         .OrderBy(wt => wt.Timestamp)
                         .ToList();
@@ -352,8 +352,8 @@ public class TankService : ITankService
                     viewModel.TDSData = monthTests.Select(wt => wt.TDS).ToList();
 
                     // Build available months dropdown
-                    var allTests = tank.WaterTests.OrderBy(wt => wt.Timestamp).ToList();
-                    if (allTests.Any())
+                    var allTests = tank.WaterTests?.OrderBy(wt => wt.Timestamp).ToList();
+                    if (allTests != null && allTests.Any())
                     {
                         var firstTest = allTests.First().Timestamp;
                         var lastTest = allTests.Last().Timestamp;
