@@ -342,17 +342,114 @@ public class WaterTestService : IWaterTestService
             // Freshwater-specific parameters
             if (tank.Type == AquariumType.Freshwater || tank.Type == AquariumType.Planted)
             {
+                // GH and KH ranges vary by tank type
+                double? ghMin = null, ghMax = null, khMin = null, khMax = null;
+
+                switch (tank.Type)
+                {
+                    case AquariumType.Planted:
+                        // Planted tanks prefer softer water
+                        ghMin = 50; ghMax = 100;  // ~3-6 °dH
+                        khMin = 40; khMax = 80;   // ~2-4 °dH
+                        break;
+                    case AquariumType.Freshwater:
+                    default:
+                        // General freshwater community
+                        ghMin = 70; ghMax = 215;  // ~4-12 °dH
+                        khMin = 54; khMax = 143;  // ~3-8 °dH
+                        break;
+                }
+
                 viewModel.ParameterTrends.Add(AnalyzeParameter(
                     waterTests, "GH", test => test.GH,
-                    4, 12, "°dH"));
+                    ghMin, ghMax, "ppm"));
 
                 viewModel.ParameterTrends.Add(AnalyzeParameter(
                     waterTests, "KH", test => test.KH,
-                    3, 8, "°dH"));
+                    khMin, khMax, "ppm"));
 
                 viewModel.ParameterTrends.Add(AnalyzeParameter(
                     waterTests, "TDS", test => test.TDS,
                     150, 250, "ppm"));
+
+                if (tank.Type != AquariumType.Planted)
+                {
+                    viewModel.ParameterTrends.Add(AnalyzeParameter(
+                        waterTests, "Phosphate", test => test.Phosphate,
+                        null, 1.0, "ppm"));
+                }
+            }
+
+            // Planted tank specific parameters
+            if (tank.Type == AquariumType.Planted)
+            {
+                viewModel.ParameterTrends.Add(AnalyzeParameter(
+                    waterTests, "Phosphate", test => test.Phosphate,
+                    0.5, 2.0, "ppm"));
+
+                viewModel.ParameterTrends.Add(AnalyzeParameter(
+                    waterTests, "Iron", test => test.Iron,
+                    0.1, 0.5, "ppm"));
+
+                viewModel.ParameterTrends.Add(AnalyzeParameter(
+                    waterTests, "CO2", test => test.CO2,
+                    20, 30, "ppm"));
+            }
+
+            // Cichlid-specific parameters (African cichlids prefer harder water)
+            if (tank.Type == AquariumType.Cichlid)
+            {
+                viewModel.ParameterTrends.Add(AnalyzeParameter(
+                    waterTests, "GH", test => test.GH,
+                    180, 360, "ppm"));  // ~10-20 °dH
+
+                viewModel.ParameterTrends.Add(AnalyzeParameter(
+                    waterTests, "KH", test => test.KH,
+                    125, 215, "ppm"));  // ~7-12 °dH
+
+                viewModel.ParameterTrends.Add(AnalyzeParameter(
+                    waterTests, "TDS", test => test.TDS,
+                    200, 400, "ppm"));
+
+                viewModel.ParameterTrends.Add(AnalyzeParameter(
+                    waterTests, "Phosphate", test => test.Phosphate,
+                    null, 1.0, "ppm"));
+            }
+
+            // Shrimp-specific parameters (prefer very soft water)
+            if (tank.Type == AquariumType.Shrimp)
+            {
+                viewModel.ParameterTrends.Add(AnalyzeParameter(
+                    waterTests, "GH", test => test.GH,
+                    36, 90, "ppm"));  // ~2-5 °dH
+
+                viewModel.ParameterTrends.Add(AnalyzeParameter(
+                    waterTests, "KH", test => test.KH,
+                    18, 54, "ppm"));  // ~1-3 °dH
+
+                viewModel.ParameterTrends.Add(AnalyzeParameter(
+                    waterTests, "TDS", test => test.TDS,
+                    100, 200, "ppm"));
+
+                viewModel.ParameterTrends.Add(AnalyzeParameter(
+                    waterTests, "Phosphate", test => test.Phosphate,
+                    null, 0.5, "ppm"));
+            }
+
+            // Betta/Goldfish parameters (moderate hardness)
+            if (tank.Type == AquariumType.Betta || tank.Type == AquariumType.Goldfish)
+            {
+                viewModel.ParameterTrends.Add(AnalyzeParameter(
+                    waterTests, "GH", test => test.GH,
+                    90, 180, "ppm"));  // ~5-10 °dH
+
+                viewModel.ParameterTrends.Add(AnalyzeParameter(
+                    waterTests, "KH", test => test.KH,
+                    54, 125, "ppm"));  // ~3-7 °dH
+
+                viewModel.ParameterTrends.Add(AnalyzeParameter(
+                    waterTests, "TDS", test => test.TDS,
+                    150, 300, "ppm"));
 
                 viewModel.ParameterTrends.Add(AnalyzeParameter(
                     waterTests, "Phosphate", test => test.Phosphate,

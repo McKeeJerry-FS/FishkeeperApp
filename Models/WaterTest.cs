@@ -26,6 +26,10 @@ public class WaterTest
     public double? KH { get; set; }
     public double? TDS { get; set; }
 
+    // Planted Tank Specific
+    public double? Iron { get; set; }
+    public double? CO2 { get; set; }
+
     // Reef 
     public double? Salinity { get; set; }
     public double? Alkalinity { get; set; }

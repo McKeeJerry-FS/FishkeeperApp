@@ -128,6 +128,146 @@
             </div>
 
             <div class="col-lg-4">
+                @{
+                    var latestWaterTest = ViewData["LatestWaterTest"] as AquaHub.MVC.Models.WaterTest;
+                }
+
+                @if (latestWaterTest != null)
+                {
+                    var isSaltwater = Model.Type == AquaHub.MVC.Models.Enums.AquariumType.Saltwater || 
+                                      Model.Type == AquaHub.MVC.Models.Enums.AquariumType.Reef || 
+                                      Model.Type == AquaHub.MVC.Models.Enums.AquariumType.NanoReef;
+                    
+                    <!-- Water Quality Status Card -->
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-header bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                            <h5 class="mb-0">
+                                <i class="bi bi-water"></i> Water Quality
+                            </h5>
+                            <small>Last tested: @latestWaterTest.Timestamp.ToString("MMM dd, yyyy")</small>
+                        </div>
+                        <div class="card-body p-2">
+                            @{
+                                var criticalParams = new List<(string Name, double? Value, double? MaxSafe, string Unit, string Icon)>
+                                {
+                                    ("Ammonia", latestWaterTest.Ammonia, 0.0, "ppm", "bi-exclamation-octagon-fill"),
+                                    ("Nitrite", latestWaterTest.Nitrite, 0.0, "ppm", "bi-exclamation-triangle-fill"),
+                                    ("Nitrate", latestWaterTest.Nitrate, isSaltwater ? 20.0 : 40.0, "ppm", "bi-info-circle-fill")
+                                };
+                                
+                                foreach (var param in criticalParams.Where(p => p.Value.HasValue))
+                                {
+                                    var value = param.Value!.Value;
+                                    var maxSafe = param.MaxSafe!.Value;
+                                    var isGood = value <= maxSafe;
+                                    var percentage = maxSafe > 0 ? Math.Min(100, (value / (maxSafe * 2)) * 100) : (value == 0 ? 0 : 100);
+                                    var gaugeColor = isGood ? "success" : "danger";
+                                    
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <small class="fw-bold">
+                                                <i class="bi @param.Icon text-@gaugeColor"></i> @param.Name
+                                            </small>
+                                            <span class="badge bg-@gaugeColor">@value.ToString("F2") @param.Unit</span>
+                                        </div>
+                                        <div class="progress" style="height: 10px;">
+                                            <div class="progress-bar bg-@gaugeColor @(!isGood ? "progress-bar-striped progress-bar-animated" : "")" 
+                                                 role="progressbar" 
+                                                 style="width: @percentage.ToString("F0")%" 
+                                                 aria-valuenow="@percentage" aria-valuemin="0" aria-valuemax="100">
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">Safe: ≤ @maxSafe @param.Unit</small>
+                                    </div>
+                                }
+                                
+                                // pH and Temperature
+                                if (latestWaterTest.PH.HasValue)
+                                {
+                                    var ph = latestWaterTest.PH.Value;
+                                    var phMin = isSaltwater ? 8.1 : 6.5;
+                                    var phMax = isSaltwater ? 8.4 : 7.5;
+                                    var phGood = ph >= phMin && ph <= phMax;
+                                    
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <small class="fw-bold">
+                                                <i class="bi bi-droplet-half text-@(phGood ? "success" : "warning")"></i> pH
+                                            </small>
+                                            <span class="badge bg-@(phGood ? "success" : "warning")">@ph.ToString("F2")</span>
+                                        </div>
+                                        <div class="progress" style="height: 10px;">
+                                            @{
+                                                var phRange = phMax - phMin;
+                                                var phPosition = ((ph - phMin) / phRange) * 100;
+                                                phPosition = Math.Max(0, Math.Min(100, phPosition));
+                                            }
+                                            <div class="progress-bar bg-@(phGood ? "success" : "warning")" 
+                                                 role="progressbar" 
+                                                 style="width: @phPosition.ToString("F0")%" 
+                                                 aria-valuenow="@phPosition" aria-valuemin="0" aria-valuemax="100">
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">Ideal: @phMin.ToString("F1") - @phMax.ToString("F1")</small>
+                                    </div>
+                                }
+                                
+                                if (latestWaterTest.Temperature.HasValue)
+                                {
+                                    var temp = latestWaterTest.Temperature.Value;
+                                    var tempMin = isSaltwater ? 76.0 : 72.0;
+                                    var tempMax = isSaltwater ? 82.0 : 78.0;
+                                    var tempGood = temp >= tempMin && temp <= tempMax;
+                                    
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <small class="fw-bold">
+                                                <i class="bi bi-thermometer-half text-@(tempGood ? "success" : "warning")"></i> Temperature
+                                            </small>
+                                            <span class="badge bg-@(tempGood ? "success" : "warning")">@temp.ToString("F1")°F</span>
+                                        </div>
+                                        <div class="progress" style="height: 10px;">
+                                            @{
+                                                var tempRange = tempMax - tempMin;
+                                                var tempPosition = ((temp - tempMin) / tempRange) * 100;
+                                                tempPosition = Math.Max(0, Math.Min(100, tempPosition));
+                                            }
+                                            <div class="progress-bar bg-@(tempGood ? "success" : "warning")" 
+                                                 role="progressbar" 
+                                                 style="width: @tempPosition.ToString("F0")%" 
+                                                 aria-valuenow="@tempPosition" aria-valuemin="0" aria-valuemax="100">
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">Ideal: @tempMin.ToString("F0")°F - @tempMax.ToString("F0")°F</small>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <div class="card-footer bg-transparent text-center">
+                            <a asp-controller="WaterTest" asp-action="Trends" asp-route-tankId="@Model.Id" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-graph-up"></i> View Trends
+                            </a>
+                            <a asp-controller="WaterTest" asp-action="Create" asp-route-tankId="@Model.Id" class="btn btn-sm btn-primary">
+                                <i class="bi bi-plus-circle"></i> New Test
+                            </a>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <!-- No Water Test Available -->
+                    <div class="card border-warning shadow-sm mb-3">
+                        <div class="card-body text-center">
+                            <i class="bi bi-droplet display-4 text-muted"></i>
+                            <h6 class="mt-2">No Water Test Data</h6>
+                            <p class="text-muted small">Log your first water test to monitor water quality</p>
+                            <a asp-controller="WaterTest" asp-action="Create" asp-route-tankId="@Model.Id" class="btn btn-primary btn-sm">
+                                <i class="bi bi-plus-circle"></i> Log Test
+                            </a>
+                        </div>
+                    </div>
+                }
+
                 @if (Model.IsQuarantineTank)
                 {
                     <div class="card border-warning shadow-sm mb-3">

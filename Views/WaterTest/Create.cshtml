@@ -99,6 +99,32 @@
                                 <span asp-validation-for="TDS" class="text-danger small"></span>
                             </div>
 
+                            <div class="col-12" id="plantedSection">
+                                <hr>
+                                <h5 class="text-success">Planted Tank Parameters</h5>
+                            </div>
+
+                            <div class="col-md-3" id="ironField">
+                                <label asp-for="Iron" class="form-label fw-bold">Iron (Fe) (ppm)</label>
+                                <input asp-for="Iron" class="form-control" type="number" step="0.01" />
+                                <span asp-validation-for="Iron" class="text-danger small"></span>
+                                <small class="text-muted">Ideal: 0.1-0.5 ppm</small>
+                            </div>
+
+                            <div class="col-md-3" id="co2Field">
+                                <label asp-for="CO2" class="form-label fw-bold">CO2 (ppm)</label>
+                                <input asp-for="CO2" class="form-control" type="number" step="1" />
+                                <span asp-validation-for="CO2" class="text-danger small"></span>
+                                <small class="text-muted">Ideal: 20-30 ppm</small>
+                            </div>
+
+                            <div class="col-md-3" id="phosphatePlantedField">
+                                <label asp-for="Phosphate" class="form-label fw-bold">Phosphate (PO4) (ppm)</label>
+                                <input asp-for="Phosphate" class="form-control" type="number" step="0.1" />
+                                <span asp-validation-for="Phosphate" class="text-danger small"></span>
+                                <small class="text-muted">Ideal: 0.5-2.0 ppm</small>
+                            </div>
+
                             <div class="col-12">
                                 <hr>
                                 <h5 class="text-info" id="saltwaterSection">Saltwater Parameters</h5>
@@ -156,133 +182,156 @@
     }
 
     <script>
-            // Tank types from controller
-            const tankTypes = @Html.Raw(ViewBag.TankTypes ?? "{}");
+                    // Tank types from controller
+                    const tankTypes = @Html.Raw(ViewBag.TankTypes ?? "{}");
 
-            // Define parameter visibility by tank type
-            const parameterVisibility = {
-                'Freshwater': {
-                    freshwater: true,
-                    saltwater: false,
-                    phosphate: false
-                },
-                'Planted': {
-                    freshwater: true,
-                    saltwater: false,
-                    phosphate: true // Planted tanks need phosphate monitoring
-                },
-                'Saltwater': {
-                    freshwater: false,
-                    saltwater: true,
-                    phosphate: true
-                },
-                'Reef': {
-                    freshwater: false,
-                    saltwater: true,
-                    phosphate: true
-                },
-                'NanoReef': {
-                    freshwater: false,
-                    saltwater: true,
-                    phosphate: true
-                },
-                'Brackish': {
-                    freshwater: true,
-                    saltwater: true,
-                    phosphate: false
-                },
-                'Cichlid': {
-                    freshwater: true,
-                    saltwater: false,
-                    phosphate: false
-                },
-                'Betta': {
-                    freshwater: true,
-                    saltwater: false,
-                    phosphate: false
-                },
-                'Goldfish': {
-                    freshwater: true,
-                    saltwater: false,
-                    phosphate: false
-                },
-                'Shrimp': {
-                    freshwater: true,
-                    saltwater: false,
-                    phosphate: false
-                },
-                'Turtle': {
-                    freshwater: true,
-                    saltwater: false,
-                    phosphate: false
-                },
-                'Quarantine': {
-                    freshwater: true,
-                    saltwater: true,
-                    phosphate: false
-                },
-                'Other': {
-                    freshwater: true,
-                    saltwater: true,
-                    phosphate: true
-                }
-            };
+                    // Define parameter visibility by tank type
+                    const parameterVisibility = {
+                        'Freshwater': {
+                        planted: false,
+                            freshwater: true,
+                            saltwater: false,
+                            phosphate: false
+                        },
+                        'Planted': {
+                            freshwater: true,
+                            saltwater: false,
+                            phosphate: false,
+                            planted: true
+                        },
+                        'Saltwater': {
+                        planted: false,
+                            freshwater: false,
+                            saltwater: true,
+                            phosphate: true
+                        },
+                        'Reef': {
+                        planted: false,
+                            freshwater: false,
+                            saltwater: true,
+                            phosphate: true
+                        },
+                        'NanoReef': {
+                        planted: false,
+                            freshwater: false,
+                            saltwater: true,
+                            phosphate: true
+                        },
+                        'Brackish': {
+                        planted: false,
+                            freshwater: true,
+                            saltwater: true,
+                            phosphate: false
+                        },
+                        'Cichlid': {
+                        planted: false,
+                            freshwater: true,
+                            saltwater: false,
+                            phosphate: false
+                        },
+                        'Betta': {
+                        planted: false,
+                            freshwater: true,
+                            saltwater: false,
+                            phosphate: false
+                        },
+                        'Goldfish': {
+                        planted: false,
+                            freshwater: true,
+                            saltwater: false,
+                            phosphate: false
+                        },
+                        'Shrimp': {
+                        planted: false,
+                            freshwater: true,
+                            saltwater: false,
+                            phosphate: false
+                        },
+                        'Turtle': {
+                        planted: false,
+                            freshwater: true,
+                            saltwater: false,
+                            phosphate: false
+                        },
+                        'Quarantine': {
+                        planted: false,
+                            freshwater: true,
+                            saltwater: true,
+                            phosphate: false
+                        },
+                        'Other': {
+                        planted: false,
+                            freshwater: true,
+                            saltwater: true,
+                            phosphate: true
+                        }
+                    };
 
-            function updateParameterVisibility() {
-                const tankId = document.getElementById('tankSelect').value;
+                    function updateParameterVisibility() {
+                        const tankId = document.getElementById('tankSelect').value;
 
-                if (!tankId || tankId === '') {
-                    // Show all if no tank selected
-                    showAllParameters();
-                    return;
-                }
+                        if (!tankId || tankId === '') {
+                            // Show all if no tank selected
+                            showAllParameters();
+                            return;
+                        }
 
-                const tankType = tankTypes[tankId];
-                const visibility = parameterVisibility[tankType] || parameterVisibility['Other'];
+                        const tankType = tankTypes[tankId];
+                        const visibility = parameterVisibility[tankType] || parameterVisibility['Other'];
 
-                // Freshwater parameters
-                const freshwaterElements = ['freshwaterSection', 'ghField', 'khField', 'tdsField'];
-                freshwaterElements.forEach(id => {
-                    const element = document.getElementById(id);
-                    if (element) {
-                        element.style.display = visibility.freshwater ? '' : 'none';
+                        // Freshwater parameters
+                        const freshwaterElements = ['freshwaterSection', 'ghField', 'khField', 'tdsField'];
+                        freshwaterElements.forEach(id => {
+                            const element = document.getElementById(id);
+                            if (element) {
+                                element.style.display = visibility.freshwater ? '' : 'none';
+                            }
+                        });
+
+                        // Saltwater parameters (excluding phosphate)
+                        const saltwaterElements = ['saltwaterSection', 'salinityField', 'alkalinityField', 'calciumField', 'magnesiumField'];
+                        saltwaterElements.forEach(id => {
+                            const element = document.getElementById(id);
+                            if (element) {
+                                element.style.display = visibility.saltwater ? '' : 'none';
+                            }
+                        });
+
+                        // Planted tank parameters
+                        const plantedElements = ['plantedSection', 'ironField', 'co2Field', 'phosphatePlantedField'];
+                        plantedElements.forEach(id => {
+                            const element = document.getElementById(id);
+                            if (element) {
+                                element.style.display = (visibility.planted === true) ? '' : 'none';
+                            }
+                        });
+
+                        // Phosphate (shown for saltwater and reef only)
+                        const phosphateElement = document.getElementById('phosphateField');
+                        if (phosphateElement) {
+                            phosphateElement.style.display = visibility.phosphate ? '' : 'none';
+                        }
                     }
-                });
 
-                // Saltwater parameters (excluding phosphate)
-                const saltwaterElements = ['saltwaterSection', 'salinityField', 'alkalinityField', 'calciumField', 'magnesiumField'];
-                saltwaterElements.forEach(id => {
-                    const element = document.getElementById(id);
-                    if (element) {
-                        element.style.display = visibility.saltwater ? '' : 'none';
+                    function showAllParameters() {
+                        const allElements = [
+                            'freshwaterSection', 'ghField', 'khField', 'tdsField',
+                            'plantedSection', 'ironField', 'co2Field', 'phosphatePlantedField',
+                            'saltwaterSection', 'salinityField', 'alkalinityField',
+                            'calciumField', 'magnesiumField', 'phosphateField'
+                        ];
+                        allElements.forEach(id => {
+                            const element = document.getElementById(id);
+                            if (element) {
+                                element.style.display = '';
+                            }
+                        });
                     }
-                });
 
-                // Phosphate (shown for planted, saltwater, and reef)
-                const phosphateElement = document.getElementById('phosphateField');
-                if (phosphateElement) {
-                    phosphateElement.style.display = visibility.phosphate ? '' : 'none';
-                }
-            }
+                    // Attach event listener
+                    document.getElementById('tankSelect').addEventListener('change', updateParameterVisibility);
 
-            function showAllParameters() {
-                const allElements = [
-                    'freshwaterSection', 'ghField', 'khField', 'tdsField',
-                    'saltwaterSection', 'salinityField', 'alkalinityField',
-                    'calciumField', 'magnesiumField', 'phosphateField'
-                ];
-                allElements.forEach(id => {
-                    const element = document.getElementById(id);
-                    if (element) {
-                        element.style.display = '';
-                    }
-                });
-            }
-
-            // Attach event listener
-            document.getElementById('tankSelect').addEventListener('change', updateParameterVisibility);
-
-            // Run on page load
-            document.addEventListener('DOMContentLoaded', updateParameterVisibility);
+                    // Run on page load
+                    document.addEventListener('DOMContentLoaded', updateParameterVisibility);
     </script>
 }

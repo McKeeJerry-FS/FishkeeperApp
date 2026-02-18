@@ -18,7 +18,7 @@
                         <input type="hidden" asp-for="Id" />
                         <input type="hidden" asp-for="TankId" />
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-                        
+
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label asp-for="Timestamp" class="form-label fw-bold">Test Date</label>
@@ -30,7 +30,10 @@
                                 <input asp-for="Temperature" class="form-control" type="number" step="0.1" />
                             </div>
 
-                            <div class="col-12"><hr><h5 class="text-primary">General Parameters</h5></div>
+                            <div class="col-12">
+                                <hr>
+                                <h5 class="text-primary">General Parameters</h5>
+                            </div>
 
                             <div class="col-md-4">
                                 <label asp-for="PH" class="form-label fw-bold">pH</label>
@@ -52,7 +55,10 @@
                                 <input asp-for="Nitrate" class="form-control" type="number" step="0.1" />
                             </div>
 
-                            <div class="col-12"><hr><h5 class="text-success">Freshwater Parameters</h5></div>
+                            <div class="col-12">
+                                <hr>
+                                <h5 class="text-success">Freshwater Parameters</h5>
+                            </div>
 
                             <div class="col-md-4">
                                 <label asp-for="GH" class="form-label fw-bold">GH (°dH)</label>
@@ -69,7 +75,10 @@
                                 <input asp-for="TDS" class="form-control" type="number" step="1" />
                             </div>
 
-                            <div class="col-12"><hr><h5 class="text-info">Saltwater Parameters</h5></div>
+                            <div class="col-12">
+                                <hr>
+                                <h5 class="text-info">Saltwater Parameters</h5>
+                            </div>
 
                             <div class="col-md-3">
                                 <label asp-for="Salinity" class="form-label fw-bold">Salinity (ppt)</label>
@@ -97,6 +106,35 @@
                             </div>
                         </div>
 
+                        <!-- Planted Tank Parameters -->
+                        <div id="plantedSection" class="row g-3 mt-2">
+                            <div class="col-12">
+                                <hr>
+                                <h5 class="text-success"><i class="bi bi-flower1"></i> Planted Tank Parameters</h5>
+                            </div>
+
+                            <div class="col-md-4" id="ironField">
+                                <label asp-for="Iron" class="form-label fw-bold">Iron (Fe) (ppm)</label>
+                                <input asp-for="Iron" class="form-control" type="number" step="0.01"
+                                       placeholder="Ideal: 0.1 - 0.5 ppm" />
+                                <small class="text-muted">Optimal range: 0.1 - 0.5 ppm</small>
+                            </div>
+
+                            <div class="col-md-4" id="co2Field">
+                                <label asp-for="CO2" class="form-label fw-bold">CO₂ (ppm)</label>
+                                <input asp-for="CO2" class="form-control" type="number" step="1"
+                                       placeholder="Ideal: 20 - 30 ppm" />
+                                <small class="text-muted">Optimal range: 20 - 30 ppm</small>
+                            </div>
+
+                            <div class="col-md-4" id="phosphatePlantedField">
+                                <label class="form-label fw-bold">Phosphate - Planted (ppm)</label>
+                                <input asp-for="Phosphate" class="form-control" type="number" step="0.01"
+                                       placeholder="Ideal: 0.5 - 2.0 ppm" />
+                                <small class="text-muted">Planted tanks: 0.5 - 2.0 ppm</small>
+                            </div>
+                        </div>
+
                         <div class="d-flex gap-2 mt-4">
                             <button type="submit" class="btn btn-warning px-4">
                                 <i class="bi bi-save"></i> Update
@@ -116,5 +154,20 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+            // Show/hide planted tank parameters based on tank type
+            document.addEventListener('DOMContentLoaded', function () {
+                var tankType = '@Model.Tank.Type';
+                var isPlanted = tankType === 'Planted';
+
+                var plantedSection = document.getElementById('plantedSection');
+                if (plantedSection) {
+                    plantedSection.style.display = isPlanted ? '' : 'none';
+                }
+            });
+    </script>
 }

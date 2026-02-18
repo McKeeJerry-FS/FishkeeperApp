@@ -101,7 +101,7 @@ public class WaterTestController : Controller
     }
 
     // GET: WaterTest/Trends/5
-    public async Task<IActionResult> Trends(int tankId, DateTime? startDate, DateTime? endDate)
+    public async Task<IActionResult> Trends(int? tankId, DateTime? startDate, DateTime? endDate)
     {
         try
         {
@@ -111,7 +111,23 @@ public class WaterTestController : Controller
                 return Unauthorized();
             }
 
-            var trends = await _waterTestService.GetParameterTrendsAsync(tankId, userId, startDate, endDate);
+            // Populate tank list for filter dropdown
+            var tanks = await _tankService.GetAllTanksAsync(userId);
+            ViewBag.TankList = new SelectList(tanks, "Id", "Name", tankId);
+
+            // If no tankId is specified and tanks exist, use the first one
+            if (!tankId.HasValue && tanks.Any())
+            {
+                tankId = tanks.First().Id;
+            }
+
+            if (!tankId.HasValue)
+            {
+                TempData["Error"] = "Please select a tank to view trends.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var trends = await _waterTestService.GetParameterTrendsAsync(tankId.Value, userId, startDate, endDate);
             if (trends == null)
             {
                 return NotFound();

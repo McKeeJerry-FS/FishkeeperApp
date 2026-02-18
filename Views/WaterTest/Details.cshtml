@@ -2,16 +2,55 @@
 
 @{
     ViewData["Title"] = "Water Test Details";
+
+    // Define ideal ranges based on tank type
+    var tankType = Model.Tank?.Type ?? AquaHub.MVC.Models.Enums.AquariumType.Freshwater;
+    var isSaltwater = tankType == AquaHub.MVC.Models.Enums.AquariumType.Saltwater ||
+    tankType == AquaHub.MVC.Models.Enums.AquariumType.Reef ||
+    tankType == AquaHub.MVC.Models.Enums.AquariumType.NanoReef;
+    var isReef = tankType == AquaHub.MVC.Models.Enums.AquariumType.Reef ||
+    tankType == AquaHub.MVC.Models.Enums.AquariumType.NanoReef;
+}
+
+@functions {
+    public class ParameterGauge
+    {
+        public string Name { get; set; } = "";
+        public double? Value { get; set; }
+        public double? MinIdeal { get; set; }
+        public double? MaxIdeal { get; set; }
+        public string Unit { get; set; } = "";
+
+        public bool GetIsInRange()
+        {
+            if (!Value.HasValue) return false;
+            if (!MinIdeal.HasValue && !MaxIdeal.HasValue) return true;
+            if (!MinIdeal.HasValue && MaxIdeal.HasValue) return Value.Value <= MaxIdeal.Value;
+            if (!MaxIdeal.HasValue && MinIdeal.HasValue) return Value.Value >= MinIdeal.Value;
+            if (MinIdeal.HasValue && MaxIdeal.HasValue)
+                return Value.Value >= MinIdeal.Value && Value.Value <= MaxIdeal.Value;
+            return false;
+        }
+
+        public string StatusClass => GetIsInRange() ? "success" : "danger";
+        public string StatusIcon => GetIsInRange() ? "bi-check-circle-fill" : "bi-exclamation-triangle-fill";
+    }
 }
 
 <div class="container py-4">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
+        <div class="col-lg-10">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-info text-white">
-                    <h3 class="mb-0">
-                        <i class="bi bi-droplet-fill"></i> Water Test - @Model.Timestamp.ToString("MMMM dd, yyyy")
-                    </h3>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">
+                            <i class="bi bi-droplet-fill"></i> Water Test - @Model.Timestamp.ToString("MMMM dd, yyyy")
+                        </h3>
+                        @if (Model.Tank != null)
+                        {
+                            <span class="badge bg-light text-dark">@Model.Tank.Name</span>
+                        }
+                    </div>
                 </div>
 
                 @* Water Test Image *@
@@ -19,106 +58,292 @@
                     @{
                         var waterTestImage = ViewData["WaterTestImage"] as string;
                         var displayImage = !string.IsNullOrEmpty(waterTestImage) ? waterTestImage :
-                    Url.Content("~/img/water_test.jpg");
+                        Url.Content("~/img/water_test.jpg");
                     }
                     <img src="@displayImage" alt="Water Test Image"
                          style="width: 400px; height: 400px; object-fit: cover; border-radius: 8px;">
                 </div>
 
                 <div class="card-body p-4">
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <h5 class="text-primary border-bottom pb-2">General Parameters</h5>
-                            <dl class="row">
-                                <dt class="col-sm-5">Temperature:</dt>
-                                <dd class="col-sm-7">@(Model.Temperature.HasValue ? $"{Model.Temperature.Value:F1}°F" :
-                                                                        "Not recorded")</dd>
+                    @{
+                        var gauges = new List<ParameterGauge>();
 
-                                    <dt class="col-sm-5">pH:</dt>
-                                    <dd class="col-sm-7">@(Model.PH.HasValue ? Model.PH.Value.ToString("F2") : "Not                            recorded")</dd>
+                        // Universal parameters
+                        gauges.Add(new ParameterGauge
+                        {
+                            Name = "Temperature",
+                            Value = Model.Temperature,
+                            MinIdeal =
+                        isSaltwater ? 76 : 72,
+                            MaxIdeal = isSaltwater ? 82 : 78,
+                            Unit = "°F"
+                        });
+                        gauges.Add(new ParameterGauge
+                        {
+                            Name = "pH",
+                            Value = Model.PH,
+                            MinIdeal = isSaltwater ? 8.1 : 6.5,
+                            MaxIdeal = isSaltwater ? 8.4 : 7.5,
+                            Unit = ""
+                        });
+                        gauges.Add(new ParameterGauge
+                        {
+                            Name = "Ammonia",
+                            Value = Model.Ammonia,
+                            MinIdeal = null,
+                            MaxIdeal =
+                        0,
+                            Unit = "ppm"
+                        });
+                        gauges.Add(new ParameterGauge
+                        {
+                            Name = "Nitrite",
+                            Value = Model.Nitrite,
+                            MinIdeal = null,
+                            MaxIdeal =
+                        0,
+                            Unit = "ppm"
+                        });
+                        gauges.Add(new ParameterGauge
+                        {
+                            Name = "Nitrate",
+                            Value = Model.Nitrate,
+                            MinIdeal = null,
+                            MaxIdeal =
+                        isSaltwater ? 20 : 40,
+                            Unit = "ppm"
+                        });
 
-                                    <dt class="col-sm-5">Ammonia:</dt>
-                                    <dd class="col-sm-7">@(Model.Ammonia.HasValue ? $"{Model.Ammonia.Value:F2} ppm" : "Not       recorded")</dd>
+                        // Saltwater parameters
+                        if (isSaltwater)
+                        {
+                            if (Model.Salinity.HasValue)
+                                gauges.Add(new ParameterGauge
+                                {
+                                    Name = "Salinity",
+                                    Value = Model.Salinity,
+                                    MinIdeal = 1.023,
+                                    MaxIdeal = 1.026,
+                                    Unit = "ppt"
+                                });
+                            if (Model.Alkalinity.HasValue)
+                                gauges.Add(new ParameterGauge
+                                {
+                                    Name = "Alkalinity",
+                                    Value = Model.Alkalinity,
+                                    MinIdeal = 8,
+                                    MaxIdeal = 12,
+                                    Unit = "dKH"
+                                });
+                            if (Model.Phosphate.HasValue)
+                                gauges.Add(new ParameterGauge
+                                {
+                                    Name = "Phosphate",
+                                    Value = Model.Phosphate,
+                                    MinIdeal = null,
+                                    MaxIdeal = 0.03,
+                                    Unit = "ppm"
+                                });
+                        }
 
-                                    <dt class="col-sm-5">Nitrite:</dt>
-                                    <dd class="col-sm-7">@(Model.Nitrite.HasValue ? $"{Model.Nitrite.Value:F2} ppm" : "Not              recorded")</dd>
+                        // Reef parameters
+                        if (isReef)
+                        {
+                            if (Model.Calcium.HasValue)
+                                gauges.Add(new ParameterGauge
+                                {
+                                    Name = "Calcium",
+                                    Value = Model.Calcium,
+                                    MinIdeal = 380,
+                                    MaxIdeal =
+                                450,
+                                    Unit = "ppm"
+                                });
+                            if (Model.Magnesium.HasValue)
+                                gauges.Add(new ParameterGauge
+                                {
+                                    Name = "Magnesium",
+                                    Value = Model.Magnesium,
+                                    MinIdeal = 1250,
+                                    MaxIdeal = 1350,
+                                    Unit = "ppm"
+                                });
+                        }
 
-                                    <dt class="col-sm-5">Nitrate:</dt>
-                                    <dd class="col-sm-7">@(Model.Nitrate.HasValue ? $"{Model.Nitrate.Value:F1} ppm" : "Not                      recorded")</dd>
-                                </dl>
+                        // Freshwater parameters
+                        if (!isSaltwater)
+                        {
+                            if (Model.GH.HasValue)
+                                gauges.Add(new ParameterGauge
+                                {
+                                    Name = "GH",
+                                    Value = Model.GH,
+                                    MinIdeal = 70,
+                                    MaxIdeal = 215,
+                                    Unit =
+                                "ppm"
+                                });
+                            if (Model.KH.HasValue)
+                                gauges.Add(new ParameterGauge
+                                {
+                                    Name = "KH",
+                                    Value = Model.KH,
+                                    MinIdeal = 54,
+                                    MaxIdeal = 143,
+                                    Unit =
+                                "ppm"
+                                });
+                            if (Model.TDS.HasValue)
+                                gauges.Add(new ParameterGauge
+                                {
+                                    Name = "TDS",
+                                    Value = Model.TDS,
+                                    MinIdeal = 150,
+                                    MaxIdeal = 250,
+                                    Unit = "ppm"
+                                });
+                            if (Model.Phosphate.HasValue)
+                                gauges.Add(new ParameterGauge
+                                {
+                                    Name = "Phosphate",
+                                    Value = Model.Phosphate,
+                                    MinIdeal = null,
+                                    MaxIdeal = 1.0,
+                                    Unit = "ppm"
+                                });
+                        }
+
+                        // Planted tank specific parameters
+                        var isPlanted = Model.Tank.Type == AquaHub.MVC.Models.Enums.AquariumType.Planted;
+                        if (isPlanted)
+                        {
+                            if (Model.Iron.HasValue)
+                                gauges.Add(new ParameterGauge
+                                {
+                                    Name = "Iron (Fe)",
+                                    Value = Model.Iron,
+                                    MinIdeal = 0.1,
+                                    MaxIdeal = 0.5,
+                                    Unit = "ppm"
+                                });
+                            if (Model.CO2.HasValue)
+                                gauges.Add(new ParameterGauge
+                                {
+                                    Name = "CO₂",
+                                    Value = Model.CO2,
+                                    MinIdeal = 20,
+                                    MaxIdeal = 30,
+                                    Unit = "ppm"
+                                });
+                            // Update Phosphate range for planted tanks
+                            var phosphateGauge = gauges.FirstOrDefault(g => g.Name == "Phosphate");
+                            if (phosphateGauge != null)
+                            {
+                                phosphateGauge.MinIdeal = 0.5;
+                                phosphateGauge.MaxIdeal = 2.0;
+                            }
+                            // Update GH range for planted tanks
+                            var ghGauge = gauges.FirstOrDefault(g => g.Name == "GH");
+                            if (ghGauge != null)
+                            {
+                                ghGauge.MinIdeal = 50;
+                                ghGauge.MaxIdeal = 100;
+                            }
+                            // Update KH range for planted tanks
+                            var khGauge = gauges.FirstOrDefault(g => g.Name == "KH");
+                            if (khGauge != null)
+                            {
+                                khGauge.MinIdeal = 40;
+                                khGauge.MaxIdeal = 80;
+                            }
+                        }
+
+                        var parametersInRange = gauges.Count(g => g.Value.HasValue && g.GetIsInRange());
+                        var totalParameters = gauges.Count(g => g.Value.HasValue);
+                        var healthPercentage = totalParameters > 0 ? (parametersInRange * 100.0 / totalParameters) : 0;
+                    }
+
+                    <!-- Overall Health Status -->
+                    <div
+                        class="alert @(healthPercentage >= 80 ? "alert-success" : healthPercentage >= 60 ? "alert-info" : healthPercentage >= 40 ? "alert-warning" : "alert-danger") mb-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <i
+                                class="bi @(healthPercentage >= 80 ? "bi-check-circle-fill" : "bi-exclamation-triangle-fill") fs-4"></i>
+                                <strong class="ms-2">Water Quality: @(healthPercentage >= 80 ? "Excellent" :
+                                                                                                                                                                                                                                                            healthPercentage >= 60 ? "Good" : healthPercentage >= 40 ? "Fair" : "Needs                       Attention")</strong>
+                                </div>
+                                <div>
+                                    <span class="badge bg-light text-dark fs-6">@parametersInRange/@totalParameters
+                                        Parameters in Range</span>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="col-md-6">
-                                <h5 class="text-success border-bottom pb-2">Additional Parameters</h5>
-                                <dl class="row">
-                                    @if (Model.GH.HasValue || Model.KH.HasValue || Model.TDS.HasValue)
-                                    {
-                                        <dt class="col-12 fw-bold mt-2">Freshwater:</dt>
-                                        @if (Model.GH.HasValue)
-                                        {
-                                            <dt class="col-sm-5">GH:</dt>
-                                            <dd class="col-sm-7">@($"{Model.GH.Value:F1} °dH")</dd>
-                                        }
-                                        @if (Model.KH.HasValue)
-                                        {
-                                            <dt class="col-sm-5">KH:</dt>
-                                            <dd class="col-sm-7">@($"{Model.KH.Value:F1} °dH")</dd>
-                                        }
-                                        @if (Model.TDS.HasValue)
-                                        {
-                                            <dt class="col-sm-5">TDS:</dt>
-                                            <dd class="col-sm-7">@($"{Model.TDS.Value:F0} ppm")</dd>
-                                        }
-                                    }
-
-                                    @if (Model.Salinity.HasValue || Model.Alkalinity.HasValue || Model.Calcium.HasValue ||
-                                                                    Model.Magnesium.HasValue || Model.Phosphate.HasValue)
-                                    {
-                                        <dt class="col-12 fw-bold mt-2">Saltwater:</dt>
-                                        @if (Model.Salinity.HasValue)
-                                        {
-                                            <dt class="col-sm-5">Salinity:</dt>
-                                            <dd class="col-sm-7">@($"{Model.Salinity.Value:F1} ppt")</dd>
-                                        }
-                                        @if (Model.Alkalinity.HasValue)
-                                        {
-                                            <dt class="col-sm-5">Alkalinity:</dt>
-                                            <dd class="col-sm-7">@($"{Model.Alkalinity.Value:F1} dKH")</dd>
-                                        }
-                                        @if (Model.Calcium.HasValue)
-                                        {
-                                            <dt class="col-sm-5">Calcium:</dt>
-                                            <dd class="col-sm-7">@($"{Model.Calcium.Value:F0} ppm")</dd>
-                                        }
-                                        @if (Model.Magnesium.HasValue)
-                                        {
-                                            <dt class="col-sm-5">Magnesium:</dt>
-                                            <dd class="col-sm-7">@($"{Model.Magnesium.Value:F0} ppm")</dd>
-                                        }
-                                        @if (Model.Phosphate.HasValue)
-                                        {
-                                            <dt class="col-sm-5">Phosphate:</dt>
-                                            <dd class="col-sm-7">@($"{Model.Phosphate.Value:F2} ppm")</dd>
-                                        }
-                                    }
-                                </dl>
+                            <!-- Parameter Gauges -->
+                            <div class="row g-3">
+                                @foreach (var gauge in gauges.Where(g => g.Value.HasValue))
+                                {
+                                    var gaugeValue = gauge.Value!.Value;
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="card border-@gauge.StatusClass">
+                                            <div class="card-body text-center p-3">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 class="mb-0 text-muted">@gauge.Name</h6>
+                                                    <i class="bi @gauge.StatusIcon text-@gauge.StatusClass"></i>
+                                                </div>
+                                                <div class="display-6 fw-bold text-@gauge.StatusClass">
+                                                    @gaugeValue.ToString(gauge.Name == "pH" || gauge.Name == "Salinity" ?
+                                                    "F2" : gauge.Name == "TDS" ? "F0" : "F1")
+                                                </div>
+                                                <div class="text-muted small">@gauge.Unit</div>
+                                                @if (gauge.MinIdeal.HasValue || gauge.MaxIdeal.HasValue)
+                                                {
+                                                    <div class="mt-2">
+                                                        <div class="progress" style="height: 8px;">
+                                                            @{
+                                                                double minRange = gauge.MinIdeal ?? 0;
+                                                                double maxRange = gauge.MaxIdeal ?? (gaugeValue * 1.5);
+                                                                double range = maxRange - minRange;
+                                                                double position = range > 0 ? ((gaugeValue - minRange) / range * 100)
+                                                                : 50;
+                                                                position = Math.Max(0, Math.Min(100, position));
+                                                            }
+                                                            <div class="progress-bar bg-@gauge.StatusClass" role="progressbar"
+                                                                 style="width: @position.ToString("F0")%" aria-valuenow="@position"
+                                                                 aria-valuemin="0" aria-valuemax="100">
+                                                            </div>
+                                                        </div>
+                                                        <small class="text-muted">
+                                                            Ideal: @(gauge.MinIdeal?.ToString("F1") ?? "0") -
+                                                            @(gauge.MaxIdeal?.ToString("F1") ?? "∞") @gauge.Unit
+                                                        </small>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
                             </div>
                         </div>
-                    </div>
-                    <div class="card-footer bg-transparent">
-                        <div class="btn-group" role="group">
-                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
-                                <i class="bi bi-pencil"></i> Edit
-                            </a>
-                            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
-                                <i class="bi bi-trash"></i> Delete
-                            </a>
-                        </div>
-                        <a asp-action="Index" asp-route-tankId="@Model.TankId" class="btn btn-outline-secondary float-end">
-                            <i class="bi bi-arrow-left"></i> Back to List
-                        </a>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="card-footer bg-transparent">
+            <div class="btn-group" role="group">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Delete
+                </a>
+            </div>
+            <a asp-action="Index" asp-route-tankId="@Model.TankId" class="btn btn-outline-secondary float-end">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
+        </div>
     </div>
+</div>
+</div>
+</div>

@@ -111,6 +111,14 @@ public class TankController : Controller
                 return NotFound();
             }
 
+            // Get latest water test
+            var latestWaterTest = await _context.WaterTests
+                .Where(w => w.TankId == id && w.Tank!.UserId == userId)
+                .OrderByDescending(w => w.Timestamp)
+                .FirstOrDefaultAsync();
+
+            ViewData["LatestWaterTest"] = latestWaterTest;
+
             // Convert image data to displayable format
             var tankImage = _imageService.ConvertByteArrayToFile(
                 tank.ImageData,
