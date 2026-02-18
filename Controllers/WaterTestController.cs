@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using AquaHub.MVC.Models;
 using AquaHub.MVC.Services.Interfaces;
+using AquaHub.MVC.Services;
 
 namespace AquaHub.MVC.Controllers;
 
@@ -15,19 +16,22 @@ public class WaterTestController : Controller
     private readonly UserManager<AppUser> _userManager;
     private readonly ILogger<WaterTestController> _logger;
     private readonly IImageService _imageService;
+    private readonly ITestScheduleOptimizerService _scheduleOptimizer;
 
     public WaterTestController(
         IWaterTestService waterTestService,
         ITankService tankService,
         UserManager<AppUser> userManager,
         ILogger<WaterTestController> logger,
-        IImageService imageService)
+        IImageService imageService,
+        ITestScheduleOptimizerService scheduleOptimizer)
     {
         _waterTestService = waterTestService;
         _tankService = tankService;
         _userManager = userManager;
         _logger = logger;
         _imageService = imageService;
+        _scheduleOptimizer = scheduleOptimizer;
     }
 
     // GET: WaterTest
@@ -369,5 +373,109 @@ public class WaterTestController : Controller
         // Create a dictionary of tank ID to tank type for JavaScript
         var tankTypes = tanks.ToDictionary(t => t.Id, t => t.Type.ToString());
         ViewBag.TankTypes = System.Text.Json.JsonSerializer.Serialize(tankTypes);
+    }
+
+    // GET: WaterTest/TestSchedule
+    public async Task<IActionResult> TestSchedule(int? tankId)
+    {
+        var userId = _userManager.GetUserId(User);
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        var tanks = await _tankService.GetAllTanksAsync(userId);
+
+        if (!tanks.Any())
+        {
+            TempData["Error"] = "You must create a tank before viewing test schedules.";
+            return RedirectToAction("Create", "Tank");
+        }
+
+        ViewBag.Tanks = new SelectList(tanks, "Id", "Name", tankId);
+        ViewBag.SelectedTankId = tankId;
+
+        if (tankId.HasValue)
+        {
+            return RedirectToAction("TestScheduleDetails", new { tankId = tankId.Value });
+        }
+
+        return View();
+    }
+
+    // GET: WaterTest/TestScheduleDetails/5
+    public async Task<IActionResult> TestScheduleDetails(int tankId)
+    {
+        try
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var recommendation = await _scheduleOptimizer.GetRecommendedScheduleAsync(tankId, userId);
+            var tank = await _tankService.GetTankByIdAsync(tankId, userId);
+
+            if (tank == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new Models.ViewModels.TestScheduleOptimizerViewModel
+            {
+                Tank = tank,
+                Recommendation = recommendation,
+                RecentTests = tank.WaterTests.OrderByDescending(t => t.Timestamp).Take(10).ToList()
+            };
+
+            return View(viewModel);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving test schedule for tank {TankId}", tankId);
+            TempData["Error"] = "An error occurred while loading the test schedule.";
+            return RedirectToAction(nameof(Index));
+        }
+    }
+
+    // POST: WaterTest/CreateScheduleReminders
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateScheduleReminders(int tankId, List<string> selectedParameters)
+    {
+        try
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            if (selectedParameters == null || !selectedParameters.Any())
+            {
+                TempData["Error"] = "Please select at least one parameter to create reminders for.";
+                return RedirectToAction("TestScheduleDetails", new { tankId });
+            }
+
+            var success = await _scheduleOptimizer.CreateRemindersFromScheduleAsync(tankId, userId, selectedParameters);
+
+            if (success)
+            {
+                TempData["Success"] = $"Successfully created {selectedParameters.Count} reminder(s) based on your test schedule.";
+            }
+            else
+            {
+                TempData["Error"] = "Failed to create reminders. Please try again.";
+            }
+
+            return RedirectToAction("TestScheduleDetails", new { tankId });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating schedule reminders for tank {TankId}", tankId);
+            TempData["Error"] = "An error occurred while creating reminders.";
+            return RedirectToAction("TestScheduleDetails", new { tankId });
+        }
     }
 }

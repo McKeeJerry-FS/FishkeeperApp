@@ -52,6 +52,9 @@ public class TankService : ITankService
     {
         tank.UserId = userId;
 
+        // Normalize StartDate to UTC midnight to avoid timezone issues
+        tank.StartDate = DateTime.SpecifyKind(tank.StartDate.Date, DateTimeKind.Utc);
+
         // Ensure navigation properties are initialized
         if (tank.ShoppingListItems == null)
         {
@@ -78,7 +81,8 @@ public class TankService : ITankService
         existingTank.Name = tank.Name;
         existingTank.VolumeGallons = tank.VolumeGallons;
         existingTank.Type = tank.Type;
-        existingTank.StartDate = tank.StartDate;
+        // Normalize StartDate to UTC midnight to avoid timezone issues
+        existingTank.StartDate = DateTime.SpecifyKind(tank.StartDate.Date, DateTimeKind.Utc);
         existingTank.Notes = tank.Notes;
         existingTank.ImagePath = tank.ImagePath;
 

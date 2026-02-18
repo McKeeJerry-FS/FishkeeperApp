@@ -24,7 +24,7 @@
 ## 🌊 Advanced Water Testing
 
 - [x] **Predictive Water Chemistry** - Machine learning predictions for future water parameters ✅ _Added February 9, 2026_
-- [ ] **Test Schedule Optimizer** - Recommend testing frequency based on tank age/type
+- [x] **Test Schedule Optimizer** - Recommend testing frequency based on tank age/type ✅ _Added February 17, 2026_
 - [ ] **Parameter Comparisons** - Compare your tank to ideal ranges for your setup
 - [ ] **Chemical Calculator** - Calculate dosing amounts for supplements
 - [ ] **Test Kit Inventory** - Track when test kits expire

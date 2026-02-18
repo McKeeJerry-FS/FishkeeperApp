@@ -81,6 +81,7 @@ builder.Services.AddScoped<IEquipmentService, EquipmentService>();
 builder.Services.AddScoped<IWaterTestService, WaterTestService>();
 builder.Services.AddScoped<IMaintenanceLogService, MaintenanceLogService>();
 builder.Services.AddScoped<IGrowthRecordService, GrowthRecordService>();
+builder.Services.AddScoped<ITestScheduleOptimizerService, TestScheduleOptimizerService>();
 
 // Financial Services
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
