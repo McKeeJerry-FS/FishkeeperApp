@@ -104,4 +104,4 @@
 
 ---
 
-_Last Updated: January 28, 2026_
+### Last Updated: January 28, 2026

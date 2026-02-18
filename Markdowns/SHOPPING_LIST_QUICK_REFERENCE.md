@@ -44,7 +44,6 @@ Click ✓ icon → Item moves to "Purchased" section
 
 ## 🎨 Visual Cues
 
-```
 🔴 High Priority Badge
 🟡 Medium Priority Badge
 ⚪ Low Priority Badge
@@ -52,7 +51,6 @@ Click ✓ icon → Item moves to "Purchased" section
 🔧 Equipment Type Badge (Blue)
 📦 Supply Type Badge (Green)
 🐠 Livestock Type Badge (Purple)
-```
 
 ## 💡 Pro Tips
 
@@ -71,9 +69,7 @@ Click ✓ icon → Item moves to "Purchased" section
 
 ## 🔄 Workflow
 
-```
 Plan → Add to List → Set Priority → Purchase → Mark Purchased → Add to Inventory
-```
 
 ## 📱 Mobile Friendly
 
