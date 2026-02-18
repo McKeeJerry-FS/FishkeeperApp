@@ -214,7 +214,7 @@
                         }
 
                         // Planted tank specific parameters
-                        var isPlanted = Model.Tank.Type == AquaHub.MVC.Models.Enums.AquariumType.Planted;
+                        var isPlanted = Model.Tank?.Type == AquaHub.MVC.Models.Enums.AquariumType.Planted;
                         if (isPlanted)
                         {
                             if (Model.Iron.HasValue)

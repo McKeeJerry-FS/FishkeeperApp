@@ -11,17 +11,20 @@ public class GrowthRecordController : Controller
 {
     private readonly IGrowthRecordService _growthRecordService;
     private readonly ILivestockService _livestockService;
+    private readonly ITankService _tankService;
     private readonly UserManager<AppUser> _userManager;
     private readonly ILogger<GrowthRecordController> _logger;
 
     public GrowthRecordController(
         IGrowthRecordService growthRecordService,
         ILivestockService livestockService,
+        ITankService tankService,
         UserManager<AppUser> userManager,
         ILogger<GrowthRecordController> logger)
     {
         _growthRecordService = growthRecordService;
         _livestockService = livestockService;
+        _tankService = tankService;
         _userManager = userManager;
         _logger = logger;
     }
@@ -121,7 +124,7 @@ public class GrowthRecordController : Controller
     }
 
     // GET: GrowthRecord/Create
-    public async Task<IActionResult> Create(int? livestockId)
+    public async Task<IActionResult> Create(int? livestockId, int? tankId)
     {
         try
         {
@@ -131,27 +134,26 @@ public class GrowthRecordController : Controller
                 return Unauthorized();
             }
 
-            if (!livestockId.HasValue)
-            {
-                TempData["Error"] = "Livestock ID is required to create a growth record.";
-                return RedirectToAction("Index", "Livestock");
-            }
-
-            var livestock = await _livestockService.GetLivestockByIdAsync(livestockId.Value, userId);
-            if (livestock == null)
-            {
-                return NotFound();
-            }
-
-            ViewBag.LivestockName = livestock.Name;
-            ViewBag.LivestockId = livestockId.Value;
+            // Populate livestock dropdown
+            await PopulateLivestockDropdownAsync(userId, livestockId, tankId);
 
             // Pre-populate with current date
             var growthRecord = new GrowthRecord
             {
                 MeasurementDate = DateTime.Now,
-                LivestockId = livestockId.Value
+                LivestockId = livestockId ?? 0
             };
+
+            // If a specific livestock is provided, set the name in ViewBag
+            if (livestockId.HasValue)
+            {
+                var livestock = await _livestockService.GetLivestockByIdAsync(livestockId.Value, userId);
+                if (livestock == null)
+                {
+                    return NotFound();
+                }
+                ViewBag.LivestockName = livestock.Name;
+            }
 
             return View(growthRecord);
         }
@@ -183,9 +185,11 @@ public class GrowthRecordController : Controller
                 return RedirectToAction(nameof(Index), new { livestockId = growthRecord.LivestockId });
             }
 
+            // Re-populate dropdown on validation failure
+            await PopulateLivestockDropdownAsync(userId, growthRecord.LivestockId, null);
+
             var livestock = await _livestockService.GetLivestockByIdAsync(growthRecord.LivestockId, userId);
             ViewBag.LivestockName = livestock?.Name;
-            ViewBag.LivestockId = growthRecord.LivestockId;
 
             return View(growthRecord);
         }
@@ -331,5 +335,32 @@ public class GrowthRecordController : Controller
             TempData["Error"] = "An error occurred while deleting the growth record.";
             return RedirectToAction(nameof(Index));
         }
+    }
+
+    private async Task PopulateLivestockDropdownAsync(string userId, int? selectedLivestockId = null, int? tankId = null)
+    {
+        List<Livestock> livestock;
+
+        if (tankId.HasValue)
+        {
+            // Get livestock for a specific tank
+            livestock = await _livestockService.GetLivestockByTankAsync(tankId.Value, userId);
+        }
+        else
+        {
+            // Get all livestock for the user
+            livestock = await _livestockService.GetAllLivestockAsync(userId);
+        }
+
+        ViewBag.LivestockList = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(
+            livestock.Select(l => new
+            {
+                l.Id,
+                DisplayName = $"{l.Name} ({l.Species})"
+            }),
+            "Id",
+            "DisplayName",
+            selectedLivestockId
+        );
     }
 }

@@ -161,7 +161,7 @@
     <script>
             // Show/hide planted tank parameters based on tank type
             document.addEventListener('DOMContentLoaded', function () {
-                var tankType = '@Model.Tank.Type';
+                var tankType = '@Model.Tank?.Type';
                 var isPlanted = tankType === 'Planted';
 
                 var plantedSection = document.getElementById('plantedSection');

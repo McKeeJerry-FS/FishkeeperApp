@@ -121,6 +121,10 @@ public class ReminderController : Controller
                 return Unauthorized();
             }
 
+            // Remove UserId from ModelState since it's set by the controller
+            ModelState.Remove("UserId");
+            ModelState.Remove("User");
+
             if (ModelState.IsValid)
             {
                 reminder.UserId = userId;
@@ -185,6 +189,10 @@ public class ReminderController : Controller
             {
                 return Unauthorized();
             }
+
+            // Remove UserId from ModelState since it's set by the controller
+            ModelState.Remove("UserId");
+            ModelState.Remove("User");
 
             if (ModelState.IsValid)
             {
