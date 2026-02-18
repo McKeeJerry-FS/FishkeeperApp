@@ -170,23 +170,29 @@ using (var scope = app.Services.CreateScope())
             logger.LogInformation(
                 "Database connection test result: {ConnectionStatus}",
                 canConnect ? "Success" : "Failed");
+            // Add custom middleware for enhanced logging and error handling
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
+            app.UseMiddleware<RequestLoggingMiddleware>();
 
-            if (canConnect)
+            // Enable HTTP logging in development
+            if (app.Environment.IsDevelopment())
             {
-                logger.LogInformation("Applying pending migrations...");
-                context.Database.Migrate();
-                logger.LogInformation(
-                    LoggingConstants.EventIds.DatabaseSaveCompleted,
-                    "Database migrations completed successfully");
+                app.UseHttpLogging();
+                app.UseDeveloperExceptionPage();
             }
             else
             {
-                logger.LogError(
-                    LoggingConstants.EventIds.DatabaseConnectionClosed,
-                    "Cannot connect to database");
+                app.UseExceptionHandler("/Home/Error");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts
+            else
+                {
+                    logger.LogError(
+                        LoggingConstants.EventIds.DatabaseConnectionClosed,
+                        "Cannot connect to database");
+                }
             }
         }
-    }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
@@ -200,21 +206,15 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
-// Add custom middleware for enhanced logging and error handling
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-app.UseMiddleware<RequestLoggingMiddleware>();
-
-// Enable HTTP logging in development
-if (app.Environment.IsDevelopment())
-{
-    app.UseHttpLogging();
-    app.UseDeveloperExceptionPage();
-}
-else
+if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+}
+else
+{
+    app.UseDeveloperExceptionPage();
 }
 
 // Only use HTTPS redirection in development with local certificates
@@ -229,12 +229,6 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-app.MapRazorPages();
-
 // Log application ready state
 startupLogger.LogInformation(
     "AquaHub application configured and ready to handle requests on port {Port}",
@@ -245,4 +239,10 @@ app.Run();
 // Log application shutdown
 startupLogger.LogInformation(
     LoggingConstants.EventIds.ApplicationShutdown,
-    "AquaHub application shutting down");
+    "AquaHub application shutting down"ontrollerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapRazorPages();
+
+app.Run();
