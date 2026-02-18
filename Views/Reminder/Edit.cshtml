@@ -41,7 +41,7 @@
                             <label asp-for="Description" class="form-label">
                                 <i class="bi bi-text-paragraph"></i> Description
                             </label>
-                            <textarea asp-for="Description" class="form-control" rows="3" 
+                            <textarea asp-for="Description" class="form-control" rows="3"
                                       placeholder="Additional details about this reminder..."></textarea>
                             <span asp-validation-for="Description" class="text-danger small"></span>
                         </div>
@@ -51,7 +51,8 @@
                                 <label asp-for="Type" class="form-label">
                                     <i class="bi bi-tag"></i> Type <span class="text-danger">*</span>
                                 </label>
-                                <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<AquaHub.MVC.Models.Enums.ReminderType>()">
+                                <select asp-for="Type" class="form-select"
+                                        asp-items="Html.GetEnumSelectList<AquaHub.MVC.Models.Enums.ReminderType>()">
                                     <option value="">-- Select Type --</option>
                                 </select>
                                 <span asp-validation-for="Type" class="text-danger small"></span>
@@ -61,7 +62,8 @@
                                 <label asp-for="Frequency" class="form-label">
                                     <i class="bi bi-repeat"></i> Frequency <span class="text-danger">*</span>
                                 </label>
-                                <select asp-for="Frequency" class="form-select" asp-items="Html.GetEnumSelectList<AquaHub.MVC.Models.Enums.ReminderFrequency>()">
+                                <select asp-for="Frequency" class="form-select"
+                                        asp-items="Html.GetEnumSelectList<AquaHub.MVC.Models.Enums.ReminderFrequency>()">
                                     <option value="">-- Select Frequency --</option>
                                 </select>
                                 <span asp-validation-for="Frequency" class="text-danger small"></span>
@@ -137,5 +139,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

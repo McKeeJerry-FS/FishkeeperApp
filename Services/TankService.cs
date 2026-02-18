@@ -248,6 +248,12 @@ public class TankService : ITankService
         viewModel.UnreadNotificationCount = await _context.Notifications
             .CountAsync(n => n.UserId == userId && n.TankId == tankId && !n.IsRead);
 
+        // Get latest journal entry for this tank
+        viewModel.LatestJournalEntry = await _context.JournalEntries
+            .Where(j => j.TankId == tankId)
+            .OrderByDescending(j => j.Timestamp)
+            .FirstOrDefaultAsync();
+
         return viewModel;
     }
 }

@@ -1,0 +1,78 @@
+@model AquaHub.MVC.Models.JournalEntry
+
+@{
+    ViewData["Title"] = "Delete Journal Entry";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-danger mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h2 class="mb-0">
+                        <i class="bi bi-exclamation-triangle"></i> Delete Journal Entry
+                    </h2>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <strong>Warning:</strong> Are you sure you want to delete this journal entry? This action cannot
+                        be undone.
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5 class="text-muted mb-2">
+                                <i class="bi bi-droplet-fill"></i> Tank
+                            </h5>
+                            <p class="fs-5">
+                                <span class="badge bg-info fs-6">@Model.Tank?.Name</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-muted mb-2">
+                                <i class="bi bi-calendar3"></i> Date & Time
+                            </h5>
+                            <p class="fs-5">
+                                @Model.Timestamp.ToLocalTime().ToString("MMMM dd, yyyy 'at' hh:mm tt")
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="mb-4">
+                        <h3 class="mb-3">
+                            <i class="bi bi-card-heading text-primary"></i> @Model.Title
+                        </h3>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="text-muted mb-3">
+                            <i class="bi bi-text-paragraph"></i> Entry Content
+                        </h5>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <p class="mb-0" style="white-space: pre-wrap;">@Model.Content</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="bi bi-arrow-left"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="bi bi-trash"></i> Confirm Delete
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

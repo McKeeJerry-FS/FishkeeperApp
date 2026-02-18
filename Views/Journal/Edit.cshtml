@@ -1,0 +1,85 @@
+@model AquaHub.MVC.Models.JournalEntry
+
+@{
+    ViewData["Title"] = "Edit Journal Entry";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h2 class="mb-0">
+                        <i class="bi bi-pencil-square"></i> Edit Journal Entry
+                    </h2>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="mb-4">
+                            <label asp-for="TankId" class="form-label fw-bold">
+                                <i class="bi bi-droplet-fill text-info"></i> Tank
+                            </label>
+                            <select asp-for="TankId" class="form-select" asp-items="ViewBag.TankId">
+                                <option value="">-- Select Tank --</option>
+                            </select>
+                            <span asp-validation-for="TankId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Timestamp" class="form-label fw-bold">
+                                <i class="bi bi-calendar3 text-primary"></i> Date & Time
+                            </label>
+                            <input asp-for="Timestamp" type="datetime-local" class="form-control" />
+                            <span asp-validation-for="Timestamp" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Title" class="form-label fw-bold">
+                                <i class="bi bi-card-heading text-success"></i> Title
+                            </label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Content" class="form-label fw-bold">
+                                <i class="bi bi-text-paragraph text-warning"></i> Entry Content
+                            </label>
+                            <textarea asp-for="Content" class="form-control" rows="10"></textarea>
+                            <span asp-validation-for="Content" class="text-danger"></span>
+                            <small class="form-text text-muted">Maximum 5000 characters</small>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="ImagePath" class="form-label fw-bold">
+                                <i class="bi bi-image text-secondary"></i> Image Path (Optional)
+                            </label>
+                            <input asp-for="ImagePath" class="form-control" placeholder="/img/my-photo.jpg" />
+                            <span asp-validation-for="ImagePath" class="text-danger"></span>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="bi bi-arrow-left"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-warning btn-lg">
+                                <i class="bi bi-save"></i> Update Entry
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

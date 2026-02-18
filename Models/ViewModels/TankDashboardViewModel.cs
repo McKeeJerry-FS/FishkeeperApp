@@ -48,6 +48,9 @@ public class TankDashboardViewModel
     // Reminders and Notifications
     public List<Reminder> UpcomingReminders { get; set; } = new();
     public List<Notification> RecentNotifications { get; set; } = new();
+
+    // Latest Journal Entry
+    public JournalEntry? LatestJournalEntry { get; set; }
     public int UnreadNotificationCount { get; set; }
 }
 

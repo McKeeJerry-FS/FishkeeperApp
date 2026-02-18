@@ -77,6 +77,106 @@
                 </div>
             </div>
 
+            <!-- Latest Journal Entry Section (Only for Authenticated Users) -->
+            @if (User.Identity?.IsAuthenticated == true && ViewBag.LatestJournalEntry != null)
+            {
+                var latestEntry = ViewBag.LatestJournalEntry as AquaHub.MVC.Models.JournalEntry;
+                if (latestEntry != null)
+                {
+                <div class="row mb-5">
+                    <div class="col-12">
+                        <div class="card shadow-lg border-0 border-start border-primary border-5">
+                            <div class="card-header bg-gradient text-white py-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h3 class="mb-0">
+                                        <i class="bi bi-journal-text"></i> Latest Journal Entry
+                                    </h3>
+                                    <a href="/Journal" class="btn btn-light btn-sm">
+                                        <i class="bi bi-journals"></i> View All Entries
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h4 class="mb-3">
+                                            <i class="bi bi-card-heading text-primary"></i> @latestEntry.Title
+                                        </h4>
+                                        <p class="text-muted mb-3">
+                                            <i class="bi bi-calendar3"></i> 
+                                            <strong>@latestEntry.Timestamp.ToLocalTime().ToString("MMMM dd, yyyy 'at' hh:mm tt")</strong>
+                                            &nbsp;&nbsp;|&nbsp;&nbsp;
+                                            <i class="bi bi-droplet-fill text-info"></i> 
+                                            <strong>@latestEntry.Tank?.Name</strong>
+                                        </p>
+                                        <div class="card bg-light">
+                                            <div class="card-body">
+                                                <p class="mb-0" style="white-space: pre-wrap;">
+                                                    @if (latestEntry.Content.Length > 300)
+                                                    {
+                                                        @(latestEntry.Content.Substring(0, 300))
+                                                        <text>...</text>
+                                                        <br />
+                                                        <a href="/Journal/Details/@latestEntry.Id" class="btn btn-sm btn-outline-primary mt-2">
+                                                            <i class="bi bi-arrow-right"></i> Read More
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        @latestEntry.Content
+                                                    }
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="text-center">
+                                            @if (!string.IsNullOrEmpty(latestEntry.ImagePath))
+                                            {
+                                                <img src="@latestEntry.ImagePath" alt="Journal Entry" class="img-fluid rounded shadow mb-3" style="max-height: 250px;">
+                                            }
+                                            else
+                                            {
+                                                <div class="bg-light rounded p-5 mb-3">
+                                                    <i class="bi bi-journal-bookmark-fill text-muted" style="font-size: 5rem;"></i>
+                                                </div>
+                                            }
+                                            <a href="/Journal/Details/@latestEntry.Id" class="btn btn-primary w-100 mb-2">
+                                                <i class="bi bi-eye"></i> View Full Entry
+                                            </a>
+                                            <a href="/Journal/Create" class="btn btn-outline-success w-100">
+                                                <i class="bi bi-plus-circle"></i> New Entry
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+            }
+            else if (User.Identity?.IsAuthenticated == true)
+            {
+                <!-- Call to Action for First Journal Entry -->
+                <div class="row mb-5">
+                    <div class="col-12">
+                        <div class="card shadow-lg border-0 border-start border-success border-5">
+                            <div class="card-body text-center py-5">
+                                <i class="bi bi-journal-plus text-success" style="font-size: 5rem;"></i>
+                                <h3 class="mt-4 mb-3">Start Your Aquarium Journal</h3>
+                                <p class="text-muted mb-4 lead">
+                                    Document your aquarium journey! Create journal entries to track observations, milestones, and important events.
+                                </p>
+                                <a href="/Journal/Create" class="btn btn-success btn-lg">
+                                    <i class="bi bi-plus-circle"></i> Create Your First Entry
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
             <!-- Quick Summary -->
             <div class="row mb-5">
                 <div class="col-12">

@@ -1,0 +1,133 @@
+@model IEnumerable<AquaHub.MVC.Models.JournalEntry>
+
+@{
+    ViewData["Title"] = "My Journal";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="display-5">
+                    <i class="bi bi-journal-text text-primary"></i> My Journal
+                </h1>
+                <a asp-action="Create" class="btn btn-primary btn-lg">
+                    <i class="bi bi-plus-circle"></i> New Entry
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-journal-x text-muted" style="font-size: 5rem;"></i>
+                        <h3 class="mt-4 mb-3">No Journal Entries Yet</h3>
+                        <p class="text-muted mb-4">Start documenting your aquarium journey! Create your first journal entry to track observations, milestones, and notes.</p>
+                        <a asp-action="Create" class="btn btn-primary btn-lg">
+                            <i class="bi bi-plus-circle"></i> Create Your First Entry
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th><i class="bi bi-calendar3"></i> Date</th>
+                                        <th><i class="bi bi-card-heading"></i> Title</th>
+                                        <th><i class="bi bi-droplet"></i> Tank</th>
+                                        <th><i class="bi bi-text-paragraph"></i> Preview</th>
+                                        <th class="text-end"><i class="bi bi-gear"></i> Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var entry in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <span class="badge bg-secondary">
+                                                    @entry.Timestamp.ToLocalTime().ToString("MMM dd, yyyy")
+                                                </span>
+                                                <br>
+                                                <small class="text-muted">@entry.Timestamp.ToLocalTime().ToString("hh:mm tt")</small>
+                                            </td>
+                                            <td>
+                                                <strong>@entry.Title</strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">
+                                                    <i class="bi bi-droplet-fill"></i> @entry.Tank?.Name
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="text-muted small" style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                    @(entry.Content.Length > 100 ? entry.Content.Substring(0, 100) + "..." : entry.Content)
+                                                </div>
+                                            </td>
+                                            <td class="text-end">
+                                                <div class="btn-group" role="group">
+                                                    <a asp-action="Details" asp-route-id="@entry.Id" class="btn btn-sm btn-outline-info" title="View Details">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                    <a asp-action="Edit" asp-route-id="@entry.Id" class="btn btn-sm btn-outline-warning" title="Edit">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                    <a asp-action="Delete" asp-route-id="@entry.Id" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                        <i class="bi bi-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 mt-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><i class="bi bi-info-circle text-info"></i> About Journal Entries</h5>
+                                <p class="text-muted mb-0">
+                                    Use journal entries to document observations, milestones, and important events in your aquarium's life. 
+                                    You can link maintenance activities and water tests to your entries for comprehensive record-keeping.
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <h5><i class="bi bi-lightbulb text-warning"></i> Tips</h5>
+                                <ul class="text-muted mb-0">
+                                    <li>Record daily observations about your livestock behavior</li>
+                                    <li>Document equipment changes or upgrades</li>
+                                    <li>Note any unusual events or problems</li>
+                                    <li>Track growth milestones of corals or plants</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

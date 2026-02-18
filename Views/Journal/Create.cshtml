@@ -1,0 +1,105 @@
+@model AquaHub.MVC.Models.JournalEntry
+
+@{
+    ViewData["Title"] = "New Journal Entry";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">
+                        <i class="bi bi-journal-plus"></i> New Journal Entry
+                    </h2>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <div class="mb-4">
+                            <label asp-for="TankId" class="form-label fw-bold">
+                                <i class="bi bi-droplet-fill text-info"></i> Tank
+                            </label>
+                            <select asp-for="TankId" class="form-select" asp-items="ViewBag.TankId">
+                                <option value="">-- Select Tank --</option>
+                            </select>
+                            <span asp-validation-for="TankId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Timestamp" class="form-label fw-bold">
+                                <i class="bi bi-calendar3 text-primary"></i> Date & Time
+                            </label>
+                            <input asp-for="Timestamp" type="datetime-local" class="form-control" />
+                            <span asp-validation-for="Timestamp" class="text-danger"></span>
+                            <small class="form-text text-muted">When did this observation or event occur?</small>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Title" class="form-label fw-bold">
+                                <i class="bi bi-card-heading text-success"></i> Title
+                            </label>
+                            <input asp-for="Title" class="form-control" placeholder="Brief title for this entry..." />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Content" class="form-label fw-bold">
+                                <i class="bi bi-text-paragraph text-warning"></i> Entry Content
+                            </label>
+                            <textarea asp-for="Content" class="form-control" rows="10"
+                                      placeholder="Describe your observations, thoughts, or events..."></textarea>
+                            <span asp-validation-for="Content" class="text-danger"></span>
+                            <small class="form-text text-muted">Maximum 5000 characters</small>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="ImagePath" class="form-label fw-bold">
+                                <i class="bi bi-image text-secondary"></i> Image Path (Optional)
+                            </label>
+                            <input asp-for="ImagePath" class="form-control" placeholder="/img/my-photo.jpg" />
+                            <span asp-validation-for="ImagePath" class="text-danger"></span>
+                            <small class="form-text text-muted">Optional: Path to an image related to this entry</small>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="bi bi-arrow-left"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-save"></i> Save Entry
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-lightbulb text-warning"></i> Journal Entry Tips</h5>
+                    <ul class="mb-0">
+                        <li><strong>Be Detailed:</strong> Include specific observations about water clarity, livestock
+                            behavior, and equipment performance.</li>
+                            <li><strong>Track Changes:</strong> Document any changes you make to the tank, such as adding
+                                new livestock or equipment.</li>
+                                <li><strong>Record Problems:</strong> Note any issues like algae blooms, disease signs, or
+                                    equipment failures.</li>
+                                    <li><strong>Celebrate Milestones:</strong> Record successful breeding, coral propagation, or
+                                        achieving target water parameters.</li>
+                                        <li><strong>Regular Entries:</strong> Consistent journaling helps identify patterns and trends
+                                            over time.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @section Scripts {
+                        @{
+                            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+                        }
+                    }

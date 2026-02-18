@@ -237,6 +237,105 @@
         </div>
     }
 
+    <!-- Latest Journal Entry -->
+    @if (Model.LatestJournalEntry != null)
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm border-start border-info border-4">
+                    <div class="card-header bg-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="bi bi-journal-text text-info"></i> Latest Journal Entry
+                            </h5>
+                            <div>
+                                <a asp-controller="Journal" asp-action="Index" class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-journals"></i> View All
+                                </a>
+                                <a asp-controller="Journal" asp-action="Create" class="btn btn-sm btn-info">
+                                    <i class="bi bi-plus-circle"></i> New Entry
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h4 class="mb-2">
+                                    <i class="bi bi-card-heading text-primary"></i> @Model.LatestJournalEntry.Title
+                                </h4>
+                                <p class="text-muted mb-3">
+                                    <i class="bi bi-calendar3"></i> 
+                                    <strong>@Model.LatestJournalEntry.Timestamp.ToLocalTime().ToString("MMMM dd, yyyy 'at' hh:mm tt")</strong>
+                                </p>
+                                <div class="card bg-light border-0">
+                                    <div class="card-body">
+                                        <p class="mb-0" style="white-space: pre-wrap;">
+                                            @if (Model.LatestJournalEntry.Content.Length > 250)
+                                            {
+                                                @Model.LatestJournalEntry.Content.Substring(0, 250)<text>...</text>
+                                                <br />
+                                                <a asp-controller="Journal" asp-action="Details" asp-route-id="@Model.LatestJournalEntry.Id" class="btn btn-sm btn-outline-primary mt-2">
+                                                    <i class="bi bi-arrow-right"></i> Read More
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                @Model.LatestJournalEntry.Content
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    @if (!string.IsNullOrEmpty(Model.LatestJournalEntry.ImagePath))
+                                    {
+                                        <img src="@Model.LatestJournalEntry.ImagePath" alt="Journal Entry" class="img-fluid rounded shadow mb-3" style="max-height: 200px;">
+                                    }
+                                    else
+                                    {
+                                        <div class="bg-light rounded p-4 mb-3">
+                                            <i class="bi bi-journal-bookmark-fill text-muted" style="font-size: 4rem;"></i>
+                                        </div>
+                                    }
+                                    <div class="d-grid gap-2">
+                                        <a asp-controller="Journal" asp-action="Details" asp-route-id="@Model.LatestJournalEntry.Id" class="btn btn-outline-info">
+                                            <i class="bi bi-eye"></i> View Full Entry
+                                        </a>
+                                        <a asp-controller="Journal" asp-action="Edit" asp-route-id="@Model.LatestJournalEntry.Id" class="btn btn-outline-secondary">
+                                            <i class="bi bi-pencil"></i> Edit Entry
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Call to Action for First Journal Entry -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm border-start border-success border-4">
+                    <div class="card-body text-center py-4">
+                        <i class="bi bi-journal-plus text-success" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3 mb-2">Start Your Tank Journal</h5>
+                        <p class="text-muted mb-3">
+                            Document observations, milestones, and important events for this tank.
+                        </p>
+                        <a asp-controller="Journal" asp-action="Create" class="btn btn-success">
+                            <i class="bi bi-plus-circle"></i> Create First Entry
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
     <div class="row g-4">
         <!-- Recent Activity -->
         <div class="col-lg-6">

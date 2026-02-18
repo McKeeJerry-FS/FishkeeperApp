@@ -1,6 +1,6 @@
 # AquaHub - Completed Features
 
-Last Updated: February 10, 2026
+Last Updated: February 17, 2026
 
 ## 🎯 Core Management Features
 
@@ -11,6 +11,23 @@ Last Updated: February 10, 2026
 - ✅ Tank photos and documentation
 - ✅ Tank-specific settings and preferences
 - ✅ Dashboard view with all tanks
+- ✅ Individual tank dashboards with water quality status
+- ✅ Latest journal entry display on tank dashboard
+
+### Journal System
+
+- ✅ Create and manage journal entries for each tank
+- ✅ Title and detailed content support (up to 5000 characters)
+- ✅ Timestamp tracking for observations
+- ✅ Optional image paths for visual documentation
+- ✅ Junction tables for linking to maintenance logs and water tests
+- ✅ Dashboard integration showing latest journal entry on home page
+- ✅ Tank dashboard integration showing latest entry per tank
+- ✅ Full CRUD operations (Create, Read, Update, Delete)
+- ✅ Secure user-based access control
+- ✅ Empty state with call-to-action for new users
+- ✅ Navigation integration in Care menu
+- ✅ Content preview with "Read More" functionality
 
 ### Water Testing
 
@@ -456,7 +473,7 @@ Last Updated: February 10, 2026
 
 ## Feature Count Summary
 
-**Total Completed Features: 120+**
+Total Completed Features: 120+
 
 - Core Management: 25+
 - Livestock & Coral: 20+
