@@ -1,6 +1,9 @@
 using System;
 using AquaHub.MVC.Services.Interfaces;
 using AquaHub.MVC.Models.Enums;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace AquaHub.MVC.Services;
 
@@ -13,7 +16,12 @@ public class ImageService : IImageService
     private readonly string _defaultNutrientImage = "/img/fertilizer.jpg";
     private readonly string _defaultMaintenanceImage = "/img/maintenance_default.jpg";
     private readonly string _defaultWaterTestImage = "/img/water_test.jpg";
+    private readonly ILogger<ImageService> _logger;
 
+    public ImageService(ILogger<ImageService> logger)
+    {
+        _logger = logger;
+    }
 
     public string? ConvertByteArrayToFile(byte[]? fileData, string? extension, DefaultImage defaultImage)
     {
@@ -25,31 +33,16 @@ public class ImageService : IImageService
                 return null;
             }
 
-            // Normalize content type for iOS compatibility
-            string contentType = extension?.ToLower().Trim() ?? "image/jpeg";
-
-            // Handle various iOS formats and ensure browser compatibility
-            if (contentType.Contains("heic") || contentType.Contains("heif"))
-            {
-                // HEIC/HEIF not supported in browsers, but we'll try to display it
-                // In production, you'd want to convert these to JPEG server-side
-                contentType = "image/jpeg";
-            }
-            else if (!contentType.StartsWith("image/"))
-            {
-                // Ensure proper mime type format
-                contentType = "image/jpeg";
-            }
+            // All images are already processed to JPEG in ConvertFileToByteArrayAsync
+            string contentType = "image/jpeg";
 
             string? imageBase64Data = Convert.ToBase64String(fileData!);
-            // Fixed: removed space after comma in data URL
             imageBase64Data = $"data:{contentType};base64,{imageBase64Data}";
             return imageBase64Data;
         }
         catch (Exception ex)
         {
-            // Log the error and return null so the view can show a fallback
-            Console.WriteLine($"Error converting image: {ex.Message}");
+            _logger.LogError(ex, "Error converting image to base64");
             return null;
         }
     }
@@ -58,21 +51,54 @@ public class ImageService : IImageService
     {
         try
         {
-            if (file != null)
+            if (file == null || file.Length == 0)
             {
-                using MemoryStream memoryStream = new MemoryStream();
-                await file.CopyToAsync(memoryStream);
-                byte[] byteFile = memoryStream.ToArray();
-                memoryStream.Close();
-
-                return byteFile;
+                return null!;
             }
-            return null!;
-        }
-        catch (Exception)
-        {
 
-            throw;
+            _logger.LogInformation("Processing image upload: {FileName}, ContentType: {ContentType}, Size: {Size} bytes",
+                file.FileName, file.ContentType, file.Length);
+
+            using var inputStream = file.OpenReadStream();
+            using var image = await Image.LoadAsync(inputStream);
+
+            // Log original image dimensions and format
+            _logger.LogInformation("Original image: {Width}x{Height}, Format: {Format}",
+                image.Width, image.Height, image.Metadata.DecodedImageFormat?.Name ?? "Unknown");
+
+            // Auto-orient the image based on EXIF data (fixes iOS rotation issues)
+            image.Mutate(x => x.AutoOrient());
+
+            // Resize if image is too large (max 2000px on longest side)
+            const int maxSize = 2000;
+            if (image.Width > maxSize || image.Height > maxSize)
+            {
+                var ratio = Math.Min((double)maxSize / image.Width, (double)maxSize / image.Height);
+                var newWidth = (int)(image.Width * ratio);
+                var newHeight = (int)(image.Height * ratio);
+
+                image.Mutate(x => x.Resize(newWidth, newHeight));
+                _logger.LogInformation("Resized image from original to {Width}x{Height}", newWidth, newHeight);
+            }
+
+            // Convert to JPEG format (ensures browser compatibility, handles HEIC/HEIF)
+            using var outputStream = new MemoryStream();
+            var encoder = new JpegEncoder
+            {
+                Quality = 85 // Good balance between quality and file size
+            };
+
+            await image.SaveAsJpegAsync(outputStream, encoder);
+            byte[] imageBytes = outputStream.ToArray();
+
+            _logger.LogInformation("Image processed successfully. Output size: {Size} bytes (JPEG)", imageBytes.Length);
+
+            return imageBytes;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error processing image file: {FileName}", file?.FileName ?? "unknown");
+            throw new InvalidOperationException($"Failed to process image: {ex.Message}", ex);
         }
     }
 }

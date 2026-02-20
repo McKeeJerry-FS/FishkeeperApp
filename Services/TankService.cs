@@ -197,6 +197,8 @@ public class TankService : ITankService
                     existingTank.StartDate = DateTime.SpecifyKind(tank.StartDate.Date, DateTimeKind.Utc);
                     existingTank.Notes = tank.Notes;
                     existingTank.ImagePath = tank.ImagePath;
+                    existingTank.ImageData = tank.ImageData;
+                    existingTank.ImageType = tank.ImageType;
 
                     await _context.SaveChangesAsync();
 

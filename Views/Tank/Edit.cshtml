@@ -15,6 +15,11 @@
                 </div>
                 <div class="card-body p-4">
                     <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                        @if (Model.ImageData != null && Model.ImageData.Length > 0)
+                        {
+                            <input type="hidden" name="ImageData" value="@Convert.ToBase64String(Model.ImageData)" />
+                            <input type="hidden" name="ImageType" value="@Model.ImageType" />
+                        }
                         <input type="hidden" asp-for="Id" />
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
@@ -168,22 +173,22 @@
                         await Html.RenderPartialAsync("_ValidationScriptsPartial");
                     }
                     <script>
-                            // Show/hide quarantine fields based on checkbox
-                            const quarantineCheckbox = document.getElementById('isQuarantineTank');
-                            const quarantineFields = document.getElementById('quarantineFields');
+                                                // Show/hide quarantine fields based on checkbox
+                                                const quarantineCheckbox = document.getElementById('isQuarantineTank');
+                                                const quarantineFields = document.getElementById('quarantineFields');
 
-                            function toggleQuarantineFields() {
-                                if (quarantineCheckbox.checked) {
-                                    quarantineFields.style.display = 'block';
-                                } else {
-                                    quarantineFields.style.display = 'none';
-                                }
-                            }
+                                                function toggleQuarantineFields() {
+                                                    if (quarantineCheckbox.checked) {
+                                                        quarantineFields.style.display = 'block';
+                                                    } else {
+                                                        quarantineFields.style.display = 'none';
+                                                    }
+                                                }
 
-                            // Initialize on page load
-                            toggleQuarantineFields();
+                                                // Initialize on page load
+                                                toggleQuarantineFields();
 
-                            // Toggle on checkbox change
-                            quarantineCheckbox.addEventListener('change', toggleQuarantineFields);
+                                                // Toggle on checkbox change
+                                                quarantineCheckbox.addEventListener('change', toggleQuarantineFields);
                     </script>
                 }

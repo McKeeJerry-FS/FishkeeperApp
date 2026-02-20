@@ -71,14 +71,14 @@ public class TankController : Controller
                     }
                     else
                     {
-                        tankImages[tank.Id] = string.Empty;
-                        _logger.LogInformation("Tank {TankId} has no image data", tank.Id);
+                        tankImages[tank.Id] = "/img/journal.jpg";
+                        _logger.LogInformation("Tank {TankId} has no image data, using default image", tank.Id);
                     }
                 }
                 catch (Exception imgEx)
                 {
                     _logger.LogError(imgEx, "Error converting image for tank {TankId}", tank.Id);
-                    tankImages[tank.Id] = string.Empty;
+                    tankImages[tank.Id] = "/img/journal.jpg";
                 }
             }
             ViewData["TankImages"] = tankImages;
@@ -309,7 +309,7 @@ public class TankController : Controller
                         tank.ImageFile.FileName, tank.ImageFile.ContentType, tank.ImageFile.Length);
 
                     tank.ImageData = await _imageService.ConvertFileToByteArrayAsync(tank.ImageFile);
-                    tank.ImageType = tank.ImageFile.ContentType;
+                    tank.ImageType = "image/jpeg"; // Always set to JPEG, since service always outputs JPEG
 
                     _logger.LogInformation("Image converted successfully. Data length: {Length}", tank.ImageData?.Length ?? 0);
                 }
