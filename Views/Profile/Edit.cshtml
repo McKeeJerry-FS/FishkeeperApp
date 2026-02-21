@@ -1,0 +1,48 @@
+@model AquaHub.MVC.Models.AppUser
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+<div class="container mt-4" style="max-width: 500px;">
+    <h2>@ViewData["Title"]</h2>
+    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+        <div class="mb-3 text-center">
+            <img src="@(Model.AvatarUrl ?? "/images/default-avatar.png")" class="rounded-circle mb-2"
+                 style="width: 96px; height: 96px; object-fit: cover;" alt="Avatar" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Upload New Avatar</label>
+            <input type="file" name="avatarFile" class="form-control" accept="image/*" />
+            <div class="form-text">Max size: 2MB. Only image files allowed.</div>
+        </div>
+        <div class="mb-3">
+            <label asp-for="AvatarUrl" class="form-label">Or Avatar URL</label>
+            <input asp-for="AvatarUrl" class="form-control" />
+            <span asp-validation-for="AvatarUrl" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="FirstName" class="form-label">First Name</label>
+            <input asp-for="FirstName" class="form-control" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="LastName" class="form-label">Last Name</label>
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Bio" class="form-label">Bio</label>
+            <textarea asp-for="Bio" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Bio" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="SocialLinks" class="form-label">Social Links (comma separated URLs)</label>
+            <input asp-for="SocialLinks" class="form-control" />
+            <span asp-validation-for="SocialLinks" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-success">Save Changes</button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

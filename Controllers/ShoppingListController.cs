@@ -514,9 +514,10 @@ public class ShoppingListController : Controller
             TempData["Info"] = "Redirecting to Equipment page to complete the entry...";
 
             // Redirect to equipment controller with pre-filled data
-            return RedirectToAction("SelectType", "Equipment", new
+            return RedirectToAction("Create", "Equipment", new
             {
                 tankId = item.TankId,
+                equipmentType = "",
                 brand = item.Brand,
                 model = item.ModelOrSpecies
             });

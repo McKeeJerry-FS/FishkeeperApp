@@ -8,6 +8,14 @@ namespace AquaHub.MVC.Models;
 
 public class AppUser : IdentityUser
 {
+    // Social profile fields
+    [StringLength(500, ErrorMessage = "Bio cannot be longer than 500 characters.")]
+    [Display(Name = "Bio")]
+    public string? Bio { get; set; }
+
+    [StringLength(300, ErrorMessage = "Social links cannot be longer than 300 characters.")]
+    [Display(Name = "Social Links (comma separated URLs)")]
+    public string? SocialLinks { get; set; }
     [Required]
     [StringLength(100, ErrorMessage = "First name cannot be longer than 100 characters and must be at least 2 characters long.", MinimumLength = 2)]
     [Display(Name = "First Name")]
@@ -30,7 +38,7 @@ public class AppUser : IdentityUser
     public DateTime? ProTierStartDate { get; set; }
     public DateTime? ProTierEndDate { get; set; }
     public SubscriptionStatus SubscriptionStatus { get; set; } = SubscriptionStatus.None;
-    
+
     // Cancellation tracking
     public DateTime? CancellationRequestedDate { get; set; }
     public DateTime? GracePeriodEndDate { get; set; }
@@ -38,6 +46,11 @@ public class AppUser : IdentityUser
     // Trial tracking
     public DateTime? TrialStartDate { get; set; }
     public DateTime? TrialEndDate { get; set; }
+
+    // Avatar/Profile Image
+    [Display(Name = "Avatar")]
+    [StringLength(300, ErrorMessage = "Avatar URL cannot be longer than 300 characters.")]
+    public string? AvatarUrl { get; set; }
 
     // Payment tracking
     public string? StripeCustomerId { get; set; }
@@ -52,9 +65,9 @@ public class AppUser : IdentityUser
     public bool IsDeveloperMode => Tier == UserTier.Developer;
 
     // Computed properties
-    public bool IsProTierActive => Tier == UserTier.Pro && 
+    public bool IsProTierActive => Tier == UserTier.Pro &&
                                     SubscriptionStatus == SubscriptionStatus.Active &&
-                                    ProTierEndDate.HasValue && 
+                                    ProTierEndDate.HasValue &&
                                     ProTierEndDate.Value > DateTime.UtcNow;
 
     public bool IsInGracePeriod => SubscriptionStatus == SubscriptionStatus.Cancelled &&
@@ -64,8 +77,8 @@ public class AppUser : IdentityUser
     public bool IsOnTrial => SubscriptionStatus == SubscriptionStatus.Trialing &&
                                 TrialEndDate.HasValue &&
                                 TrialEndDate.Value > DateTime.UtcNow;
-                            
+
 
     public bool CanAccessProFeatures => IsDeveloperMode || IsProTierActive || IsInGracePeriod;
-    
+
 }
