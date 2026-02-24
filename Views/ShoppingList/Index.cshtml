@@ -248,23 +248,45 @@
                                                     @if (item.ItemType == ShoppingListItemType.Supply)
                                                     {
                                                         <li>
-                                                            <form asp-action="AddToSupplies" asp-route-id="@item.Id" method="post"
-                                                                  class="d-inline">
+                                                            <form asp-action="AddToSupplies" asp-route-id="@item.Id" method="post" class="d-inline">
                                                                 @Html.AntiForgeryToken()
                                                                 <button type="submit" class="dropdown-item">
                                                                     <i class="bi bi-box"></i> Add to Supplies
                                                                 </button>
                                                             </form>
                                                         </li>
+                                                           <li>
+                                                               <form asp-action="AddToSaltWater" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                                   @Html.AntiForgeryToken()
+                                                                   <button type="submit" class="dropdown-item">
+                                                                       <i class="bi bi-droplet"></i> Record Saltwater Mixing
+                                                                   </button>
+                                                               </form>
+                                                           </li>
                                                     }
                                                     @if (item.ItemType == ShoppingListItemType.Equipment)
                                                     {
                                                         <li>
-                                                            <form asp-action="AddToEquipment" asp-route-id="@item.Id" method="post"
-                                                                  class="d-inline">
+                                                            <form asp-action="AddToEquipment" asp-route-id="@item.Id" method="post" class="d-inline">
                                                                 @Html.AntiForgeryToken()
                                                                 <button type="submit" class="dropdown-item">
                                                                     <i class="bi bi-gear"></i> Add to Equipment
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                        <li>
+                                                            <form asp-action="AddToMaintenance" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                                @Html.AntiForgeryToken()
+                                                                   <button type="submit" class="dropdown-item">
+                                                                       <i class="bi bi-tools"></i> Log Maintenance Task
+                                                                   </button>
+                                                            </form>
+                                                        </li>
+                                                        <li>
+                                                            <form asp-action="AddToCO2" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                                @Html.AntiForgeryToken()
+                                                                <button type="submit" class="dropdown-item">
+                                                                    <i class="bi bi-cloud"></i> Add to CO2 Cartridge Change
                                                                 </button>
                                                             </form>
                                                         </li>
@@ -272,8 +294,7 @@
                                                     @if (item.ItemType == ShoppingListItemType.Livestock)
                                                     {
                                                         <li>
-                                                            <form asp-action="AddToLivestock" asp-route-id="@item.Id" method="post"
-                                                                  class="d-inline">
+                                                            <form asp-action="AddToLivestock" asp-route-id="@item.Id" method="post" class="d-inline">
                                                                 @Html.AntiForgeryToken()
                                                                 <button type="submit" class="dropdown-item">
                                                                     <i class="bi bi-fish"></i> Add to Livestock
