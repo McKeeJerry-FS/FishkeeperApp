@@ -170,36 +170,84 @@
                                 });
                         }
 
-                        // Freshwater parameters
+                        // Freshwater parameters - TANK-TYPE-SPECIFIC RANGES
                         if (!isSaltwater)
                         {
+                            // Set GH, KH, TDS, and Phosphate ranges based on specific tank type
+                            double? ghMin = null, ghMax = null, khMin = null, khMax = null;
+                            double? tdsMin = 150, tdsMax = 250;
+                            double? phosphateMin = null, phosphateMax = 1.0;
+
+                            switch (tankType)
+                            {
+                                case AquaHub.MVC.Models.Enums.AquariumType.Planted:
+                                    // Planted tanks prefer softer water
+                                    ghMin = 50; ghMax = 100;  // ~3-6 °dH
+                                    khMin = 40; khMax = 80;   // ~2-4 °dH
+                                    tdsMin = 150; tdsMax = 250;
+                                    phosphateMin = 0.5; phosphateMax = 2.0; // Planted tanks need more phosphate
+                                    break;
+
+                                case AquaHub.MVC.Models.Enums.AquariumType.Cichlid:
+                                    // African cichlids prefer harder water
+                                    ghMin = 180; ghMax = 360;  // ~10-20 °dH
+                                    khMin = 125; khMax = 215;  // ~7-12 °dH
+                                    tdsMin = 200; tdsMax = 400;
+                                    phosphateMin = null; phosphateMax = 1.0;
+                                    break;
+
+                                case AquaHub.MVC.Models.Enums.AquariumType.Shrimp:
+                                    // Shrimp prefer very soft water
+                                    ghMin = 36; ghMax = 90;    // ~2-5 °dH
+                                    khMin = 18; khMax = 54;    // ~1-3 °dH
+                                    tdsMin = 100; tdsMax = 200;
+                                    phosphateMin = null; phosphateMax = 0.5;
+                                    break;
+
+                                case AquaHub.MVC.Models.Enums.AquariumType.Betta:
+                                case AquaHub.MVC.Models.Enums.AquariumType.Goldfish:
+                                    // Moderate hardness
+                                    ghMin = 90; ghMax = 180;   // ~5-10 °dH
+                                    khMin = 54; khMax = 125;   // ~3-7 °dH
+                                    tdsMin = 150; tdsMax = 300;
+                                    phosphateMin = null; phosphateMax = 1.0;
+                                    break;
+
+                                case AquaHub.MVC.Models.Enums.AquariumType.Freshwater:
+                                default:
+                                    // General freshwater community
+                                    ghMin = 70; ghMax = 215;   // ~4-12 °dH
+                                    khMin = 54; khMax = 143;   // ~3-8 °dH
+                                    tdsMin = 150; tdsMax = 250;
+                                    phosphateMin = null; phosphateMax = 1.0;
+                                    break;
+                            }
+
                             if (Model.GH.HasValue)
                                 gauges.Add(new ParameterGauge
                                 {
                                     Name = "GH",
                                     Value = Model.GH,
-                                    MinIdeal = 70,
-                                    MaxIdeal = 215,
-                                    Unit =
-                                "ppm"
+                                    MinIdeal = ghMin,
+                                    MaxIdeal = ghMax,
+                                    Unit = "ppm"
                                 });
                             if (Model.KH.HasValue)
                                 gauges.Add(new ParameterGauge
                                 {
                                     Name = "KH",
                                     Value = Model.KH,
-                                    MinIdeal = 54,
-                                    MaxIdeal = 143,
-                                    Unit =
-                                "ppm"
+                                    MinIdeal = khMin,
+                                    MaxIdeal = khMax,
+                                    Unit = "ppm"
                                 });
                             if (Model.TDS.HasValue)
                                 gauges.Add(new ParameterGauge
                                 {
                                     Name = "TDS",
                                     Value = Model.TDS,
-                                    MinIdeal = 150,
-                                    MaxIdeal = 250,
+                                    MinIdeal = tdsMin,
+                                    MaxIdeal = tdsMax,
                                     Unit = "ppm"
                                 });
                             if (Model.Phosphate.HasValue)
@@ -207,56 +255,35 @@
                                 {
                                     Name = "Phosphate",
                                     Value = Model.Phosphate,
-                                    MinIdeal = null,
-                                    MaxIdeal = 1.0,
+                                    MinIdeal = phosphateMin,
+                                    MaxIdeal = phosphateMax,
                                     Unit = "ppm"
                                 });
                         }
 
-                        // Planted tank specific parameters
-                        var isPlanted = Model.Tank?.Type == AquaHub.MVC.Models.Enums.AquariumType.Planted;
+                        // Planted tank specific parameters (Iron and CO2)
+                        var isPlanted = tankType == AquaHub.MVC.Models.Enums.AquariumType.Planted;
                         if (isPlanted)
-                        {
-                            if (Model.Iron.HasValue)
-                                gauges.Add(new ParameterGauge
-                                {
-                                    Name = "Iron (Fe)",
-                                    Value = Model.Iron,
-                                    MinIdeal = 0.1,
-                                    MaxIdeal = 0.5,
-                                    Unit = "ppm"
-                                });
-                            if (Model.CO2.HasValue)
-                                gauges.Add(new ParameterGauge
-                                {
-                                    Name = "CO₂",
-                                    Value = Model.CO2,
-                                    MinIdeal = 20,
-                                    MaxIdeal = 30,
-                                    Unit = "ppm"
-                                });
-                            // Update Phosphate range for planted tanks
-                            var phosphateGauge = gauges.FirstOrDefault(g => g.Name == "Phosphate");
-                            if (phosphateGauge != null)
-                            {
-                                phosphateGauge.MinIdeal = 0.5;
-                                phosphateGauge.MaxIdeal = 2.0;
-                            }
-                            // Update GH range for planted tanks
-                            var ghGauge = gauges.FirstOrDefault(g => g.Name == "GH");
-                            if (ghGauge != null)
-                            {
-                                ghGauge.MinIdeal = 50;
-                                ghGauge.MaxIdeal = 100;
-                            }
-                            // Update KH range for planted tanks
-                            var khGauge = gauges.FirstOrDefault(g => g.Name == "KH");
-                            if (khGauge != null)
-                            {
-                                khGauge.MinIdeal = 40;
-                                khGauge.MaxIdeal = 80;
-                            }
-                        }
+{
+    if (Model.Iron.HasValue)
+        gauges.Add(new ParameterGauge
+        {
+            Name = "Iron (Fe)",
+            Value = Model.Iron,
+            MinIdeal = 0.1,
+            MaxIdeal = 0.5,
+            Unit = "ppm"
+        });
+    if (Model.CO2.HasValue)
+        gauges.Add(new ParameterGauge
+        {
+            Name = "CO₂",
+            Value = Model.CO2,
+            MinIdeal = 20,
+            MaxIdeal = 30,
+            Unit = "ppm"
+        });
+}
 
                         var parametersInRange = gauges.Count(g => g.Value.HasValue && g.GetIsInRange());
                         var totalParameters = gauges.Count(g => g.Value.HasValue);
