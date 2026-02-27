@@ -19,6 +19,14 @@
 
                         <div class="row g-3">
                             <div class="col-md-6">
+                                <label asp-for="IsNewTank" class="form-label fw-bold">Is this a new tank?</label>
+                                <select asp-for="IsNewTank" class="form-select">
+                                    <option value="true">New (Cycling)</option>
+                                    <option value="false">Established</option>
+                                </select>
+                                <span asp-validation-for="IsNewTank" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
                                 <label asp-for="Name" class="form-label fw-bold"></label>
                                 <input asp-for="Name" class="form-control" placeholder="e.g., Living Room Reef" />
                                 <span asp-validation-for="Name" class="text-danger small"></span>

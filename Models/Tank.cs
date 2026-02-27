@@ -35,6 +35,10 @@ public class Tank : NewBaseType
     [StringLength(500, ErrorMessage = "Notes cannot exceed 500 characters")]
     public string Notes { get; set; } = string.Empty;
 
+    // Indicates if this is a new (cycling) tank or established
+    [Display(Name = "Is this a new tank?")]
+    public bool IsNewTank { get; set; } = false;
+
     // Quarantine Tank Properties
     [Display(Name = "Is Quarantine Tank")]
     public bool IsQuarantineTank { get; set; } = false;
