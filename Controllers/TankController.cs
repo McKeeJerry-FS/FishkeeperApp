@@ -71,14 +71,14 @@ public class TankController : Controller
                     }
                     else
                     {
-                        tankImages[tank.Id] = "/img/journal.jpg";
+                        tankImages[tank.Id] = "/img/journal.png";
                         _logger.LogInformation("Tank {TankId} has no image data, using default image", tank.Id);
                     }
                 }
                 catch (Exception imgEx)
                 {
                     _logger.LogError(imgEx, "Error converting image for tank {TankId}", tank.Id);
-                    tankImages[tank.Id] = "/img/journal.jpg";
+                    tankImages[tank.Id] = "/img/journal.png";
                 }
             }
             ViewData["TankImages"] = tankImages;

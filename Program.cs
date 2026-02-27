@@ -35,7 +35,9 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 
 // Add services to the container.
+
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<ITankMilestoneService, TankMilestoneService>();
 
 // Configure Database Context - detect PostgreSQL or SQLite based on connection string
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");

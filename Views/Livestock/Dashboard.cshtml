@@ -7,6 +7,13 @@
 <div class="container-fluid py-4">
     <div class="row mb-4">
         <div class="col-md-8">
+            @if (!string.IsNullOrEmpty(Model.Livestock.ImagePath))
+            {
+                <div class="mb-3 text-center">
+                    <img src="@Model.Livestock.ImagePath" alt="@Model.Livestock.Name" class="img-fluid rounded shadow"
+                         style="max-height: 250px; object-fit: contain;" />
+                </div>
+            }
             <h1 class="display-6 fw-bold">
                 <i class="bi bi-fish text-primary"></i> @Model.Livestock.Name Dashboard
             </h1>

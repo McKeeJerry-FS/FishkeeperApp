@@ -22,6 +22,8 @@ public class Tank : NewBaseType
     [Range(1, 10000, ErrorMessage = "Volume must be between 1 and 10,000 gallons")]
     [Display(Name = "Volume (Gallons)")]
     public double VolumeGallons { get; set; }
+    // Milestone tracking for cycling and setup
+    public ICollection<TankMilestone> TankMilestones { get; set; } = new List<TankMilestone>();
 
     [Required(ErrorMessage = "Tank type is required")]
     [Display(Name = "Tank Type")]

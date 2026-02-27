@@ -19,12 +19,16 @@
     <div class="row g-4">
         <div class="col-lg-8">
             <div class="card border-0 shadow-sm">
-
                 <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.ImagePath))
+                    {
+                        <div class="mb-3 text-center">
+                            <img src="@Model.ImagePath" alt="@Model.Name" class="img-fluid rounded shadow"
+                                 style="max-height: 300px; object-fit: contain;" />
+                        </div>
+                    }
                     <h2 class="card-title display-6 fw-bold mb-3">@Model.Name</h2>
-
                     <hr />
-
                     <dl class="row">
                         <dt class="col-sm-3">Species:</dt>
                         <dd class="col-sm-9">@Model.Species</dd>
@@ -34,6 +38,24 @@
 
                         <dt class="col-sm-3">Time in Tank:</dt>
                         <dd class="col-sm-9">@((DateTime.Now - Model.AddedOn).Days) days</dd>
+
+                        @if (Model is AquaHub.MVC.Models.FreshwaterFish fwFish)
+                        {
+                            <dt class="col-sm-3">Adult Size:</dt>
+                            <dd class="col-sm-9">@fwFish.AdultSize in</dd>
+                            <dt class="col-sm-3">Coloration:</dt>
+                            <dd class="col-sm-9">@fwFish.Coloration</dd>
+                            <dt class="col-sm-3">Temperament:</dt>
+                            <dd class="col-sm-9">@fwFish.Temperament</dd>
+                            <dt class="col-sm-3">Activity Level:</dt>
+                            <dd class="col-sm-9">@fwFish.ActivityLevel</dd>
+                            <dt class="col-sm-3">Minimum Tank Size:</dt>
+                            <dd class="col-sm-9">@fwFish.MinTankSize gallons</dd>
+                            <dt class="col-sm-3">Swimming Region:</dt>
+                            <dd class="col-sm-9">@fwFish.SwimmingRegion</dd>
+                            <dt class="col-sm-3">Schooling:</dt>
+                            <dd class="col-sm-9">@(fwFish.IsSchooling ? $"Yes ({fwFish.RecommendedSchoolSize})" : "No")</dd>
+                        }
 
                         @if (!string.IsNullOrEmpty(Model.Notes))
                         {
@@ -65,11 +87,11 @@
                 </div>
                 <div class="card-body">
                     <a asp-controller="GrowthRecord" asp-action="Index" asp-route-livestockId="@Model.Id"
-                        class="btn btn-outline-primary w-100 mb-2">
+                           class="btn btn-outline-primary w-100 mb-2">
                         <i class="bi bi-bar-chart-line"></i> View Growth Records
                     </a>
                     <a asp-controller="GrowthRecord" asp-action="Create" asp-route-livestockId="@Model.Id"
-                        class="btn btn-primary w-100">
+                           class="btn btn-primary w-100">
                         <i class="bi bi-plus-circle"></i> Add Growth Record
                     </a>
                 </div>

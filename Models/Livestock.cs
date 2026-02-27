@@ -11,4 +11,7 @@ public abstract class Livestock
     public string Species { get; set; } = string.Empty;
     public DateTime AddedOn { get; set; }
     public string Notes { get; set; } = string.Empty;
+
+    // Path to livestock image
+    public string? ImagePath { get; set; }
 }

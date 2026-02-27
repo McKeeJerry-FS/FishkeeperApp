@@ -154,7 +154,7 @@ public class LivestockController : Controller
     // POST: Livestock/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(int tankId, string livestockType)
+    public async Task<IActionResult> Create(int tankId, string livestockType, IFormFile? imageFile)
     {
         _logger.LogInformation("Create POST called - TankId: {TankId}, LivestockType: {LivestockType}", tankId, livestockType);
 
@@ -189,12 +189,30 @@ public class LivestockController : Controller
             ModelState.Remove("tankId");
             ModelState.Remove("livestockType");
 
+
             // Bind common properties
             await TryUpdateModelAsync(livestock, "",
                 l => l.Name,
                 l => l.Species,
                 l => l.AddedOn,
                 l => l.Notes);
+
+            // Handle image upload
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "livestock");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+                var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(imageFile.FileName)}";
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(stream);
+                }
+                livestock.ImagePath = $"/images/livestock/{uniqueFileName}";
+            }
 
             _logger.LogInformation("Model binding complete - Name: {Name}, Species: {Species}", livestock.Name, livestock.Species);
 

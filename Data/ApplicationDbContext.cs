@@ -58,6 +58,8 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>
     public DbSet<WaterChemistryPrediction> WaterChemistryPredictions { get; set; }
     public DbSet<ShoppingListItem> ShoppingListItems { get; set; }
 
+    public DbSet<TankMilestone> TankMilestones { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

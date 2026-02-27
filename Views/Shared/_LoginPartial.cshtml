@@ -8,7 +8,7 @@
     @if (SignInManager.IsSignedIn(User))
     {
         var user = await UserManager.GetUserAsync(User);
-        var avatarUrl = user?.AvatarUrl ?? "/images/default-avatar.png";
+        var avatarUrl = user?.AvatarUrl ?? "/images/avatars/default-avatar.png";
         <li class="nav-item d-flex align-items-center">
             <a id="manage" class="nav-link text-dark d-flex align-items-center" asp-area="Identity"
                    asp-page="/Account/Manage/Index" title="Manage">

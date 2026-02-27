@@ -56,8 +56,16 @@
                 <div class="col">
                     <div class="card h-100 border-0 shadow-sm hover-shadow">
                         <div class="card-img-top bg-gradient bg-info d-flex align-items-center justify-content-center"
-                            style="height: 180px;">
-                            <i class="bi bi-fish text-white" style="font-size: 3rem;"></i>
+                             style="height: 180px;">
+                            @if (!string.IsNullOrEmpty(livestock.ImagePath))
+                            {
+                                <img src="@livestock.ImagePath" alt="@livestock.Name" class="img-fluid rounded shadow"
+                                     style="max-height: 170px; max-width: 100%; object-fit: contain; background: #e9f7fa;" />
+                            }
+                            else
+                            {
+                                <i class="bi bi-fish text-white" style="font-size: 3rem;"></i>
+                            }
                         </div>
                         <div class="card-body">
                             <h5 class="card-title fw-bold">@livestock.Name</h5>
@@ -87,13 +95,13 @@
 
 @section Styles {
     <style>
-        .hover-shadow {
-            transition: all 0.3s ease;
-        }
+            .hover-shadow {
+                transition: all 0.3s ease;
+            }
 
-        .hover-shadow:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15) !important;
-        }
+            .hover-shadow:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15) !important;
+            }
     </style>
 }

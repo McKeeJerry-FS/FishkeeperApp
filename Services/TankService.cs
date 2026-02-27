@@ -110,6 +110,20 @@ public class TankService : ITankService
             });
     }
 
+    private readonly ITankMilestoneService? _tankMilestoneService;
+
+    public TankService(
+        ApplicationDbContext context,
+        IFileUploadService fileUploadService,
+        ILogger<TankService> logger,
+        ITankMilestoneService tankMilestoneService)
+    {
+        _context = context;
+        _fileUploadService = fileUploadService;
+        _logger = logger;
+        _tankMilestoneService = tankMilestoneService;
+    }
+
     public async Task<Tank> CreateTankAsync(Tank tank, string userId)
     {
         return await _logger.LogExecutionTimeAsync(
@@ -138,6 +152,12 @@ public class TankService : ITankService
 
                     _context.Tanks.Add(tank);
                     await _context.SaveChangesAsync();
+
+                    // Generate default milestones for new tanks
+                    if (tank.IsNewTank && _tankMilestoneService != null)
+                    {
+                        await _tankMilestoneService.GenerateDefaultMilestonesAsync(tank);
+                    }
 
                     _logger.LogInformation(
                         LoggingConstants.EventIds.TankCreated,
@@ -308,7 +328,21 @@ public class TankService : ITankService
                     {
                         Tank = tank,
                         SelectedMonth = month,
-                        SelectedYear = year
+                        SelectedYear = year,
+                        TankMilestones = await _context.TankMilestones
+                            .Where(m => m.TankId == tankId)
+                            .OrderBy(m => m.TargetDate)
+                            .ToListAsync(),
+                        RecentPhotos = await _context.PhotoLogs
+                            .Where(p => p.TankId == tankId)
+                            .OrderByDescending(p => p.Timestamp)
+                            .Take(10)
+                            .ToListAsync(),
+                        RecentDosingRecords = await _context.DosingRecords
+                            .Where(d => d.TankId == tankId)
+                            .OrderByDescending(d => d.Timestamp)
+                            .Take(10)
+                            .ToListAsync()
                     };
 
                     // Get most recent water test

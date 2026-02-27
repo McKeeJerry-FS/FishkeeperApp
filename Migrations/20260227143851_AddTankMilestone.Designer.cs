@@ -3,6 +3,7 @@ using System;
 using AquaHub.MVC.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AquaHub.MVC.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260227143851_AddTankMilestone")]
+    partial class AddTankMilestone
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -924,9 +927,6 @@ namespace AquaHub.MVC.Migrations
                         .IsRequired()
                         .HasMaxLength(34)
                         .HasColumnType("character varying(34)");
-
-                    b.Property<string>("ImagePath")
-                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()

@@ -55,7 +55,14 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <small class="text-muted text-uppercase d-block mb-1">Equipment</small>
-                            <h4 class="mb-0 fw-bold">@Model.Tank.Equipment.Count</h4>
+                            <h4 class="mb-0 fw-bold">
+                                @(
+                                    ((Model.Tank.Filters != null ? Model.Tank.Filters.Count : 0)
+                                    + (Model.Tank.Lights != null ? Model.Tank.Lights.Count : 0)
+                                    + (Model.Tank.Heaters != null ? Model.Tank.Heaters.Count : 0)
+                                    + (Model.Tank.ProteinSkimmers != null ? Model.Tank.ProteinSkimmers.Count : 0))
+                                )
+                            </h4>
                         </div>
                         <div class="rounded-circle bg-info bg-opacity-10 p-2">
                             <i class="bi bi-gear-fill text-info" style="font-size: 1.5rem;"></i>
@@ -237,7 +244,52 @@
         </div>
     }
 
-    <!-- Latest Journal Entry -->
+    <!-- Tank Milestones -->
+    @if (Model.TankMilestones != null && Model.TankMilestones.Any())
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom">
+                        <h6 class="mb-0 fw-bold"><i class="bi bi-flag text-success"></i> Tank Milestones</h6>
+                    </div>
+                    <div class="card-body p-3">
+                        <ul class="list-group list-group-flush">
+                            @foreach (var milestone in Model.TankMilestones)
+                            {
+                                var statusClass = milestone.IsCompleted ? "text-success" : (milestone.TargetDate < DateTime.UtcNow ? "text-danger" : "text-secondary");
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="bi bi-flag-fill @statusClass me-2"></i>
+                                        <span class="fw-bold">@milestone.Type</span>
+                                        <span class="ms-2">@milestone.Description</span>
+                                        @if (milestone.TargetDate.HasValue)
+                                        {
+                                            <span class="badge bg-light text-dark ms-2">Target: @milestone.TargetDate.Value.ToString("MMM dd, yyyy")</span>
+                                        }
+                                        @if (milestone.IsCompleted && milestone.CompletedDate.HasValue)
+                                        {
+                                            <span class="badge bg-success ms-2">Completed: @milestone.CompletedDate.Value.ToString("MMM dd, yyyy")</span>
+                                        }
+                                    </div>
+                                    <div>
+                                        @if (!milestone.IsCompleted)
+                                        {
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">Done</span>
+                                        }
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
     @if (Model.LatestJournalEntry != null)
     {
         <div class="row mb-4">
