@@ -5,6 +5,11 @@ namespace AquaHub.MVC.Models.ViewModels;
 
 public class TankDashboardViewModel
 {
+    // Cycling status and guidance
+    public bool IsCycling { get; set; }
+    public bool IsSafeToAddLivestock { get; set; }
+    public List<TankMilestone> ReadyMilestones { get; set; } = new();
+    public string CyclingAdvice { get; set; } = string.Empty;
     public Tank Tank { get; set; } = null!;
     public int SelectedMonth { get; set; } = DateTime.Now.Month;
     public int SelectedYear { get; set; } = DateTime.Now.Year;

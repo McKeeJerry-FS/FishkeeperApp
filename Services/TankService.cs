@@ -345,6 +345,44 @@ public class TankService : ITankService
                             .ToListAsync()
                     };
 
+                    // Cycling logic and milestone readiness
+                    var recentTest = tank.WaterTests?.OrderByDescending(wt => wt.Timestamp).FirstOrDefault();
+                    viewModel.IsCycling = tank.IsNewTank && (recentTest != null);
+                    viewModel.IsSafeToAddLivestock = false;
+                    viewModel.ReadyMilestones = new List<TankMilestone>();
+                    viewModel.CyclingAdvice = "";
+
+                    if (recentTest != null)
+                    {
+                        // Criteria: Ammonia = 0, Nitrite = 0, Nitrate < threshold
+                        bool ammoniaSafe = recentTest.Ammonia.HasValue && recentTest.Ammonia.Value <= 0.0;
+                        bool nitriteSafe = recentTest.Nitrite.HasValue && recentTest.Nitrite.Value <= 0.0;
+                        bool nitrateSafe = recentTest.Nitrate.HasValue && recentTest.Nitrate.Value <= (tank.Type.ToString().Contains("Saltwater") ? 20.0 : 40.0);
+
+                        if (ammoniaSafe && nitriteSafe && nitrateSafe)
+                        {
+                            viewModel.IsSafeToAddLivestock = true;
+                            viewModel.CyclingAdvice = "Water parameters are safe. You can add livestock.";
+                        }
+                        else
+                        {
+                            viewModel.CyclingAdvice = "Tank is still cycling. Wait until ammonia and nitrite are zero, and nitrate is low.";
+                        }
+
+                        // Mark milestones as ready
+                        foreach (var milestone in viewModel.TankMilestones)
+                        {
+                            if (!milestone.IsCompleted &&
+                                (milestone.Type == TankMilestoneType.AddFirstFish || milestone.Type == TankMilestoneType.AddPlants || milestone.Type == TankMilestoneType.AddCorals || milestone.Type == TankMilestoneType.AddCleanupCrew))
+                            {
+                                if (viewModel.IsSafeToAddLivestock)
+                                {
+                                    viewModel.ReadyMilestones.Add(milestone);
+                                }
+                            }
+                        }
+                    }
+
                     // Get most recent water test
                     viewModel.MostRecentWaterTest = tank.WaterTests?
                         .OrderByDescending(wt => wt.Timestamp)

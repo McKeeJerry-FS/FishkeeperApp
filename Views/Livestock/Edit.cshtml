@@ -51,28 +51,90 @@
                                 <textarea asp-for="Notes" class="form-control" rows="4"></textarea>
                                 <span asp-validation-for="Notes" class="text-danger small"></span>
                             </div>
-                        </div>
 
-                        <div class="d-flex gap-2 mt-4">
-                            <button type="submit" class="btn btn-warning px-4">
-                                <i class="bi bi-save"></i> Update
-                            </button>
-                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary px-4">
-                                <i class="bi bi-x-circle"></i> Cancel
-                            </a>
-                            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger px-4 ms-auto">
-                                <i class="bi bi-trash"></i> Delete
-                            </a>
-                        </div>
-                    </form>
+                            <div class="col-md-6">
+                                <label asp-for="WaterParameters" class="form-label fw-bold">Water Parameters</label>
+                                <input asp-for="WaterParameters" class="form-control"
+                                       placeholder="e.g. pH 6.5-7.5, Temp 74-78F, Ammonia 0, Nitrite 0, Nitrate <40" />
+                                <span asp-validation-for="WaterParameters" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="LightingNeeds" class="form-label fw-bold">Lighting Needs</label>
+                                <input asp-for="LightingNeeds" class="form-control"
+                                       placeholder="e.g. Moderate, High, Full Spectrum" />
+                                <span asp-validation-for="LightingNeeds" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="WaterFlowNeeds" class="form-label fw-bold">Water Flow Needs</label>
+                                <input asp-for="WaterFlowNeeds" class="form-control"
+                                       placeholder="e.g. Low, Moderate, High, Turbulent" />
+                                <span asp-validation-for="WaterFlowNeeds" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="FeedingAndNutrition" class="form-label fw-bold">Feeding &
+                                    Nutrition</label>
+                                    <input asp-for="FeedingAndNutrition" class="form-control"
+                                           placeholder="e.g. Omnivore, feeds 2x daily, flakes, frozen" />
+                                    <span asp-validation-for="FeedingAndNutrition" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Placement" class="form-label fw-bold">Placement</label>
+                                    <input asp-for="Placement" class="form-control"
+                                           placeholder="e.g. Foreground, Rockwork, Floating" />
+                                    <span asp-validation-for="Placement" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="AggressionLevel" class="form-label fw-bold">Aggression Level</label>
+                                    <input asp-for="AggressionLevel" class="form-control"
+                                           placeholder="e.g. Peaceful, Aggressive" />
+                                    <span asp-validation-for="AggressionLevel" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="SafetyWarnings" class="form-label fw-bold">Safety Warnings</label>
+                                    <input asp-for="SafetyWarnings" class="form-control"
+                                           placeholder="e.g. Venomous spines, may jump" />
+                                    <span asp-validation-for="SafetyWarnings" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="CommonPests" class="form-label fw-bold">Common Pests</label>
+                                    <input asp-for="CommonPests" class="form-control"
+                                           placeholder="e.g. Ich, flukes, flatworms" />
+                                    <span asp-validation-for="CommonPests" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="CommonIllnesses" class="form-label fw-bold">Common Illnesses</label>
+                                    <input asp-for="CommonIllnesses" class="form-control"
+                                           placeholder="e.g. Ich, velvet, dropsy" />
+                                    <span asp-validation-for="CommonIllnesses" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="CommonIssues" class="form-label fw-bold">Common Issues</label>
+                                    <input asp-for="CommonIssues" class="form-control"
+                                           placeholder="e.g. Prone to jumping, fin nipping" />
+                                    <span asp-validation-for="CommonIssues" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2 mt-4">
+                                <button type="submit" class="btn btn-warning px-4">
+                                    <i class="bi bi-save"></i> Update
+                                </button>
+                                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary px-4">
+                                    <i class="bi bi-x-circle"></i> Cancel
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger px-4 ms-auto">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
     }
-}

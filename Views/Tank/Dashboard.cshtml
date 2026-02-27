@@ -1,3 +1,21 @@
+    <!-- Cycling Guidance -->
+    @if (Model.IsCycling)
+    {
+        <div class="alert @(Model.IsSafeToAddLivestock ? "alert-success" : "alert-warning") mb-4" role="alert">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>Cycling Status:</strong> @Model.CyclingAdvice
+            @if (Model.IsSafeToAddLivestock && Model.ReadyMilestones.Any())
+            {
+                <div class="mt-2">
+                    <span class="fw-bold">Ready Milestones:</span>
+                    @foreach (var milestone in Model.ReadyMilestones)
+                    {
+                        <span class="badge bg-success ms-2">@milestone.Type.ToString()</span>
+                    }
+                </div>
+            }
+        </div>
+    }
 @model AquaHub.MVC.Models.ViewModels.TankDashboardViewModel
 
 @{
