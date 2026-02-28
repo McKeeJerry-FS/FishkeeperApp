@@ -28,11 +28,18 @@
                 <div class="card-header bg-info text-white">
                     <i class="bi bi-funnel"></i> Filter by Tank
                 </div>
+            }
+            @foreach (var trend in parametersWithData)
+                </div>
                 <div class="card-body">
                     <form method="get" asp-action="Trends" class="row g-3">
                         <div class="col-md-10">
                             <select name="tankId" class="form-select" asp-items="ViewBag.TankList">
                                 <option value="">-- Select a Tank --</option>
+                            @if (new[]{"Salinity","Calcium","Alkalinity","Magnesium","Phosphate","CO2","Iron","Potassium","GH","KH","TDS"}.Contains(trend.ParameterName))
+                            {
+                                <span class="badge bg-info ms-2">Specialty</span>
+                            }
                             </select>
                         </div>
                         <div class="col-md-2">
