@@ -6,6 +6,7 @@ namespace AquaHub.MVC.Models;
 
 public enum TankMilestoneType
 {
+    WaterParametersStabilizing,
     AddPlants,
     AddCorals,
     AddFirstFish,

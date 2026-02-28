@@ -1,3 +1,4 @@
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -35,7 +36,60 @@ public class TankController : Controller
         _quarantineCareAdvisor = quarantineCareAdvisor;
     }
 
-    // GET: Tank
+    // POST: Tank/MarkMilestoneComplete/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> MarkMilestoneComplete(int milestoneId)
+    {
+        var userId = _userManager.GetUserId(User);
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        var milestone = await _context.TankMilestones.Include(m => m.Tank).FirstOrDefaultAsync(m => m.Id == milestoneId && m.Tank.UserId == userId);
+        if (milestone == null)
+        {
+            return NotFound();
+        }
+
+        milestone.IsManuallyCompleted = true;
+        milestone.ManualCompletedDate = DateTime.UtcNow;
+        milestone.IsCompleted = true;
+        milestone.CompletedDate = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+        TempData["Success"] = "Milestone marked as completed manually.";
+        return RedirectToAction("Details", new { id = milestone.TankId });
+    }
+
+    // POST: Tank/ResetMilestone/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetMilestone(int milestoneId)
+    {
+        var userId = _userManager.GetUserId(User);
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        var milestone = await _context.TankMilestones.Include(m => m.Tank).FirstOrDefaultAsync(m => m.Id == milestoneId && m.Tank.UserId == userId);
+        if (milestone == null)
+        {
+            return NotFound();
+        }
+
+        milestone.IsManuallyCompleted = false;
+        milestone.ManualCompletedDate = null;
+        milestone.IsCompleted = false;
+        milestone.CompletedDate = null;
+        await _context.SaveChangesAsync();
+
+        TempData["Success"] = "Milestone reset to automatic tracking.";
+        return RedirectToAction("Details", new { id = milestone.TankId });
+    }
+
+// ...existing code...
     public async Task<IActionResult> Index()
     {
         try
