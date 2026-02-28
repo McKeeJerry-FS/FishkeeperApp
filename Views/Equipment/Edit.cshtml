@@ -86,45 +86,46 @@
                                     <input asp-for="Media" class="form-control" />
                                 </div>
                                 <div class="col-12">
-                                    <label asp-for="LastMaintenanceDate" class="form-label fw-bold">Last Maintenance Date</label>
-                                    <input asp-for="LastMaintenanceDate" class="form-control" type="date" />
-                                </div>
-                            }
+                                    <label asp-for="LastMaintenanceDate" class="form-label fw-bold">Last Maintenance
+                                        Date</label>
+                                        <input asp-for="LastMaintenanceDate" class="form-control" type="date" />
+                                    </div>
+                                }
                             else if (Model.EquipmentType == "Heater")
-                            {
-                                <div class="col-12">
-                                    <hr />
-                                    <h5 class="text-danger">Heater Settings</h5>
-                                </div>
-                                <div class="col-md-6">
-                                    <label asp-for="MinTemperature" class="form-label fw-bold">Min Temperature (°F)</label>
-                                    <input asp-for="MinTemperature" class="form-control" step="0.1" />
-                                </div>
-                                <div class="col-md-6">
-                                    <label asp-for="MaxTemperature" class="form-label fw-bold">Max Temperature (°F)</label>
-                                    <input asp-for="MaxTemperature" class="form-control" step="0.1" />
-                                </div>
-                            }
-                            <!-- Add more type-specific fields here as needed -->
-                                </div>
+                                {
+                                    <div class="col-12">
+                                        <hr />
+                                        <h5 class="text-danger">Heater Settings</h5>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="MinTemperature" class="form-label fw-bold">Min Temperature (°F)</label>
+                                        <input asp-for="MinTemperature" class="form-control" step="0.1" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="MaxTemperature" class="form-label fw-bold">Max Temperature (°F)</label>
+                                        <input asp-for="MaxTemperature" class="form-control" step="0.1" />
+                                    </div>
+                                }
+                                <!-- Add more type-specific fields here as needed -->
+                            </div>
 
-                                <div class="d-flex gap-2 mt-4">
-                                    <button type="submit" class="btn btn-warning px-4">
-                                        <i class="bi bi-save"></i> Update Equipment
-                                    </button>
-                                    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary px-4">
-                                        <i class="bi bi-x-circle"></i> Cancel
-                                    </a>
-                                </div>
-                            </form>
-                        </div>
+                            <div class="d-flex gap-2 mt-4">
+                                <button type="submit" class="btn btn-warning px-4">
+                                    <i class="bi bi-save"></i> Update Equipment
+                                </button>
+                                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary px-4">
+                                    <i class="bi bi-x-circle"></i> Cancel
+                                </a>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        @section Scripts {
-            @{
-                await Html.RenderPartialAsync("_ValidationScriptsPartial");
-            }
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
         }
+    }

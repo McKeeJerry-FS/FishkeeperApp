@@ -67,8 +67,8 @@ public class MaintenanceLogController : Controller
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving maintenance logs");
-            TempData["Error"] = "An error occurred while retrieving maintenance logs.";
+            _logger.LogError(ex, $"Error retrieving maintenance logs: {ex.Message}\n{ex.StackTrace}");
+            TempData["Error"] = $"An error occurred while retrieving maintenance logs: {ex.Message}";
             return View(new List<MaintenanceLog>());
         }
     }

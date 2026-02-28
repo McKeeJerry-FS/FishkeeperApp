@@ -22,7 +22,7 @@ public class MaintenanceLogService : IMaintenanceLogService
         return await _context.MaintenanceLogs
             .Include(m => m.Tank)
             .Include(m => m.SupplyItem)
-            .Where(m => m.Tank!.UserId == userId)
+            .Where(m => m.Tank != null && m.Tank.UserId == userId)
             .OrderByDescending(m => m.Timestamp)
             .ToListAsync();
     }
@@ -32,7 +32,7 @@ public class MaintenanceLogService : IMaintenanceLogService
         return await _context.MaintenanceLogs
             .Include(m => m.Tank)
             .Include(m => m.SupplyItem)
-            .Where(m => m.TankId == tankId && m.Tank!.UserId == userId)
+            .Where(m => m.TankId == tankId && m.Tank != null && m.Tank.UserId == userId)
             .OrderByDescending(m => m.Timestamp)
             .ToListAsync();
     }
@@ -42,7 +42,7 @@ public class MaintenanceLogService : IMaintenanceLogService
         return await _context.MaintenanceLogs
             .Include(m => m.Tank)
             .Include(m => m.SupplyItem)
-            .Where(m => m.Tank!.UserId == userId)
+            .Where(m => m.Tank != null && m.Tank.UserId == userId)
             .FirstOrDefaultAsync(m => m.Id == id);
     }
 
