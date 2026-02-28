@@ -26,4 +26,8 @@ public class TankMilestone
     public bool IsCompleted { get; set; } = false;
     public string? Notes { get; set; }
     public Tank? Tank { get; set; }
+
+    // Manual override fields
+    public bool IsManuallyCompleted { get; set; } = false;
+    public DateTime? ManualCompletedDate { get; set; }
 }
