@@ -1,4 +1,4 @@
-@model AquaHub.MVC.Models.Equipment
+@* No @model directive: dynamic form, not bound to abstract Equipment *@
 @{
     ViewData["Title"] = "Add Equipment";
     var equipmentType = ViewBag.EquipmentType as string;
@@ -35,898 +35,897 @@
                                         <h5 class="mt-3">Filter</h5>
                                         <p class="text-muted small">Mechanical, biological, or chemical filtration systems
                                         </p>
-                                        <form asp-action="Create" method="post">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="equipmentType" value="Filter" />
-                                            <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
-                                            <button type="submit" class="btn btn-info">
-                                                <i class="bi bi-plus"></i> Add Filter
-                                            </button>
-                                        </form>
+                                        <form asp-action="Create" method="post" enctype="multipart/form-data">
+                                            <div class="col-12">
+                                                <label class="form-label fw-bold">Image</label>
+                                                <input type="file" name="ImageFile" class="form-control" accept="image/*" />
+                                                <small class="form-text text-muted">Upload a photo of the equipment
+                                                    (optional)</small>
+                                                </div>
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="equipmentType" value="Filter" />
+                                                <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
+                                                <button type="submit" class="btn btn-info">
+                                                    <i class="bi bi-plus"></i> Add Filter
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="card h-100 border-danger">
-                                    <div class="card-body text-center">
-                                        <i class="bi bi-thermometer-high text-danger display-1"></i>
-                                        <h5 class="mt-3">Heater</h5>
-                                        <p class="text-muted small">Temperature control and regulation equipment</p>
-                                        <form asp-action="Create" method="post">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="equipmentType" value="Heater" />
-                                            <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
-                                            <button type="submit" class="btn btn-danger">
-                                                <i class="bi bi-plus"></i> Add Heater
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="card h-100 border-warning">
-                                    <div class="card-body text-center">
-                                        <i class="bi bi-lightbulb text-warning display-1"></i>
-                                        <h5 class="mt-3">Light</h5>
-                                        <p class="text-muted small">LED, fluorescent, or other lighting systems</p>
-                                        <form asp-action="Create" method="post">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="equipmentType" value="Light" />
-                                            <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
-                                            <button type="submit" class="btn btn-warning">
-                                                <i class="bi bi-plus"></i> Add Light
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="card h-100 border-primary">
-                                    <div class="card-body text-center">
-                                        <i class="bi bi-water text-primary display-1"></i>
-                                        <h5 class="mt-3">Protein Skimmer</h5>
-                                        <p class="text-muted small">Remove organic compounds from saltwater aquariums</p>
-                                        <form asp-action="Create" method="post">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="equipmentType" value="ProteinSkimmer" />
-                                            <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
-                                            <button type="submit" class="btn btn-primary">
-                                                <i class="bi bi-plus"></i> Add Skimmer
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="card h-100 border-success">
-                                    <div class="card-body text-center">
-                                        <i class="bi bi-arrow-repeat text-success display-1"></i>
-                                        <h5 class="mt-3">Pump</h5>
-                                        <p class="text-muted small">Water circulation and flow control</p>
-                                        <form asp-action="Create" method="post">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="equipmentType" value="Pump" />
-                                            <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
-                                            <button type="submit" class="btn btn-success">
-                                                <i class="bi bi-plus"></i> Add Pump
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="card h-100 border-info">
-                                    <div class="card-body text-center">
-                                        <i class="bi bi-snow text-info display-1"></i>
-                                        <h5 class="mt-3">Chiller</h5>
-                                        <p class="text-muted small">Temperature cooling and regulation</p>
-                                        <form asp-action="Create" method="post">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="equipmentType" value="Chiller" />
-                                            <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
-                                            <button type="submit" class="btn btn-info">
-                                                <i class="bi bi-plus"></i> Add Chiller
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="card h-100 border-secondary">
-                                    <div class="card-body text-center">
-                                        <i class="bi bi-tsunami text-secondary display-1"></i>
-                                        <h5 class="mt-3">Wave Maker</h5>
-                                        <p class="text-muted small">Create natural water movement and flow patterns</p>
-                                        <form asp-action="Create" method="post">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="equipmentType" value="WaveMaker" />
-                                            <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
-                                            <button type="submit" class="btn btn-secondary">
-                                                <i class="bi bi-plus"></i> Add Wave Maker
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="card h-100 border-dark">
-                                    <div class="card-body text-center">
-                                        <i class="bi bi-droplet text-dark display-1"></i>
-                                        <h5 class="mt-3">Auto Top-Off</h5>
-                                        <p class="text-muted small">Automatic water level maintenance</p>
-                                        <form asp-action="Create" method="post">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="equipmentType" value="AutoTopOff" />
-                                            <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
-                                            <button type="submit" class="btn btn-dark">
-                                                <i class="bi bi-plus"></i> Add ATO
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="card h-100 border-warning">
-                                    <div class="card-body text-center">
-                                        <i class="bi bi-eyedropper text-warning display-1"></i>
-                                        <h5 class="mt-3">Dosing Pump</h5>
-                                        <p class="text-muted small">Automated dosing of additives and supplements</p>
-                                        <form asp-action="Create" method="post">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="equipmentType" value="DosingPump" />
-                                            <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
-                                            <button type="submit" class="btn btn-warning">
-                                                <i class="bi bi-plus"></i> Add Dosing Pump
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="card h-100 border-danger">
-                                    <div class="card-body text-center">
-                                        <i class="bi bi-cpu text-danger display-1"></i>
-                                        <h5 class="mt-3">Reactor</h5>
-                                        <p class="text-muted small">Media reactors for calcium, carbon, and more</p>
-                                        <form asp-action="Create" method="post">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="equipmentType" value="Reactor" />
-                                            <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
-                                            <button type="submit" class="btn btn-danger">
-                                                <i class="bi bi-plus"></i> Add Reactor
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="card h-100 border-primary">
-                                    <div class="card-body text-center">
-                                        <i class="bi bi-clock-history text-primary display-1"></i>
-                                        <h5 class="mt-3">Auto Feeder</h5>
-                                        <p class="text-muted small">Automatic feeding system with scheduling</p>
-                                        <form asp-action="Create" method="post">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="equipmentType" value="AutoFeeder" />
-                                            <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
-                                            <button type="submit" class="btn btn-primary">
-                                                <i class="bi bi-plus"></i> Add Auto Feeder
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="card h-100 border-success">
-                                    <div class="card-body text-center">
-                                        <i class="bi bi-graph-up text-success display-1"></i>
-                                        <h5 class="mt-3">CO2 System</h5>
-                                        <p class="text-muted small">CO2 injection for planted tanks</p>
-                                        <form asp-action="Create" method="post">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="equipmentType" value="CO2System" />
-                                            <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
-                                            <button type="submit" class="btn btn-success">
-                                                <i class="bi bi-plus"></i> Add CO2 System
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="card h-100 border-info">
-                                    <div class="card-body text-center">
-                                        <i class="bi bi-shield-check text-info display-1"></i>
-                                        <h5 class="mt-3">Digital Water Tester</h5>
-                                        <p class="text-muted small">Continuous water parameter monitoring</p>
-                                        <form asp-action="Create" method="post">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="equipmentType" value="DigitalWaterTester" />
-                                            <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
-                                            <button type="submit" class="btn btn-info">
-                                                <i class="bi bi-plus"></i> Add Tester
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="card h-100 border-secondary">
-                                    <div class="card-body text-center">
-                                        <i class="bi bi-filter-circle text-secondary display-1"></i>
-                                        <h5 class="mt-3">RO/DI System</h5>
-                                        <p class="text-muted small">Reverse osmosis water purification</p>
-                                        <form asp-action="Create" method="post">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="equipmentType" value="ReverseOsmosisSystem" />
-                                            <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
-                                            <button type="submit" class="btn btn-secondary">
-                                                <i class="bi bi-plus"></i> Add RO/DI
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="card h-100 border-dark">
-                                    <div class="card-body text-center">
-                                        <i class="bi bi-sun text-dark display-1"></i>
-                                        <h5 class="mt-3">UV Sterilizer</h5>
-                                        <p class="text-muted small">Ultraviolet water sterilization</p>
-                                        <form asp-action="Create" method="post">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="equipmentType" value="UVSterilizer" />
-                                            <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
-                                            <button type="submit" class="btn btn-dark">
-                                                <i class="bi bi-plus"></i> Add UV Sterilizer
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card shadow-sm bg-light">
-                    <div class="card-header bg-info text-white">
-                        <i class="bi bi-info-circle"></i> Equipment Types
-                    </div>
-                    <div class="card-body">
-                        <h6>Filter</h6>
-                        <p class="small mb-3">Tracks filter type, flow rate, and maintenance schedules.</p>
-
-                        <h6>Heater</h6>
-                        <p class="small mb-3">Monitors wattage, target temperature, and performance.</p>
-
-                        <h6>Light</h6>
-                        <p class="small mb-3">Manages wattage, spectrum, and photoperiod settings.</p>
-
-                        <h6>Protein Skimmer</h6>
-                        <p class="small mb-3">Tracks maintenance and collection cup cleaning schedules.</p>
-
-                        <h6>Pump</h6>
-                        <p class="small mb-3">Monitors flow rate, head height, and power consumption.</p>
-
-                        <h6>Chiller</h6>
-                        <p class="small mb-3">Temperature control with BTU capacity tracking.</p>
-
-                        <h6>Wave Maker</h6>
-                        <p class="small mb-3">Creates natural water flow patterns and movement.</p>
-
-                        <h6>Auto Top-Off</h6>
-                        <p class="small mb-3">Automatic evaporation replacement with reservoir tracking.</p>
-
-                        <h6>Dosing Pump</h6>
-                        <p class="small mb-3">Automated supplement and additive dosing.</p>
-
-                        <h6>Reactor</h6>
-                        <p class="small mb-3">Media reactors for calcium, carbon, and phosphate removal.</p>
-
-                        <h6>Auto Feeder</h6>
-                        <p class="small mb-3">Scheduled automatic feeding system.</p>
-
-                        <h6>CO2 System</h6>
-                        <p class="small mb-3">CO2 injection for planted aquariums.</p>
-
-                        <h6>Digital Water Tester</h6>
-                        <p class="small mb-3">Continuous water parameter monitoring with alerts.</p>
-
-                        <h6>RO/DI System</h6>
-                        <p class="small mb-3">Reverse osmosis water purification and filtration.</p>
-
-                        <h6>UV Sterilizer</h6>
-                        <p class="small mb-0">UV light water sterilization and algae control.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-    else
-    {
-        <!-- Equipment Details Form -->
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Equipment Details</h5>
-            </div>
-            <div class="card-body">
-                @if (TempData["Error"] != null)
-                {
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        @TempData["Error"]
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                }
-                
-                <form asp-action="Create" method="post">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="equipmentType" value="@equipmentType" />
-                    <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
-
-                    <div class="row g-3">
-                        <!-- Tank Selection -->
-                        @{
-                            int? selectedTankId = ViewBag.SelectedTankId as int?;
-                        }
-                        <div class="col-md-12">
-                            <label class="form-label fw-bold">Tank <span class="text-danger">*</span></label>
-                            <select name="tankId" class="form-select" required>
-                                <option value="">-- Select Tank --</option>
-                                @if (ViewBag.Tanks != null)
-                                {
-                                    @foreach (var tank in ViewBag.Tanks)
-                                    {
-                                        <option value="@tank.Value" selected="@(tank.Value == selectedTankId?.ToString())">
-                                            @tank.Text</option>
-                                        }
-                                    }
-                                </select>
-                            </div>
-
-                            <!-- Common Fields -->
-                            <div class="col-md-6">
-                                <label asp-for="Brand" class="form-label fw-bold">Brand <span
-                                    class="text-danger">*</span></label>
-                                    <input asp-for="Brand" class="form-control" placeholder="e.g., Fluval, Eheim" required />
-                                    <span asp-validation-for="Brand" class="text-danger small"></span>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label asp-for="Model" class="form-label fw-bold">Model <span
-                                        class="text-danger">*</span></label>
-                                        <input asp-for="Model" class="form-control" placeholder="e.g., FX6, 2217" required />
-                                        <span asp-validation-for="Model" class="text-danger small"></span>
+                                    <div class="card h-100 border-danger">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-thermometer-high text-danger display-1"></i>
+                                            <h5 class="mt-3">Heater</h5>
+                                            <p class="text-muted small">Temperature control and regulation equipment</p>
+                                            <form asp-action="Create" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="equipmentType" value="Heater" />
+                                                <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
+                                                <button type="submit" class="btn btn-danger">
+                                                    <i class="bi bi-plus"></i> Add Heater
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="card h-100 border-warning">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-lightbulb text-warning display-1"></i>
+                                            <h5 class="mt-3">Light</h5>
+                                            <p class="text-muted small">LED, fluorescent, or other lighting systems</p>
+                                            <form asp-action="Create" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="equipmentType" value="Light" />
+                                                <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
+                                                <button type="submit" class="btn btn-warning">
+                                                    <i class="bi bi-plus"></i> Add Light
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="card h-100 border-primary">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-water text-primary display-1"></i>
+                                            <h5 class="mt-3">Protein Skimmer</h5>
+                                            <p class="text-muted small">Remove organic compounds from saltwater aquariums</p>
+                                            <form asp-action="Create" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="equipmentType" value="ProteinSkimmer" />
+                                                <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="bi bi-plus"></i> Add Skimmer
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="card h-100 border-success">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-arrow-repeat text-success display-1"></i>
+                                            <h5 class="mt-3">Pump</h5>
+                                            <p class="text-muted small">Water circulation and flow control</p>
+                                            <form asp-action="Create" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="equipmentType" value="Pump" />
+                                                <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
+                                                <button type="submit" class="btn btn-success">
+                                                    <i class="bi bi-plus"></i> Add Pump
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="card h-100 border-info">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-snow text-info display-1"></i>
+                                            <h5 class="mt-3">Chiller</h5>
+                                            <p class="text-muted small">Temperature cooling and regulation</p>
+                                            <form asp-action="Create" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="equipmentType" value="Chiller" />
+                                                <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
+                                                <button type="submit" class="btn btn-info">
+                                                    <i class="bi bi-plus"></i> Add Chiller
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="card h-100 border-secondary">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-tsunami text-secondary display-1"></i>
+                                            <h5 class="mt-3">Wave Maker</h5>
+                                            <p class="text-muted small">Create natural water movement and flow patterns</p>
+                                            <form asp-action="Create" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="equipmentType" value="WaveMaker" />
+                                                <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
+                                                <button type="submit" class="btn btn-secondary">
+                                                    <i class="bi bi-plus"></i> Add Wave Maker
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="card h-100 border-dark">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-droplet text-dark display-1"></i>
+                                            <h5 class="mt-3">Auto Top-Off</h5>
+                                            <p class="text-muted small">Automatic water level maintenance</p>
+                                            <form asp-action="Create" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="equipmentType" value="AutoTopOff" />
+                                                <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
+                                                <button type="submit" class="btn btn-dark">
+                                                    <i class="bi bi-plus"></i> Add ATO
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="card h-100 border-warning">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-eyedropper text-warning display-1"></i>
+                                            <h5 class="mt-3">Dosing Pump</h5>
+                                            <p class="text-muted small">Automated dosing of additives and supplements</p>
+                                            <form asp-action="Create" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="equipmentType" value="DosingPump" />
+                                                <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
+                                                <button type="submit" class="btn btn-warning">
+                                                    <i class="bi bi-plus"></i> Add Dosing Pump
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="card h-100 border-danger">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-cpu text-danger display-1"></i>
+                                            <h5 class="mt-3">Reactor</h5>
+                                            <p class="text-muted small">Media reactors for calcium, carbon, and more</p>
+                                            <form asp-action="Create" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="equipmentType" value="Reactor" />
+                                                <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
+                                                <button type="submit" class="btn btn-danger">
+                                                    <i class="bi bi-plus"></i> Add Reactor
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="card h-100 border-primary">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-clock-history text-primary display-1"></i>
+                                            <h5 class="mt-3">Auto Feeder</h5>
+                                            <p class="text-muted small">Automatic feeding system with scheduling</p>
+                                            <form asp-action="Create" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="equipmentType" value="AutoFeeder" />
+                                                <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="bi bi-plus"></i> Add Auto Feeder
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="card h-100 border-success">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-graph-up text-success display-1"></i>
+                                            <h5 class="mt-3">CO2 System</h5>
+                                            <p class="text-muted small">CO2 injection for planted tanks</p>
+                                            <form asp-action="Create" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="equipmentType" value="CO2System" />
+                                                <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
+                                                <button type="submit" class="btn btn-success">
+                                                    <i class="bi bi-plus"></i> Add CO2 System
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="card h-100 border-info">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-shield-check text-info display-1"></i>
+                                            <h5 class="mt-3">Digital Water Tester</h5>
+                                            <p class="text-muted small">Continuous water parameter monitoring</p>
+                                            <form asp-action="Create" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="equipmentType" value="DigitalWaterTester" />
+                                                <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
+                                                <button type="submit" class="btn btn-info">
+                                                    <i class="bi bi-plus"></i> Add Tester
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="card h-100 border-secondary">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-filter-circle text-secondary display-1"></i>
+                                            <h5 class="mt-3">RO/DI System</h5>
+                                            <p class="text-muted small">Reverse osmosis water purification</p>
+                                            <form asp-action="Create" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="equipmentType" value="ReverseOsmosisSystem" />
+                                                <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
+                                                <button type="submit" class="btn btn-secondary">
+                                                    <i class="bi bi-plus"></i> Add RO/DI
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="card h-100 border-dark">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-sun text-dark display-1"></i>
+                                            <h5 class="mt-3">UV Sterilizer</h5>
+                                            <p class="text-muted small">Ultraviolet water sterilization</p>
+                                            <form asp-action="Create" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="equipmentType" value="UVSterilizer" />
+                                                <input type="hidden" name="tankId" value="@ViewBag.SelectedTankId" />
+                                                <button type="submit" class="btn btn-dark">
+                                                    <i class="bi bi-plus"></i> Add UV Sterilizer
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card shadow-sm bg-light">
+                        <div class="card-header bg-info text-white">
+                            <i class="bi bi-info-circle"></i> Equipment Types
+                        </div>
+                        <div class="card-body">
+                            <h6>Filter</h6>
+                            <p class="small mb-3">Tracks filter type, flow rate, and maintenance schedules.</p>
+
+                            <h6>Heater</h6>
+                            <p class="small mb-3">Monitors wattage, target temperature, and performance.</p>
+
+                            <h6>Light</h6>
+                            <p class="small mb-3">Manages wattage, spectrum, and photoperiod settings.</p>
+
+                            <h6>Protein Skimmer</h6>
+                            <p class="small mb-3">Tracks maintenance and collection cup cleaning schedules.</p>
+
+                            <h6>Pump</h6>
+                            <p class="small mb-3">Monitors flow rate, head height, and power consumption.</p>
+
+                            <h6>Chiller</h6>
+                            <p class="small mb-3">Temperature control with BTU capacity tracking.</p>
+
+                            <h6>Wave Maker</h6>
+                            <p class="small mb-3">Creates natural water flow patterns and movement.</p>
+
+                            <h6>Auto Top-Off</h6>
+                            <p class="small mb-3">Automatic evaporation replacement with reservoir tracking.</p>
+
+                            <h6>Dosing Pump</h6>
+                            <p class="small mb-3">Automated supplement and additive dosing.</p>
+
+                            <h6>Reactor</h6>
+                            <p class="small mb-3">Media reactors for calcium, carbon, and phosphate removal.</p>
+
+                            <h6>Auto Feeder</h6>
+                            <p class="small mb-3">Scheduled automatic feeding system.</p>
+
+                            <h6>CO2 System</h6>
+                            <p class="small mb-3">CO2 injection for planted aquariums.</p>
+
+                            <h6>Digital Water Tester</h6>
+                            <p class="small mb-3">Continuous water parameter monitoring with alerts.</p>
+
+                            <h6>RO/DI System</h6>
+                            <p class="small mb-3">Reverse osmosis water purification and filtration.</p>
+
+                            <h6>UV Sterilizer</h6>
+                            <p class="small mb-0">UV light water sterilization and algae control.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    else
+        {
+            <!-- Equipment Details Form -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Equipment Details</h5>
+                </div>
+                <div class="card-body">
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @TempData["Error"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="equipmentType" value="@equipmentType" />
+                        <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+
+                        <div class="row g-3">
+                            <!-- Tank Selection -->
+                            @{
+                                int? selectedTankId = ViewBag.SelectedTankId as int?;
+                            }
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold">Tank <span class="text-danger">*</span></label>
+                                <select name="tankId" class="form-select" required>
+                                    <option value="">-- Select Tank --</option>
+                                    @if (ViewBag.Tanks != null)
+                                    {
+                                        @foreach (var tank in ViewBag.Tanks)
+                                        {
+                                            <option value="@tank.Value" selected="@(tank.Value == selectedTankId?.ToString())">
+                                                @tank.Text</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+
+                                <!-- Common Fields -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Brand <span class="text-danger">*</span></label>
+                                    <input name="brand" class="form-control" placeholder="e.g., Fluval, Eheim" required />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Model <span class="text-danger">*</span></label>
+                                    <input name="model" class="form-control" placeholder="e.g., FX6, 2217" required />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Installation Date</label>
+                                    <input name="installedOn" class="form-control" type="date" />
+                                </div>
+
+                                <!-- Type-Specific Fields -->
+                                @if (equipmentType == "Filter")
+                                {
+                                    <div class="col-12">
+                                        <hr class="my-3" />
+                                        <h5 class="text-primary">Filter Details</h5>
                                     </div>
 
                                     <div class="col-md-6">
-                                        <label asp-for="InstalledOn" class="form-label fw-bold">Installation Date</label>
-                                        <input asp-for="InstalledOn" class="form-control" type="date" />
-                                        <span asp-validation-for="InstalledOn" class="text-danger small"></span>
+                                        <label class="form-label fw-bold">Filter Type</label>
+                                        <select name="Type" class="form-select">
+                                            <option value="">-- Select --</option>
+                                            <option value="0">Canister</option>
+                                            <option value="1">HOB (Hang On Back)</option>
+                                            <option value="2">Sump</option>
+                                            <option value="3">Internal</option>
+                                            <option value="4">Undergravel</option>
+                                            <option value="5">Sponge</option>
+                                        </select>
                                     </div>
 
-                                    <!-- Type-Specific Fields -->
-                                    @if (equipmentType == "Filter")
-                                    {
-                                        <div class="col-12">
-                                            <hr class="my-3" />
-                                            <h5 class="text-primary">Filter Details</h5>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Filter Type</label>
-                                            <select name="Type" class="form-select">
-                                                <option value="">-- Select --</option>
-                                                <option value="0">Canister</option>
-                                                <option value="1">HOB (Hang On Back)</option>
-                                                <option value="2">Sump</option>
-                                                <option value="3">Internal</option>
-                                                <option value="4">Undergravel</option>
-                                                <option value="5">Sponge</option>
-                                            </select>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Flow Rate (GPH)</label>
-                                            <input name="FlowRate" type="number" step="0.1" class="form-control" placeholder="e.g., 400" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Filter Media</label>
-                                            <input name="Media" type="text" class="form-control"
-                                                   placeholder="e.g., Ceramic rings, sponge" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Last Maintenance Date</label>
-                                            <input name="LastMaintenanceDate" type="date" class="form-control" />
-                                        </div>
-                                    }
-                                    else if (equipmentType == "Heater")
-                                    {
-                                        <div class="col-12">
-                                            <hr class="my-3" />
-                                            <h5 class="text-primary">Heater Details</h5>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Min Temperature (°F)</label>
-                                            <input name="MinTemperature" type="number" step="0.1" class="form-control"
-                                                   placeholder="e.g., 74" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Max Temperature (°F)</label>
-                                            <input name="MaxTemperature" type="number" step="0.1" class="form-control"
-                                                   placeholder="e.g., 82" />
-                                        </div>
-                                    }
-                                    else if (equipmentType == "Light")
-                                    {
-                                        <div class="col-12">
-                                            <hr class="my-3" />
-                                            <h5 class="text-primary">Light Details</h5>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Wattage</label>
-                                            <input name="Wattage" type="number" step="0.1" class="form-control" placeholder="e.g., 32" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Spectrum</label>
-                                            <input name="Spectrum" type="text" class="form-control"
-                                                   placeholder="e.g., Full Spectrum, RGB" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <div class="form-check mt-4">
-                                                <input name="IsDimmable" type="checkbox" class="form-check-input" id="isDimmable" />
-                                                <label class="form-check-label" for="isDimmable">Dimmable</label>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Intensity (%)</label>
-                                            <input name="IntensityPercent" type="number" min="0" max="100" class="form-control"
-                                                   placeholder="e.g., 75" />
-                                        </div>
-
-                                        <div class="col-md-12">
-                                            <label class="form-label fw-bold">Schedule</label>
-                                            <input name="Schedule" type="text" class="form-control" placeholder="e.g., 8am-6pm" />
-                                        </div>
-                                    }
-                                    else if (equipmentType == "ProteinSkimmer")
-                                    {
-                                        <div class="col-12">
-                                            <hr class="my-3" />
-                                            <h5 class="text-primary">Protein Skimmer Details</h5>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Capacity (gallons)</label>
-                                            <input name="Capacity" type="number" step="0.1" class="form-control" placeholder="e.g., 150" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Type</label>
-                                            <input name="Type" type="text" class="form-control" placeholder="e.g., In-sump, HOB" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Air Intake</label>
-                                            <input name="AirIntake" type="number" class="form-control" placeholder="e.g., 400" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Cup Fill Level (%)</label>
-                                            <input name="CupFillLevel" type="number" min="0" max="100" class="form-control"
-                                                   placeholder="e.g., 50" />
-                                        </div>
-                                    }
-                                    else if (Model is AquaHub.MVC.Models.Pump)
-                                    {
-                                        <div class="col-12">
-                                            <hr class="my-3" />
-                                            <h5 class="text-primary">Pump Details</h5>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Flow Rate (GPH)</label>
-                                            <input name="FlowRate" type="number" step="0.1" class="form-control" placeholder="e.g., 500" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Max Head Height (ft)</label>
-                                            <input name="MaxHeadHeight" type="number" step="0.1" class="form-control"
-                                                   placeholder="e.g., 6" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Power Consumption (Watts)</label>
-                                            <input name="PowerConsumption" type="number" step="0.1" class="form-control"
-                                                   placeholder="e.g., 45" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <div class="form-check mt-4">
-                                                <input name="IsVariableSpeed" type="checkbox" class="form-check-input"
-                                                       id="isVariableSpeed" />
-                                                <label class="form-check-label" for="isVariableSpeed">Variable Speed</label>
-                                            </div>
-                                        </div>
-                                    }
-                                    else if (Model is AquaHub.MVC.Models.Chiller)
-                                    {
-                                        <div class="col-12">
-                                            <hr class="my-3" />
-                                            <h5 class="text-primary">Chiller Details</h5>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Min Temperature (°F)</label>
-                                            <input name="MinTemperature" type="number" step="0.1" class="form-control"
-                                                   placeholder="e.g., 68" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Max Temperature (°F)</label>
-                                            <input name="MaxTemperature" type="number" step="0.1" class="form-control"
-                                                   placeholder="e.g., 74" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Target Temperature (°F)</label>
-                                            <input name="TargetTemperature" type="number" step="0.1" class="form-control"
-                                                   placeholder="e.g., 72" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">BTU Capacity</label>
-                                            <input name="BTUCapacity" type="number" step="0.1" class="form-control"
-                                                   placeholder="e.g., 5000" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Max Tank Size (gallons)</label>
-                                            <input name="MaxTankSize" type="number" step="0.1" class="form-control"
-                                                   placeholder="e.g., 125" />
-                                        </div>
-                                    }
-                                    else if (Model is AquaHub.MVC.Models.WaveMaker)
-                                    {
-                                        <div class="col-12">
-                                            <hr class="my-3" />
-                                            <h5 class="text-primary">Wave Maker Details</h5>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Flow Rate (GPH)</label>
-                                            <input name="FlowRate" type="number" step="0.1" class="form-control" placeholder="e.g., 1500" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Wave Pattern</label>
-                                            <input name="WavePattern" type="text" class="form-control" placeholder="e.g., Pulse, Random" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Intensity (%)</label>
-                                            <input name="IntensityPercent" type="number" min="0" max="100" class="form-control"
-                                                   placeholder="e.g., 75" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Power Consumption (Watts)</label>
-                                            <input name="PowerConsumption" type="number" step="0.1" class="form-control"
-                                                   placeholder="e.g., 25" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <div class="form-check mt-4">
-                                                <input name="IsControllable" type="checkbox" class="form-check-input" id="isControllable" />
-                                                <label class="form-check-label" for="isControllable">Controllable</label>
-                                            </div>
-                                        </div>
-                                    }
-                                    else if (Model is AquaHub.MVC.Models.AutoTopOff)
-                                    {
-                                        <div class="col-12">
-                                            <hr class="my-3" />
-                                            <h5 class="text-primary">Auto Top-Off Details</h5>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Reservoir Capacity (gallons)</label>
-                                            <input name="ReservoirCapacity" type="number" step="0.1" class="form-control"
-                                                   placeholder="e.g., 5" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Pump Rate (GPM)</label>
-                                            <input name="PumpRate" type="number" step="0.1" class="form-control" placeholder="e.g., 0.5" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Sensor Type</label>
-                                            <input name="SensorType" type="text" class="form-control" placeholder="e.g., Float, Optical" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Last Reservoir Refill</label>
-                                            <input name="LastReservoirRefill" type="date" class="form-control" />
-                                        </div>
-                                    }
-                                    else if (Model is AquaHub.MVC.Models.DosingPump)
-                                    {
-                                        <div class="col-12">
-                                            <hr class="my-3" />
-                                            <h5 class="text-primary">Dosing Pump Details</h5>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Number of Channels</label>
-                                            <input name="NumberOfChannels" type="number" class="form-control" placeholder="e.g., 4" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Solution Type</label>
-                                            <input name="SolutionType" type="text" class="form-control"
-                                                   placeholder="e.g., Calcium, Alkalinity" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Dose Amount (ml)</label>
-                                            <input name="DoseAmount" type="number" step="0.1" class="form-control" placeholder="e.g., 5" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Dosing Schedule</label>
-                                            <input name="DosingSchedule" type="text" class="form-control"
-                                                   placeholder="e.g., Daily at 8am" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Last Refill Date</label>
-                                            <input name="LastRefillDate" type="date" class="form-control" />
-                                        </div>
-                                    }
-                                    else if (Model is AquaHub.MVC.Models.Reactor)
-                                    {
-                                        <div class="col-12">
-                                            <hr class="my-3" />
-                                            <h5 class="text-primary">Reactor Details</h5>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Reactor Type</label>
-                                            <input name="ReactorType" type="text" class="form-control"
-                                                   placeholder="e.g., Calcium, Carbon" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Flow Rate (GPH)</label>
-                                            <input name="FlowRate" type="number" step="0.1" class="form-control" placeholder="e.g., 100" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Media Type</label>
-                                            <input name="MediaType" type="text" class="form-control" placeholder="e.g., GFO, Carbon" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Media Capacity</label>
-                                            <input name="MediaCapacity" type="number" step="0.1" class="form-control"
-                                                   placeholder="e.g., 500" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Last Media Change</label>
-                                            <input name="LastMediaChange" type="date" class="form-control" />
-                                        </div>
-                                    }
-                                    else if (Model is AquaHub.MVC.Models.AutoFeeder)
-                                    {
-                                        <div class="col-12">
-                                            <hr class="my-3" />
-                                            <h5 class="text-primary">Auto Feeder Details</h5>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Feedings Per Day</label>
-                                            <input name="FeedingsPerDay" type="number" class="form-control" placeholder="e.g., 3" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Feeding Schedule</label>
-                                            <input name="FeedingSchedule" type="text" class="form-control"
-                                                   placeholder="e.g., 8am, 2pm, 8pm" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Portion Size (grams)</label>
-                                            <input name="PortionSize" type="number" step="0.1" class="form-control" placeholder="e.g., 2" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Hopper Capacity (grams)</label>
-                                            <input name="HopperCapacity" type="number" step="0.1" class="form-control"
-                                                   placeholder="e.g., 100" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Last Refill Date</label>
-                                            <input name="LastRefillDate" type="date" class="form-control" />
-                                        </div>
-                                    }
-                                    else if (Model is AquaHub.MVC.Models.CO2System)
-                                    {
-                                        <div class="col-12">
-                                            <hr class="my-3" />
-                                            <h5 class="text-primary">CO2 System Details</h5>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Target pH</label>
-                                            <input name="TargetPH" type="number" step="0.1" class="form-control" placeholder="e.g., 6.8" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Current pH</label>
-                                            <input name="CurrentPH" type="number" step="0.1" class="form-control" placeholder="e.g., 7.0" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Regulator Type</label>
-                                            <input name="RegulatorType" type="text" class="form-control" placeholder="e.g., Dual stage" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Diffuser Type</label>
-                                            <input name="DiffuserType" type="text" class="form-control" placeholder="e.g., Glass, Inline" />
-                                        </div>
-                                    }
-                                    else if (Model is AquaHub.MVC.Models.DigitalWaterTester)
-                                    {
-                                        <div class="col-12">
-                                            <hr class="my-3" />
-                                            <h5 class="text-primary">Digital Water Tester Details</h5>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Parameters Monitored</label>
-                                            <input name="ParametersMonitored" type="text" class="form-control"
-                                                   placeholder="e.g., pH, Temp, Salinity" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Calibration Interval (days)</label>
-                                            <input name="CalibrationIntervalDays" type="number" class="form-control"
-                                                   placeholder="e.g., 30" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Last Calibration Date</label>
-                                            <input name="LastCalibrationDate" type="date" class="form-control" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <div class="form-check mt-2">
-                                                <input name="HasWifiConnectivity" type="checkbox" class="form-check-input" id="hasWifi" />
-                                                <label class="form-check-label" for="hasWifi">WiFi Connectivity</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input name="HasAlerts" type="checkbox" class="form-check-input" id="hasAlerts" />
-                                                <label class="form-check-label" for="hasAlerts">Has Alerts</label>
-                                            </div>
-                                        </div>
-                                    }
-                                    else if (Model is AquaHub.MVC.Models.ReverseOsmosisSystem)
-                                    {
-                                        <div class="col-12">
-                                            <hr class="my-3" />
-                                            <h5 class="text-primary">RO/DI System Details</h5>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">GPD Rating</label>
-                                            <input name="GPDRating" type="number" step="0.1" class="form-control" placeholder="e.g., 75" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Number of Stages</label>
-                                            <input name="NumberOfStages" type="number" class="form-control" placeholder="e.g., 5" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Membrane Lifespan (months)</label>
-                                            <input name="MembraneLifespanMonths" type="number" class="form-control"
-                                                   placeholder="e.g., 24" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Waste Water Ratio</label>
-                                            <input name="WasteWaterRatio" type="number" step="0.1" class="form-control"
-                                                   placeholder="e.g., 3" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Last Membrane Change</label>
-                                            <input name="LastMembraneChange" type="date" class="form-control" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Last Filter Change</label>
-                                            <input name="LastFilterChange" type="date" class="form-control" />
-                                        </div>
-                                    }
-                                    else if (Model is AquaHub.MVC.Models.UVSterilizer)
-                                    {
-                                        <div class="col-12">
-                                            <hr class="my-3" />
-                                            <h5 class="text-primary">UV Sterilizer Details</h5>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Wattage</label>
-                                            <input name="Wattage" type="number" step="0.1" class="form-control" placeholder="e.g., 36" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Flow Rate (GPH)</label>
-                                            <input name="FlowRate" type="number" step="0.1" class="form-control" placeholder="e.g., 300" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Max Tank Size (gallons)</label>
-                                            <input name="MaxTankSize" type="number" step="0.1" class="form-control"
-                                                   placeholder="e.g., 150" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Bulb Lifespan (hours)</label>
-                                            <input name="BulbLifespanHours" type="number" class="form-control" placeholder="e.g., 8000" />
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Bulb Installed Date</label>
-                                            <input name="BulbInstalledDate" type="date" class="form-control" />
-                                        </div>
-                                    }
-                                </div>
-
-                                <div class="d-flex gap-2 mt-4">
-                                    <button type="submit" class="btn btn-primary px-4">
-                                        <i class="bi bi-save"></i> Save Equipment
-                                    </button>
-                                    <a asp-action="Create" class="btn btn-outline-secondary px-4">
-                                        <i class="bi bi-arrow-left"></i> Back to Selection
-                                    </a>
-                                </div>
-                            </form>
-                        </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Flow Rate (GPH)</label>
+                                        <input name="FlowRate" type="number" step="0.1" class="form-control" placeholder="e.g., 400" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Filter Media</label>
+                                        <input name="Media" type="text" class="form-control"
+                                               placeholder="e.g., Ceramic rings, sponge" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Last Maintenance Date</label>
+                                        <input name="LastMaintenanceDate" type="date" class="form-control" />
+                                    </div>
+                                }
+                                else if (equipmentType == "Heater")
+                                {
+                                    <div class="col-12">
+                                        <hr class="my-3" />
+                                        <h5 class="text-primary">Heater Details</h5>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Min Temperature (°F)</label>
+                                        <input name="MinTemperature" type="number" step="0.1" class="form-control"
+                                               placeholder="e.g., 74" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Max Temperature (°F)</label>
+                                        <input name="MaxTemperature" type="number" step="0.1" class="form-control"
+                                               placeholder="e.g., 82" />
+                                    </div>
+                                }
+                                else if (equipmentType == "Light")
+                                {
+                                    <div class="col-12">
+                                        <hr class="my-3" />
+                                        <h5 class="text-primary">Light Details</h5>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Wattage</label>
+                                        <input name="Wattage" type="number" step="0.1" class="form-control" placeholder="e.g., 32" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Spectrum</label>
+                                        <input name="Spectrum" type="text" class="form-control"
+                                               placeholder="e.g., Full Spectrum, RGB" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-check mt-4">
+                                            <input name="IsDimmable" type="checkbox" class="form-check-input" id="isDimmable" />
+                                            <label class="form-check-label" for="isDimmable">Dimmable</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Intensity (%)</label>
+                                        <input name="IntensityPercent" type="number" min="0" max="100" class="form-control"
+                                               placeholder="e.g., 75" />
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label class="form-label fw-bold">Schedule</label>
+                                        <input name="Schedule" type="text" class="form-control" placeholder="e.g., 8am-6pm" />
+                                    </div>
+                                }
+                                else if (equipmentType == "ProteinSkimmer")
+                                {
+                                    <div class="col-12">
+                                        <hr class="my-3" />
+                                        <h5 class="text-primary">Protein Skimmer Details</h5>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Capacity (gallons)</label>
+                                        <input name="Capacity" type="number" step="0.1" class="form-control" placeholder="e.g., 150" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Type</label>
+                                        <input name="Type" type="text" class="form-control" placeholder="e.g., In-sump, HOB" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Air Intake</label>
+                                        <input name="AirIntake" type="number" class="form-control" placeholder="e.g., 400" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Cup Fill Level (%)</label>
+                                        <input name="CupFillLevel" type="number" min="0" max="100" class="form-control"
+                                               placeholder="e.g., 50" />
+                                    </div>
+                                }
+                                else if (Model is AquaHub.MVC.Models.Pump)
+                                {
+                                    <div class="col-12">
+                                        <hr class="my-3" />
+                                        <h5 class="text-primary">Pump Details</h5>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Flow Rate (GPH)</label>
+                                        <input name="FlowRate" type="number" step="0.1" class="form-control" placeholder="e.g., 500" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Max Head Height (ft)</label>
+                                        <input name="MaxHeadHeight" type="number" step="0.1" class="form-control"
+                                               placeholder="e.g., 6" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Power Consumption (Watts)</label>
+                                        <input name="PowerConsumption" type="number" step="0.1" class="form-control"
+                                               placeholder="e.g., 45" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-check mt-4">
+                                            <input name="IsVariableSpeed" type="checkbox" class="form-check-input"
+                                                   id="isVariableSpeed" />
+                                            <label class="form-check-label" for="isVariableSpeed">Variable Speed</label>
+                                        </div>
+                                    </div>
+                                }
+                                else if (Model is AquaHub.MVC.Models.Chiller)
+                                {
+                                    <div class="col-12">
+                                        <hr class="my-3" />
+                                        <h5 class="text-primary">Chiller Details</h5>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Min Temperature (°F)</label>
+                                        <input name="MinTemperature" type="number" step="0.1" class="form-control"
+                                               placeholder="e.g., 68" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Max Temperature (°F)</label>
+                                        <input name="MaxTemperature" type="number" step="0.1" class="form-control"
+                                               placeholder="e.g., 74" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Target Temperature (°F)</label>
+                                        <input name="TargetTemperature" type="number" step="0.1" class="form-control"
+                                               placeholder="e.g., 72" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">BTU Capacity</label>
+                                        <input name="BTUCapacity" type="number" step="0.1" class="form-control"
+                                               placeholder="e.g., 5000" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Max Tank Size (gallons)</label>
+                                        <input name="MaxTankSize" type="number" step="0.1" class="form-control"
+                                               placeholder="e.g., 125" />
+                                    </div>
+                                }
+                                else if (Model is AquaHub.MVC.Models.WaveMaker)
+                                {
+                                    <div class="col-12">
+                                        <hr class="my-3" />
+                                        <h5 class="text-primary">Wave Maker Details</h5>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Flow Rate (GPH)</label>
+                                        <input name="FlowRate" type="number" step="0.1" class="form-control" placeholder="e.g., 1500" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Wave Pattern</label>
+                                        <input name="WavePattern" type="text" class="form-control" placeholder="e.g., Pulse, Random" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Intensity (%)</label>
+                                        <input name="IntensityPercent" type="number" min="0" max="100" class="form-control"
+                                               placeholder="e.g., 75" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Power Consumption (Watts)</label>
+                                        <input name="PowerConsumption" type="number" step="0.1" class="form-control"
+                                               placeholder="e.g., 25" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-check mt-4">
+                                            <input name="IsControllable" type="checkbox" class="form-check-input" id="isControllable" />
+                                            <label class="form-check-label" for="isControllable">Controllable</label>
+                                        </div>
+                                    </div>
+                                }
+                                else if (Model is AquaHub.MVC.Models.AutoTopOff)
+                                {
+                                    <div class="col-12">
+                                        <hr class="my-3" />
+                                        <h5 class="text-primary">Auto Top-Off Details</h5>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Reservoir Capacity (gallons)</label>
+                                        <input name="ReservoirCapacity" type="number" step="0.1" class="form-control"
+                                               placeholder="e.g., 5" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Pump Rate (GPM)</label>
+                                        <input name="PumpRate" type="number" step="0.1" class="form-control" placeholder="e.g., 0.5" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Sensor Type</label>
+                                        <input name="SensorType" type="text" class="form-control" placeholder="e.g., Float, Optical" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Last Reservoir Refill</label>
+                                        <input name="LastReservoirRefill" type="date" class="form-control" />
+                                    </div>
+                                }
+                                else if (Model is AquaHub.MVC.Models.DosingPump)
+                                {
+                                    <div class="col-12">
+                                        <hr class="my-3" />
+                                        <h5 class="text-primary">Dosing Pump Details</h5>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Number of Channels</label>
+                                        <input name="NumberOfChannels" type="number" class="form-control" placeholder="e.g., 4" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Solution Type</label>
+                                        <input name="SolutionType" type="text" class="form-control"
+                                               placeholder="e.g., Calcium, Alkalinity" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Dose Amount (ml)</label>
+                                        <input name="DoseAmount" type="number" step="0.1" class="form-control" placeholder="e.g., 5" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Dosing Schedule</label>
+                                        <input name="DosingSchedule" type="text" class="form-control"
+                                               placeholder="e.g., Daily at 8am" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Last Refill Date</label>
+                                        <input name="LastRefillDate" type="date" class="form-control" />
+                                    </div>
+                                }
+                                else if (Model is AquaHub.MVC.Models.Reactor)
+                                {
+                                    <div class="col-12">
+                                        <hr class="my-3" />
+                                        <h5 class="text-primary">Reactor Details</h5>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Reactor Type</label>
+                                        <input name="ReactorType" type="text" class="form-control"
+                                               placeholder="e.g., Calcium, Carbon" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Flow Rate (GPH)</label>
+                                        <input name="FlowRate" type="number" step="0.1" class="form-control" placeholder="e.g., 100" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Media Type</label>
+                                        <input name="MediaType" type="text" class="form-control" placeholder="e.g., GFO, Carbon" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Media Capacity</label>
+                                        <input name="MediaCapacity" type="number" step="0.1" class="form-control"
+                                               placeholder="e.g., 500" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Last Media Change</label>
+                                        <input name="LastMediaChange" type="date" class="form-control" />
+                                    </div>
+                                }
+                                else if (Model is AquaHub.MVC.Models.AutoFeeder)
+                                {
+                                    <div class="col-12">
+                                        <hr class="my-3" />
+                                        <h5 class="text-primary">Auto Feeder Details</h5>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Feedings Per Day</label>
+                                        <input name="FeedingsPerDay" type="number" class="form-control" placeholder="e.g., 3" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Feeding Schedule</label>
+                                        <input name="FeedingSchedule" type="text" class="form-control"
+                                               placeholder="e.g., 8am, 2pm, 8pm" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Portion Size (grams)</label>
+                                        <input name="PortionSize" type="number" step="0.1" class="form-control" placeholder="e.g., 2" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Hopper Capacity (grams)</label>
+                                        <input name="HopperCapacity" type="number" step="0.1" class="form-control"
+                                               placeholder="e.g., 100" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Last Refill Date</label>
+                                        <input name="LastRefillDate" type="date" class="form-control" />
+                                    </div>
+                                }
+                                else if (Model is AquaHub.MVC.Models.CO2System)
+                                {
+                                    <div class="col-12">
+                                        <hr class="my-3" />
+                                        <h5 class="text-primary">CO2 System Details</h5>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Target pH</label>
+                                        <input name="TargetPH" type="number" step="0.1" class="form-control" placeholder="e.g., 6.8" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Current pH</label>
+                                        <input name="CurrentPH" type="number" step="0.1" class="form-control" placeholder="e.g., 7.0" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Regulator Type</label>
+                                        <input name="RegulatorType" type="text" class="form-control" placeholder="e.g., Dual stage" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Diffuser Type</label>
+                                        <input name="DiffuserType" type="text" class="form-control" placeholder="e.g., Glass, Inline" />
+                                    </div>
+                                }
+                                else if (Model is AquaHub.MVC.Models.DigitalWaterTester)
+                                {
+                                    <div class="col-12">
+                                        <hr class="my-3" />
+                                        <h5 class="text-primary">Digital Water Tester Details</h5>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Parameters Monitored</label>
+                                        <input name="ParametersMonitored" type="text" class="form-control"
+                                               placeholder="e.g., pH, Temp, Salinity" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Calibration Interval (days)</label>
+                                        <input name="CalibrationIntervalDays" type="number" class="form-control"
+                                               placeholder="e.g., 30" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Last Calibration Date</label>
+                                        <input name="LastCalibrationDate" type="date" class="form-control" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-check mt-2">
+                                            <input name="HasWifiConnectivity" type="checkbox" class="form-check-input" id="hasWifi" />
+                                            <label class="form-check-label" for="hasWifi">WiFi Connectivity</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input name="HasAlerts" type="checkbox" class="form-check-input" id="hasAlerts" />
+                                            <label class="form-check-label" for="hasAlerts">Has Alerts</label>
+                                        </div>
+                                    </div>
+                                }
+                                else if (Model is AquaHub.MVC.Models.ReverseOsmosisSystem)
+                                {
+                                    <div class="col-12">
+                                        <hr class="my-3" />
+                                        <h5 class="text-primary">RO/DI System Details</h5>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">GPD Rating</label>
+                                        <input name="GPDRating" type="number" step="0.1" class="form-control" placeholder="e.g., 75" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Number of Stages</label>
+                                        <input name="NumberOfStages" type="number" class="form-control" placeholder="e.g., 5" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Membrane Lifespan (months)</label>
+                                        <input name="MembraneLifespanMonths" type="number" class="form-control"
+                                               placeholder="e.g., 24" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Waste Water Ratio</label>
+                                        <input name="WasteWaterRatio" type="number" step="0.1" class="form-control"
+                                               placeholder="e.g., 3" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Last Membrane Change</label>
+                                        <input name="LastMembraneChange" type="date" class="form-control" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Last Filter Change</label>
+                                        <input name="LastFilterChange" type="date" class="form-control" />
+                                    </div>
+                                }
+                                else if (Model is AquaHub.MVC.Models.UVSterilizer)
+                                {
+                                    <div class="col-12">
+                                        <hr class="my-3" />
+                                        <h5 class="text-primary">UV Sterilizer Details</h5>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Wattage</label>
+                                        <input name="Wattage" type="number" step="0.1" class="form-control" placeholder="e.g., 36" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Flow Rate (GPH)</label>
+                                        <input name="FlowRate" type="number" step="0.1" class="form-control" placeholder="e.g., 300" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Max Tank Size (gallons)</label>
+                                        <input name="MaxTankSize" type="number" step="0.1" class="form-control"
+                                               placeholder="e.g., 150" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Bulb Lifespan (hours)</label>
+                                        <input name="BulbLifespanHours" type="number" class="form-control" placeholder="e.g., 8000" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Bulb Installed Date</label>
+                                        <input name="BulbInstalledDate" type="date" class="form-control" />
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="d-flex gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="bi bi-save"></i> Save Equipment
+                                </button>
+                                <a asp-action="Create" class="btn btn-outline-secondary px-4">
+                                    <i class="bi bi-arrow-left"></i> Back to Selection
+                                </a>
+                            </div>
+                        </form>
                     </div>
-                }
-            </div>
-
-            @section Scripts {
-                @{
-                    await Html.RenderPartialAsync("_ValidationScriptsPartial");
-                }
+                </div>
             }
+        </div>
+
+        @section Scripts {
+            @{
+                await Html.RenderPartialAsync("_ValidationScriptsPartial");
+            }
+        }

@@ -1,12 +1,19 @@
+
 using System;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using AquaHub.MVC.Models.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AquaHub.MVC.Models;
 
 public class SupplyItem
 {
+    // Image Properties
+    [NotMapped]
+    public IFormFile? ImageFile { get; set; }
+    public byte[]? ImageData { get; set; }
+    public string? ImageType { get; set; }
     public int Id { get; set; }
 
     // User relationship (set by controller, not from form)

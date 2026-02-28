@@ -158,7 +158,7 @@ public class EquipmentController : Controller
     // POST: Equipment/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(int tankId, string equipmentType, string? brand)
+    public async Task<IActionResult> Create(int tankId, string equipmentType, string? brand, IFormFile? ImageFile)
     {
         try
         {
@@ -210,11 +210,23 @@ public class EquipmentController : Controller
 
             equipment.TankId = tankId;
 
+
             // Bind common properties
             await TryUpdateModelAsync(equipment, "",
                 e => e.Brand,
                 e => e.Model,
                 e => e.InstalledOn);
+
+            // Handle image upload
+            if (ImageFile != null && ImageFile.Length > 0)
+            {
+                using (var ms = new System.IO.MemoryStream())
+                {
+                    await ImageFile.CopyToAsync(ms);
+                    equipment.ImageData = ms.ToArray();
+                    equipment.ImageType = ImageFile.ContentType;
+                }
+            }
 
             // Bind type-specific properties
             switch (equipment)
@@ -409,8 +421,33 @@ public class EquipmentController : Controller
                 return NotFound();
             }
 
+            // Map to EquipmentEditViewModel
+            var vm = new AquaHub.MVC.Models.ViewModels.EquipmentEditViewModel
+            {
+                Id = equipment.Id,
+                TankId = equipment.TankId,
+                Brand = equipment.Brand,
+                Model = equipment.Model,
+                InstalledOn = equipment.InstalledOn,
+                EquipmentType = equipment.GetType().Name
+                // Map additional fields as needed
+            };
+            if (equipment is Filter filter)
+            {
+                vm.FilterType = filter.Type.ToString();
+                vm.FlowRate = filter.FlowRate;
+                vm.Media = filter.Media;
+                vm.LastMaintenanceDate = filter.LastMaintenanceDate;
+            }
+            if (equipment is Heater heater)
+            {
+                vm.MinTemperature = (double?)heater.MinTemperature;
+                vm.MaxTemperature = (double?)heater.MaxTemperature;
+            }
+            // Add more mappings for other types as needed
+
             await PopulateTanksDropdown(userId);
-            return View(equipment);
+            return View(vm);
         }
         catch (Exception ex)
         {
@@ -423,9 +460,9 @@ public class EquipmentController : Controller
     // POST: Equipment/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Type,Brand,Model,PurchaseDate,PurchasePrice,WarrantyExpirationDate,Notes")] Equipment equipment)
+    public async Task<IActionResult> Edit(int id, AquaHub.MVC.Models.ViewModels.EquipmentEditViewModel vm)
     {
-        if (id != equipment.Id)
+        if (id != vm.Id)
         {
             return NotFound();
         }
@@ -440,20 +477,45 @@ public class EquipmentController : Controller
 
             if (ModelState.IsValid)
             {
+                // Fetch the existing equipment and update its properties
+                var equipment = await _equipmentService.GetEquipmentByIdAsync(id, userId);
+                if (equipment == null)
+                {
+                    return NotFound();
+                }
+                equipment.Brand = vm.Brand;
+                equipment.Model = vm.Model;
+                equipment.InstalledOn = vm.InstalledOn;
+                // Update additional fields for each type
+                if (equipment is Filter filter)
+                {
+                    if (!string.IsNullOrEmpty(vm.FilterType) && Enum.TryParse<AquaHub.MVC.Models.Enums.FilterType>(vm.FilterType, out var parsedType))
+                        filter.Type = parsedType;
+                    filter.FlowRate = vm.FlowRate ?? 0;
+                    filter.Media = vm.Media ?? string.Empty;
+                    filter.LastMaintenanceDate = vm.LastMaintenanceDate ?? DateTime.MinValue;
+                }
+                if (equipment is Heater heater)
+                {
+                    heater.MinTemperature = (decimal)(vm.MinTemperature ?? 0);
+                    heater.MaxTemperature = (decimal)(vm.MaxTemperature ?? 0);
+                }
+                // Add more updates for other types as needed
+
                 await _equipmentService.UpdateEquipmentAsync(equipment, userId);
                 TempData["Success"] = "Equipment updated successfully!";
                 return RedirectToAction(nameof(Details), new { id = equipment.Id });
             }
 
             await PopulateTanksDropdown(userId);
-            return View(equipment);
+            return View(vm);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating equipment ID: {EquipmentId}", id);
             TempData["Error"] = "An error occurred while updating the equipment.";
             await PopulateTanksDropdown(_userManager.GetUserId(User)!);
-            return View(equipment);
+            return View(vm);
         }
     }
 

@@ -1,8 +1,8 @@
-@model AquaHub.MVC.Models.Equipment
+@model AquaHub.MVC.Models.ViewModels.EquipmentEditViewModel
 
 @{
     ViewData["Title"] = "Edit Equipment";
-    var equipmentType = Model.GetType().Name;
+    var equipmentType = Model.EquipmentType;
 }
 
 <div class="container py-4">
@@ -11,19 +11,19 @@
             <div class="card border-0 shadow">
                 <div class="card-header bg-warning">
                     <h3 class="mb-0">
-                        @if (Model is Filter)
+                        @if (Model.EquipmentType == "Filter")
                         {
                             <i class="bi bi-funnel"></i>
                         }
-                        else if (Model is Heater)
+                        else if (Model.EquipmentType == "Heater")
                         {
                             <i class="bi bi-thermometer-high"></i>
                         }
-                        else if (Model is Light)
+                        else if (Model.EquipmentType == "Light")
                         {
                             <i class="bi bi-lightbulb"></i>
                         }
-                        else if (Model is ProteinSkimmer)
+                        else if (Model.EquipmentType == "ProteinSkimmer")
                         {
                             <i class="bi bi-water"></i>
                         }
@@ -67,142 +67,64 @@
                                 <span asp-validation-for="InstalledOn" class="text-danger small"></span>
                             </div>
 
-                            @if (Model is Filter filter)
+                            @if (Model.EquipmentType == "Filter")
                             {
                                 <div class="col-12">
                                     <hr />
                                     <h5 class="text-info">Filter Settings</h5>
                                 </div>
-
                                 <div class="col-md-6">
-                                    <label for="Type" class="form-label fw-bold">Filter Type</label>
-                                    <input type="text" name="Type" value="@filter.Type" class="form-control" />
+                                    <label asp-for="FilterType" class="form-label fw-bold">Filter Type</label>
+                                    <input asp-for="FilterType" class="form-control" />
                                 </div>
-
                                 <div class="col-md-6">
-                                    <label for="FlowRate" class="form-label fw-bold">Flow Rate (GPH)</label>
-                                    <input type="number" name="FlowRate" value="@filter.FlowRate" class="form-control"
-                                           step="1" />
+                                    <label asp-for="FlowRate" class="form-label fw-bold">Flow Rate (GPH)</label>
+                                    <input asp-for="FlowRate" class="form-control" step="1" />
+                                </div>
+                                <div class="col-12">
+                                    <label asp-for="Media" class="form-label fw-bold">Media</label>
+                                    <input asp-for="Media" class="form-control" />
+                                </div>
+                                <div class="col-12">
+                                    <label asp-for="LastMaintenanceDate" class="form-label fw-bold">Last Maintenance Date</label>
+                                    <input asp-for="LastMaintenanceDate" class="form-control" type="date" />
+                                </div>
+                            }
+                            else if (Model.EquipmentType == "Heater")
+                            {
+                                <div class="col-12">
+                                    <hr />
+                                    <h5 class="text-danger">Heater Settings</h5>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="MinTemperature" class="form-label fw-bold">Min Temperature (°F)</label>
+                                    <input asp-for="MinTemperature" class="form-control" step="0.1" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="MaxTemperature" class="form-label fw-bold">Max Temperature (°F)</label>
+                                    <input asp-for="MaxTemperature" class="form-control" step="0.1" />
+                                </div>
+                            }
+                            <!-- Add more type-specific fields here as needed -->
                                 </div>
 
-                                <div class="col-12">
-                                    <label for="Media" class="form-label fw-bold">Media</label>
-                                    <input type="text" name="Media" value="@filter.Media" class="form-control" />
+                                <div class="d-flex gap-2 mt-4">
+                                    <button type="submit" class="btn btn-warning px-4">
+                                        <i class="bi bi-save"></i> Update Equipment
+                                    </button>
+                                    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary px-4">
+                                        <i class="bi bi-x-circle"></i> Cancel
+                                    </a>
                                 </div>
-
-                                <div class="col-12">
-                                    <label for="LastMaintenanceDate" class="form-label fw-bold">Last Maintenance
-                                        Date</label>
-                                        <input type="date" name="LastMaintenanceDate"
-                                               value="@filter.LastMaintenanceDate.ToString("yyyy-MM-dd")" class="form-control" />
-                                    </div>
-                                }
-                            else if (Model is Heater heater)
-                                {
-                                    <div class="col-12">
-                                        <hr />
-                                        <h5 class="text-danger">Heater Settings</h5>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label for="MinTemperature" class="form-label fw-bold">Min Temperature (°F)</label>
-                                        <input type="number" name="MinTemperature" value="@heater.MinTemperature"
-                                               class="form-control" step="0.1" />
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label for="MaxTemperature" class="form-label fw-bold">Max Temperature (°F)</label>
-                                        <input type="number" name="MaxTemperature" value="@heater.MaxTemperature"
-                                               class="form-control" step="0.1" />
-                                    </div>
-                                }
-                                else if (Model is Light light)
-                                {
-                                    <div class="col-12">
-                                        <hr />
-                                        <h5 class="text-warning">Light Settings</h5>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <label for="Wattage" class="form-label fw-bold">Wattage</label>
-                                        <input type="number" name="Wattage" value="@light.Wattage" class="form-control"
-                                               step="1" />
-                                    </div>
-
-                                    <div class="col-md-8">
-                                        <label for="Spectrum" class="form-label fw-bold">Spectrum</label>
-                                        <input type="text" name="Spectrum" value="@light.Spectrum" class="form-control" />
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <label for="IsDimmable" class="form-label fw-bold">Dimmable</label>
-                                        <select name="IsDimmable" class="form-select">
-                                            <option value="true" selected="@(light.IsDimmable)">Yes</option>
-                                            <option value="false" selected="@(!light.IsDimmable)">No</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <label for="IntensityPercent" class="form-label fw-bold">Intensity %</label>
-                                        <input type="number" name="IntensityPercent" value="@light.IntensityPercent"
-                                               class="form-control" min="0" max="100" />
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <label for="Schedule" class="form-label fw-bold">Schedule</label>
-                                        <input type="text" name="Schedule" value="@light.Schedule" class="form-control"
-                                               placeholder="8am-8pm" />
-                                    </div>
-                                }
-                                else if (Model is ProteinSkimmer skimmer)
-                                {
-                                    <div class="col-12">
-                                        <hr />
-                                        <h5 class="text-primary">Protein Skimmer Settings</h5>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label for="Capacity" class="form-label fw-bold">Capacity (gallons)</label>
-                                        <input type="number" name="Capacity" value="@skimmer.Capacity" class="form-control"
-                                               step="1" />
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label for="Type" class="form-label fw-bold">Type</label>
-                                        <input type="text" name="Type" value="@skimmer.Type" class="form-control" />
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label for="AirIntake" class="form-label fw-bold">Air Intake (L/hr)</label>
-                                        <input type="number" name="AirIntake" value="@skimmer.AirIntake" class="form-control"
-                                               step="1" />
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label for="CupFillLevel" class="form-label fw-bold">Cup Fill Level</label>
-                                        <input type="text" name="CupFillLevel" value="@skimmer.CupFillLevel"
-                                               class="form-control" />
-                                    </div>
-                                }
-                            </div>
-
-                            <div class="d-flex gap-2 mt-4">
-                                <button type="submit" class="btn btn-warning px-4">
-                                    <i class="bi bi-save"></i> Update Equipment
-                                </button>
-                                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary px-4">
-                                    <i class="bi bi-x-circle"></i> Cancel
-                                </a>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    @section Scripts {
-        @{
-            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        @section Scripts {
+            @{
+                await Html.RenderPartialAsync("_ValidationScriptsPartial");
+            }
         }
-    }

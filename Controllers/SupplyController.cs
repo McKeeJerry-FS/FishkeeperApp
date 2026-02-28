@@ -158,7 +158,7 @@ public class SupplyController : Controller
     // POST: Supply/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(SupplyItem supply)
+    public async Task<IActionResult> Create(SupplyItem supply, IFormFile? ImageFile)
     {
         try
         {
@@ -168,7 +168,19 @@ public class SupplyController : Controller
                 return Unauthorized();
             }
 
+
             supply.UserId = userId;
+
+            // Handle image upload
+            if (ImageFile != null && ImageFile.Length > 0)
+            {
+                using (var ms = new System.IO.MemoryStream())
+                {
+                    await ImageFile.CopyToAsync(ms);
+                    supply.ImageData = ms.ToArray();
+                    supply.ImageType = ImageFile.ContentType;
+                }
+            }
 
             // Validate tank ownership if tank is specified
             if (supply.TankId.HasValue)
