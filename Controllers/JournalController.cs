@@ -106,7 +106,7 @@ public class JournalController : Controller
     // POST: Journal/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("TankId,Title,Content,Timestamp,ImagePath")] JournalEntry journalEntry)
+    public async Task<IActionResult> Create([Bind("TankId,Title,Content,Timestamp,ImagePath")] JournalEntry journalEntry, IFormFile? ImageFile)
     {
         var userId = _userManager.GetUserId(User);
         if (string.IsNullOrEmpty(userId))
@@ -127,6 +127,23 @@ public class JournalController : Controller
         {
             try
             {
+                // Handle image upload
+                if (ImageFile != null && ImageFile.Length > 0)
+                {
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/journal");
+                    if (!Directory.Exists(uploadsFolder))
+                        Directory.CreateDirectory(uploadsFolder);
+
+                    var uniqueFileName = $"journal_{Guid.NewGuid()}{Path.GetExtension(ImageFile.FileName)}";
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await ImageFile.CopyToAsync(stream);
+                    }
+                    // Save relative path for web access
+                    journalEntry.ImagePath = $"/images/journal/{uniqueFileName}";
+                }
+
                 _context.Add(journalEntry);
                 await _context.SaveChangesAsync();
 
@@ -184,7 +201,7 @@ public class JournalController : Controller
     // POST: Journal/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, [Bind("Id,TankId,Title,Content,Timestamp,ImagePath")] JournalEntry journalEntry)
+    public async Task<IActionResult> Edit(int id, [Bind("Id,TankId,Title,Content,Timestamp,ImagePath")] JournalEntry journalEntry, IFormFile? ImageFile)
     {
         if (id != journalEntry.Id)
         {
@@ -210,6 +227,23 @@ public class JournalController : Controller
         {
             try
             {
+                // Handle image upload
+                if (ImageFile != null && ImageFile.Length > 0)
+                {
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/journal");
+                    if (!Directory.Exists(uploadsFolder))
+                        Directory.CreateDirectory(uploadsFolder);
+
+                    var uniqueFileName = $"journal_{Guid.NewGuid()}{Path.GetExtension(ImageFile.FileName)}";
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await ImageFile.CopyToAsync(stream);
+                    }
+                    // Save relative path for web access
+                    journalEntry.ImagePath = $"/images/journal/{uniqueFileName}";
+                }
+
                 _context.Update(journalEntry);
                 await _context.SaveChangesAsync();
 

@@ -39,6 +39,82 @@
                                             <div class="col-12">
                                                 <label class="form-label fw-bold">Image</label>
                                                 <input type="file" name="ImageFile" class="form-control" accept="image/*" />
+                                                <div id="imagePreviewContainer" class="mt-3" style="display:none;">
+                                                    <label class="form-label">Preview &amp; Adjust:</label>
+                                                    <div style="max-width:300px;">
+                                                        <canvas id="imagePreviewCanvas"
+                                                                style="width:100%;border:1px solid #ccc;border-radius:8px;"></canvas>
+                                                    </div>
+                                                    <div class="mt-2">
+                                                        <label>Zoom:</label>
+                                                        <input type="range" id="imageZoom" min="1" max="3" step="0.01"
+                                                               value="1" style="width:150px;">
+                                                        <label>Position:</label>
+                                                        <input type="range" id="imageX" min="-150" max="150" step="1"
+                                                               value="0" style="width:100px;">
+                                                        <input type="range" id="imageY" min="-150" max="150" step="1"
+                                                               value="0" style="width:100px;">
+                                                    </div>
+                                                </div>
+                                                @section Scripts {
+                                                    <script>
+                                                                                                    const imageInput = document.querySelector('input[type="file"][name="ImageFile"]');
+                                                                                                    const previewContainer = document.getElementById('imagePreviewContainer');
+                                                                                                    const previewCanvas = document.getElementById('imagePreviewCanvas');
+                                                                                                    const zoomInput = document.getElementById('imageZoom');
+                                                                                                    const xInput = document.getElementById('imageX');
+                                                                                                    const yInput = document.getElementById('imageY');
+                                                                                                    let img = null;
+                                                                                                    let imgLoaded = false;
+                                                                                                    imageInput.addEventListener('change', function (e) {
+                                                                                                        const file = e.target.files[0];
+                                                                                                        if (!file) return;
+                                                                                                        const reader = new FileReader();
+                                                                                                        reader.onload = function (ev) {
+                                                                                                            img = new window.Image();
+                                                                                                            img.onload = function () {
+                                                                                                                imgLoaded = true;
+                                                                                                                previewContainer.style.display = 'block';
+                                                                                                                // Calculate fit-to-canvas zoom
+                                                                                                                const canvasWidth = 300;
+                                                                                                                const canvasHeight = 200;
+                                                                                                                const imgRatio = img.width / img.height;
+                                                                                                                const canvasRatio = canvasWidth / canvasHeight;
+                                                                                                                let fitZoom = 1;
+                                                                                                                if (imgRatio > canvasRatio) {
+                                                                                                                    fitZoom = canvasWidth / img.width;
+                                                                                                                } else {
+                                                                                                                    fitZoom = canvasHeight / img.height;
+                                                                                                                }
+                                                                                                                zoomInput.value = fitZoom;
+                                                                                                                xInput.value = 0;
+                                                                                                                yInput.value = 0;
+                                                                                                                drawImage();
+                                                                                                            };
+                                                                                                            img.src = ev.target.result;
+                                                                                                        };
+                                                                                                        reader.readAsDataURL(file);
+                                                                                                    });
+                                                                                                    function drawImage() {
+                                                                                                        if (!imgLoaded) return;
+                                                                                                        const ctx = previewCanvas.getContext('2d');
+                                                                                                        const zoom = parseFloat(zoomInput.value);
+                                                                                                        const x = parseInt(xInput.value);
+                                                                                                        const y = parseInt(yInput.value);
+                                                                                                        previewCanvas.width = 300;
+                                                                                                        previewCanvas.height = 200;
+                                                                                                        ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+                                                                                                        ctx.save();
+                                                                                                        ctx.translate(previewCanvas.width / 2 + x, previewCanvas.height / 2 + y);
+                                                                                                        ctx.scale(zoom, zoom);
+                                                                                                        ctx.drawImage(img, -img.width / 2, -img.height / 2);
+                                                                                                        ctx.restore();
+                                                                                                    }
+                                                                                                    zoomInput.addEventListener('input', drawImage);
+                                                                                                    xInput.addEventListener('input', drawImage);
+                                                                                                    yInput.addEventListener('input', drawImage);
+                                                    </script>
+                                                }
                                                 <small class="form-text text-muted">Upload a photo of the equipment
                                                     (optional)</small>
                                                 </div>
