@@ -224,24 +224,36 @@ public class PredictionController : Controller
             }
 
             // Generate detailed prediction
-            var prediction = await _predictionService.GenerateParameterPredictionAsync(
-                tankId,
-                parameterName,
-                userId,
-                daysAhead);
+                var prediction = await _predictionService.GenerateParameterPredictionAsync(
+                    tankId,
+                    parameterName,
+                    userId,
+                    daysAhead);
 
-            if (prediction == null)
-            {
-                ViewBag.Message = $"Insufficient data to predict {parameterName}. Record more water tests!";
+                if (prediction == null)
+                {
+                    ViewBag.Message = $"Insufficient data to predict {parameterName}. Record more water tests!";
+                    ViewBag.TankName = tank.Name;
+                    ViewBag.ParameterName = parameterName;
+                    return View();
+                }
+
+                // Map WaterChemistryPredictionDTO to ParameterPredictionDetailViewModel
+                var detailViewModel = new AquaHub.MVC.Models.ViewModels.ParameterPredictionDetailViewModel
+                {
+                    ParameterName = prediction.ParameterName,
+                    DaysAhead = prediction.DaysAhead,
+                    CurrentValue = prediction.CurrentValue,
+                    PredictedValue = prediction.PredictedValue,
+                    Confidence = prediction.ConfidenceScore,
+                    RecommendedActions = prediction.Message != null ? new List<string> { prediction.Message } : new List<string>(),
+                    // Add more mappings as needed (Unit, IdealMin, IdealMax, TrendDates, HistoricalValues, PredictedValues)
+                };
+
                 ViewBag.TankName = tank.Name;
-                ViewBag.ParameterName = parameterName;
-                return View();
-            }
+                ViewBag.TankId = tankId;
 
-            ViewBag.TankName = tank.Name;
-            ViewBag.TankId = tankId;
-
-            return View(prediction);
+                return View(detailViewModel);
         }
         catch (Exception ex)
         {
