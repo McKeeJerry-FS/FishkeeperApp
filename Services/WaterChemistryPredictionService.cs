@@ -416,7 +416,7 @@ public class WaterChemistryPredictionService : IWaterChemistryPredictionService
     /// - Regularity: Tests at consistent intervals work better
     /// - Recency: Recent data is more relevant than old data
     /// </remarks>
-    private async Task<List<WaterTest>> GetHistoricalWaterTestsAsync(int tankId, string userId)
+    public async Task<List<WaterTest>> GetHistoricalWaterTestsAsync(int tankId, string userId)
     {
         var cutoffDate = DateTime.UtcNow.AddDays(-MAX_HISTORY_DAYS);
 
@@ -441,7 +441,7 @@ public class WaterChemistryPredictionService : IWaterChemistryPredictionService
     /// - ML algorithms can't work with missing data (null values)
     /// - We need continuous data points to find patterns
     /// </remarks>
-    private List<(DateTime Date, double Value)> ExtractParameterData(
+    public List<(DateTime Date, double Value)> ExtractParameterData(
         List<WaterTest> tests,
         string parameterName)
     {

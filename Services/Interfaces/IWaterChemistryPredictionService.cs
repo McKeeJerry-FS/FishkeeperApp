@@ -58,6 +58,22 @@ public interface IWaterChemistryPredictionService
     Task<List<WaterChemistryPrediction>> GetHistoricalPredictionsAsync(int tankId, string userId);
 
     /// <summary>
+    /// Get historical water test records for a tank and user
+    /// </summary>
+    /// <param name="tankId">The tank to analyze</param>
+    /// <param name="userId">The user who owns the tank</param>
+    /// <returns>List of WaterTest records</returns>
+    Task<List<WaterTest>> GetHistoricalWaterTestsAsync(int tankId, string userId);
+
+    /// <summary>
+    /// Extract parameter data points from water tests for charting
+    /// </summary>
+    /// <param name="tests">List of WaterTest records</param>
+    /// <param name="parameterName">Parameter to extract (e.g., "pH")</param>
+    /// <returns>List of (Date, Value) tuples</returns>
+    List<(DateTime Date, double Value)> ExtractParameterData(List<WaterTest> tests, string parameterName);
+
+    /// <summary>
     /// Save a prediction to the database for future reference
     /// </summary>
     Task SavePredictionAsync(WaterChemistryPrediction prediction);

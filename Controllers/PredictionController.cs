@@ -224,36 +224,57 @@ public class PredictionController : Controller
             }
 
             // Generate detailed prediction
-                var prediction = await _predictionService.GenerateParameterPredictionAsync(
-                    tankId,
-                    parameterName,
-                    userId,
-                    daysAhead);
+            var prediction = await _predictionService.GenerateParameterPredictionAsync(
+                tankId,
+                parameterName,
+                userId,
+                daysAhead);
 
-                if (prediction == null)
-                {
-                    ViewBag.Message = $"Insufficient data to predict {parameterName}. Record more water tests!";
-                    ViewBag.TankName = tank.Name;
-                    ViewBag.ParameterName = parameterName;
-                    return View();
-                }
-
-                // Map WaterChemistryPredictionDTO to ParameterPredictionDetailViewModel
-                var detailViewModel = new AquaHub.MVC.Models.ViewModels.ParameterPredictionDetailViewModel
-                {
-                    ParameterName = prediction.ParameterName,
-                    DaysAhead = prediction.DaysAhead,
-                    CurrentValue = prediction.CurrentValue,
-                    PredictedValue = prediction.PredictedValue,
-                    Confidence = prediction.ConfidenceScore,
-                    RecommendedActions = prediction.Message != null ? new List<string> { prediction.Message } : new List<string>(),
-                    // Add more mappings as needed (Unit, IdealMin, IdealMax, TrendDates, HistoricalValues, PredictedValues)
-                };
-
+            if (prediction == null)
+            {
+                ViewBag.Message = $"Insufficient data to predict {parameterName}. Record more water tests!";
                 ViewBag.TankName = tank.Name;
-                ViewBag.TankId = tankId;
+                ViewBag.ParameterName = parameterName;
+                return View();
+            }
 
-                return View(detailViewModel);
+            // Get historical data for graph
+            var historicalTests = await _predictionService.GetHistoricalWaterTestsAsync(tankId, userId);
+            var parameterData = _predictionService.ExtractParameterData(historicalTests, parameterName);
+
+            var trendDates = parameterData.Select(pd => pd.Date.ToString("yyyy-MM-dd")).ToList();
+            var historicalValues = parameterData.Select(pd => pd.Value).ToList();
+
+            // Predicted values: extend the historical trend by daysAhead
+            var predictedValues = new List<double>();
+            if (historicalValues.Count > 0)
+            {
+                var lastValue = historicalValues.Last();
+                var slope = historicalValues.Count > 1 ? (historicalValues.Last() - historicalValues.First()) / (historicalValues.Count - 1) : 0;
+                for (int i = 1; i <= daysAhead; i++)
+                {
+                    predictedValues.Add(lastValue + slope * i);
+                }
+            }
+
+            var detailViewModel = new AquaHub.MVC.Models.ViewModels.ParameterPredictionDetailViewModel
+            {
+                ParameterName = prediction.ParameterName,
+                DaysAhead = prediction.DaysAhead,
+                CurrentValue = prediction.CurrentValue,
+                PredictedValue = prediction.PredictedValue,
+                Confidence = prediction.ConfidenceScore,
+                RecommendedActions = prediction.Message != null ? new List<string> { prediction.Message } : new List<string>(),
+                TrendDates = trendDates,
+                HistoricalValues = historicalValues,
+                PredictedValues = predictedValues,
+                // Add more mappings as needed (Unit, IdealMin, IdealMax)
+            };
+
+            ViewBag.TankName = tank.Name;
+            ViewBag.TankId = tankId;
+
+            return View(detailViewModel);
         }
         catch (Exception ex)
         {
