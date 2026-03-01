@@ -35,65 +35,6 @@
                                            style="width:100px;">
                                 </div>
                             </div>
-                            @section Scripts {
-                                <script>
-                                                                                                                                    const imageInput = document.querySelector('input[type="file"][name="imageFile"]');
-                                                                                                                                    const previewContainer = document.getElementById('imagePreviewContainer');
-                                                                                                                                    const previewCanvas = document.getElementById('imagePreviewCanvas');
-                                                                                                                                    const zoomInput = document.getElementById('imageZoom');
-                                                                                                                                    const xInput = document.getElementById('imageX');
-                                                                                                                                    const yInput = document.getElementById('imageY');
-                                                                                                                                    let img = null;
-                                                                                                                                    let imgLoaded = false;
-                                                                                                                                    imageInput.addEventListener('change', function (e) {
-                                                                                                                                        const file = e.target.files[0];
-                                                                                                                                        if (!file) return;
-                                                                                                                                        const reader = new FileReader();
-                                                                                                                                        reader.onload = function (ev) {
-                                                                                                                                            img = new window.Image();
-                                                                                                                                            img.onload = function () {
-                                                                                                                                                imgLoaded = true;
-                                                                                                                                                previewContainer.style.display = 'block';
-                                                                                                                                                // Calculate fit-to-canvas zoom
-                                                                                                                                                const canvasWidth = 300;
-                                                                                                                                                const canvasHeight = 200;
-                                                                                                                                                const imgRatio = img.width / img.height;
-                                                                                                                                                const canvasRatio = canvasWidth / canvasHeight;
-                                                                                                                                                let fitZoom = 1;
-                                                                                                                                                if (imgRatio > canvasRatio) {
-                                                                                                                                                    fitZoom = canvasWidth / img.width;
-                                                                                                                                                } else {
-                                                                                                                                                    fitZoom = canvasHeight / img.height;
-                                                                                                                                                }
-                                                                                                                                                zoomInput.value = fitZoom;
-                                                                                                                                                xInput.value = 0;
-                                                                                                                                                yInput.value = 0;
-                                                                                                                                                drawImage();
-                                                                                                                                            };
-                                                                                                                                            img.src = ev.target.result;
-                                                                                                                                        };
-                                                                                                                                        reader.readAsDataURL(file);
-                                                                                                                                    });
-                                                                                                                                    function drawImage() {
-                                                                                                                                        if (!imgLoaded) return;
-                                                                                                                                        const ctx = previewCanvas.getContext('2d');
-                                                                                                                                        const zoom = parseFloat(zoomInput.value);
-                                                                                                                                        const x = parseInt(xInput.value);
-                                                                                                                                        const y = parseInt(yInput.value);
-                                                                                                                                        previewCanvas.width = 300;
-                                                                                                                                        previewCanvas.height = 200;
-                                                                                                                                        ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-                                                                                                                                        ctx.save();
-                                                                                                                                        ctx.translate(previewCanvas.width / 2 + x, previewCanvas.height / 2 + y);
-                                                                                                                                        ctx.scale(zoom, zoom);
-                                                                                                                                        ctx.drawImage(img, -img.width / 2, -img.height / 2);
-                                                                                                                                        ctx.restore();
-                                                                                                                                    }
-                                                                                                                                    zoomInput.addEventListener('input', drawImage);
-                                                                                                                                    xInput.addEventListener('input', drawImage);
-                                                                                                                                    yInput.addEventListener('input', drawImage);
-                                </script>
-                            }
                             <small class="form-text text-muted">Upload a photo of the livestock (optional)</small>
                         </div>
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
@@ -193,289 +134,333 @@
                         await Html.RenderPartialAsync("_ValidationScriptsPartial");
                     }
                     <script>
-                                                                                                                                                                                            document.addEventListener('DOMContentLoaded', function () {
-                                                                                                                                                                                                const livestockType = document.getElementById('livestockType');
-                                                                                                                                                                                                const dynamicFields = document.getElementById('dynamicFields');
-                                                                                                                                                                            const speciesSelect = document.getElementById('speciesSelect');
-
-                                                                                                                                                                            livestockType.addEventListener('change', function () {
-                                                                                                                                                                                const selectedType = this.value;
-                                                                                                                                                                                dynamicFields.innerHTML = '';
-                                                                                                                                                                                updateSpeciesList(selectedType);
-
-                                                                                                                                                                                if (!selectedType) return;
-
-                                                                                                                                                                                const fieldsHTML = getFieldsForType(selectedType);
-                                                                                                                                                                                dynamicFields.innerHTML = fieldsHTML;
-                                                                                                                                                                            });
-
-                                                                                                                                                                            function updateSpeciesList(type) {
-                                                                                                                                                                                speciesSelect.innerHTML = '<option value="">-- Select Species --</option>';
-
-                                                                                                                                                                                // Get species from ViewBag enums
-                                                                                                                                                                                const speciesByType = {
-                                                                                                                                                                                    'FreshwaterFish': @Html.Raw(Json.Serialize(ViewBag.FreshwaterFishTypes)),
-                                                                                                                                                                                    'SaltwaterFish': @Html.Raw(Json.Serialize(ViewBag.SaltwaterFishTypes)),
-                                                                                                                                                                                    'Coral': @Html.Raw(Json.Serialize(ViewBag.CoralTypes)),
-                                                                                                                                                                                    'Plant': @Html.Raw(Json.Serialize(ViewBag.PlantTypes)),
-                                                                                                                                                                                    'FreshwaterInvertebrate': @Html.Raw(Json.Serialize(ViewBag.FreshwaterInvertebrateTypes)),
-                                                                                                                                                                                    'SaltwaterInvertebrate': @Html.Raw(Json.Serialize(ViewBag.InvertebrateTypes))
-                                                                                                                                                                                };
-
-                                                                                                                                                                                const species = speciesByType[type] || [];
-                                                                                                                                                                                species.forEach(function (sp) {
-                                                                                                                                                                                    const option = document.createElement('option');
-                                                                                                                                                                                    option.value = sp;
-                                                                                                                                                                                    // Convert enum name to readable format (e.g., "SPS_Acropora" -> "SPS Acropora")
-                                                                                                                                                                                    option.textContent = sp.replace(/_/g, ' ');
-                                                                                                                                                                                    speciesSelect.appendChild(option);
-                                                                                                                                                                                });
-                                                                                                                                                                            }
-
-                                                                                                                                                                            function getFieldsForType(type) {
-                                                                                                                                                                                let html = '<div class="row g-3">';
-
-                                                                                                                                                                                switch (type) {
-                                                                                                                                                                                                        case 'FreshwaterFish':
-                                                                                                                                                                                                        case 'SaltwaterFish':
-                                                                                                                                                                                                            html += `
-                                                                                                                                                                                                                        <div class="col-12"><h5 class="text-primary mt-3"><i class="bi bi-fish"></i> Fish Details</h5></div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Adult Size (inches)</label>
-                                                                                                                                                                                                                            <input name="adultSize" type="number" step="0.1" class="form-control" placeholder="e.g., 3.5" />
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Coloration</label>
-                                                                                                                                                                                                                            <input name="coloration" type="text" class="form-control" placeholder="e.g., Orange and white" />
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Temperament</label>
-                                                                                                                                                                                                                            <select name="temperament" class="form-select">
-                                                                                                                                                                                                                                <option value="">-- Select --</option>
-                                                                                                                                                                                                                                <option value="Peaceful">Peaceful</option>
-                                                                                                                                                                                                                                <option value="Semi-aggressive">Semi-aggressive</option>
-                                                                                                                                                                                                                                <option value="Aggressive">Aggressive</option>
-                                                                                                                                                                                                                            </select>
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Activity Level</label>
-                                                                                                                                                                                                                            <select name="activityLevel" class="form-select">
-                                                                                                                                                                                                                                <option value="">-- Select --</option>
-                                                                                                                                                                                                                                <option value="Low">Low</option>
-                                                                                                                                                                                                                                <option value="Moderate">Moderate</option>
-                                                                                                                                                                                                                                <option value="High">High</option>
-                                                                                                                                                                                                                            </select>
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Minimum Tank Size (gallons)</label>
-                                                                                                                                                                                                                            <input name="minTankSize" type="number" class="form-control" placeholder="e.g., 20" />
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Swimming Region</label>
-                                                                                                                                                                                                                            <select name="swimmingRegion" class="form-select">
-                                                                                                                                                                                                                                <option value="">-- Select --</option>
-                                                                                                                                                                                                                                <option value="Top">Top</option>
-                                                                                                                                                                                                                                <option value="Middle">Middle</option>
-                                                                                                                                                                                                                                <option value="Bottom">Bottom</option>
-                                                                                                                                                                                                                                <option value="All">All Levels</option>
-                                                                                                                                                                                                                            </select>
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <div class="form-check mt-4">
-                                                                                                                                                                                                                                <input name="isSchooling" type="checkbox" class="form-check-input" id="isSchooling" />
-                                                                                                                                                                                                                                <label class="form-check-label" for="isSchooling">Schooling Fish</label>
-                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-6" id="schoolSizeField" style="display: none;">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Recommended School Size</label>
-                                                                                                                                                                                                                            <input name="recommendedSchoolSize" type="number" class="form-control" placeholder="e.g., 6" />
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                    `;
-                                                                                                                                                                                                            if (type === 'SaltwaterFish') {
-                                                                                                                                                                                                                html += `
-                                                                                                                                                                                                                            <div class="col-md-6">
-                                                                                                                                                                                                                                <div class="form-check mt-2">
-                                                                                                                                                                                                                                    <input name="isReefSafe" type="checkbox" class="form-check-input" id="isReefSafe" />
-                                                                                                                                                                                                                                    <label class="form-check-label" for="isReefSafe">Reef Safe</label>
-                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                        `;
-                                                                                                                                                                                                            }
-                                                                                                                                                                                                            break;
-
-                                                                                                                                                                                                        case 'Coral':
-                                                                                                                                                                                                            html += `
-                                                                                                                                                                                                                        <div class="col-12"><h5 class="text-primary mt-3"><i class="bi bi-flower3"></i> Coral Details</h5></div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Colony Size (inches)</label>
-                                                                                                                                                                                                                            <input name="colonySize" type="number" step="0.1" class="form-control" placeholder="e.g., 2.5" />
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Coloration</label>
-                                                                                                                                                                                                                            <input name="coloration" type="text" class="form-control" placeholder="e.g., Green/Purple" />
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-4">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Lighting Needs</label>
-                                                                                                                                                                                                                            <select name="lightingNeeds" class="form-select">
-                                                                                                                                                                                                                                <option value="">-- Select --</option>
-                                                                                                                                                                                                                                <option value="Low">Low</option>
-                                                                                                                                                                                                                                <option value="Moderate">Moderate</option>
-                                                                                                                                                                                                                                <option value="High">High</option>
-                                                                                                                                                                                                                            </select>
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-4">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Flow Needs</label>
-                                                                                                                                                                                                                            <select name="flowNeeds" class="form-select">
-                                                                                                                                                                                                                                <option value="">-- Select --</option>
-                                                                                                                                                                                                                                <option value="Low">Low</option>
-                                                                                                                                                                                                                                <option value="Moderate">Moderate</option>
-                                                                                                                                                                                                                                <option value="High">High</option>
-                                                                                                                                                                                                                                <option value="Turbulent">Turbulent</option>
-                                                                                                                                                                                                                            </select>
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-4">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Placement</label>
-                                                                                                                                                                                                                            <select name="placement" class="form-select">
-                                                                                                                                                                                                                                <option value="">-- Select --</option>
-                                                                                                                                                                                                                                <option value="Bottom">Bottom</option>
-                                                                                                                                                                                                                                <option value="Middle">Middle</option>
-                                                                                                                                                                                                                                <option value="Top">Top</option>
-                                                                                                                                                                                                                                <option value="Sand bed">Sand Bed</option>
-                                                                                                                                                                                                                            </select>
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Growth Rate</label>
-                                                                                                                                                                                                                            <input name="growthRate" type="text" class="form-control" placeholder="e.g., Slow, 1 inch/year" />
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Care Level</label>
-                                                                                                                                                                                                                            <select name="careLevel" class="form-select">
-                                                                                                                                                                                                                                <option value="">-- Select --</option>
-                                                                                                                                                                                                                                <option value="Easy">Easy</option>
-                                                                                                                                                                                                                                <option value="Moderate">Moderate</option>
-                                                                                                                                                                                                                                <option value="Difficult">Difficult</option>
-                                                                                                                                                                                                                                <option value="Expert">Expert</option>
-                                                                                                                                                                                                                            </select>
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                    `;
-                                                                                                                                                                                                            break;
-
-                                                                                                                                                                                                        case 'Plant':
-                                                                                                                                                                                                            html += `
-                                                                                                                                                                                                                        <div class="col-12"><h5 class="text-primary mt-3"><i class="bi bi-flower1"></i> Plant Details</h5></div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Max Height (inches)</label>
-                                                                                                                                                                                                                            <input name="maxHeight" type="number" step="0.1" class="form-control" placeholder="e.g., 12" />
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Growth Rate</label>
-                                                                                                                                                                                                                            <select name="growthRate" class="form-select">
-                                                                                                                                                                                                                                <option value="">-- Select --</option>
-                                                                                                                                                                                                                                <option value="Slow">Slow</option>
-                                                                                                                                                                                                                                <option value="Moderate">Moderate</option>
-                                                                                                                                                                                                                                <option value="Fast">Fast</option>
-                                                                                                                                                                                                                            </select>
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Coloration</label>
-                                                                                                                                                                                                                            <input name="coloration" type="text" class="form-control" placeholder="e.g., Deep Green" />
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Placement</label>
-                                                                                                                                                                                                                            <select name="placement" class="form-select">
-                                                                                                                                                                                                                                <option value="">-- Select --</option>
-                                                                                                                                                                                                                                <option value="Foreground">Foreground</option>
-                                                                                                                                                                                                                                <option value="Midground">Midground</option>
-                                                                                                                                                                                                                                <option value="Background">Background</option>
-                                                                                                                                                                                                                                <option value="Floating">Floating</option>
-                                                                                                                                                                                                                            </select>
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Lighting Requirement</label>
-                                                                                                                                                                                                                            <select name="lightingRequirement" class="form-select">
-                                                                                                                                                                                                                                <option value="">-- Select --</option>
-                                                                                                                                                                                                                                <option value="Low">Low</option>
-                                                                                                                                                                                                                                <option value="Medium">Medium</option>
-                                                                                                                                                                                                                                <option value="High">High</option>
-                                                                                                                                                                                                                                <option value="Very High">Very High</option>
-                                                                                                                                                                                                                            </select>
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Care Level</label>
-                                                                                                                                                                                                                            <select name="careLevel" class="form-select">
-                                                                                                                                                                                                                                <option value="">-- Select --</option>
-                                                                                                                                                                                                                                <option value="Easy">Easy</option>
-                                                                                                                                                                                                                                <option value="Moderate">Moderate</option>
-                                                                                                                                                                                                                                <option value="Difficult">Difficult</option>
-                                                                                                                                                                                                                                <option value="Expert">Expert</option>
-                                                                                                                                                                                                                            </select>
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <div class="form-check mt-4">
-                                                                                                                                                                                                                                <input name="requiresCO2" type="checkbox" class="form-check-input" id="requiresCO2" />
-                                                                                                                                                                                                                                <label class="form-check-label" for="requiresCO2">Requires CO2</label>
-                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                    `;
-                                                                                                                                                                                                            break;
-
-                                                                                                                                                                                                        case 'FreshwaterInvertebrate':
-                                                                                                                                                                                                        case 'SaltwaterInvertebrate':
-                                                                                                                                                                                                            html += `
-                                                                                                                                                                                                                        <div class="col-12"><h5 class="text-primary mt-3"><i class="bi bi-bug"></i> Invertebrate Details</h5></div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Adult Size (inches)</label>
-                                                                                                                                                                                                                            <input name="adultSize" type="number" step="0.1" class="form-control" placeholder="e.g., 2.0" />
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Coloration</label>
-                                                                                                                                                                                                                            <input name="coloration" type="text" class="form-control" placeholder="e.g., Red with white dots" />
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Behavior</label>
-                                                                                                                                                                                                                            <input name="behavior" type="text" class="form-control" placeholder="e.g., Peaceful, Nocturnal" />
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                        <div class="col-md-6">
-                                                                                                                                                                                                                            <label class="form-label fw-bold">Minimum Tank Size (gallons)</label>
-                                                                                                                                                                                                                            <input name="minTankSize" type="number" class="form-control" placeholder="e.g., 10" />
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                    `;
-                                                                                                                                                                                                            if (type === 'FreshwaterInvertebrate') {
-                                                                                                                                                                                                                html += `
-                                                                                                                                                                                                                            <div class="col-md-6">
-                                                                                                                                                                                                                                <div class="form-check mt-2">
-                                                                                                                                                                                                                                    <input name="isPlantSafe" type="checkbox" class="form-check-input" id="isPlantSafe" />
-                                                                                                                                                                                                                                    <label class="form-check-label" for="isPlantSafe">Plant Safe</label>
-                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                        `;
-                                                                                                                                                                                                            }
-                                                                                                                                                                                                            if (type === 'SaltwaterInvertebrate') {
-                                                                                                                                                                                                                html += `
-                                                                                                                                                                                                                            <div class="col-md-6">
-                                                                                                                                                                                                                                <div class="form-check mt-2">
-                                                                                                                                                                                                                                    <input name="isReefSafe" type="checkbox" class="form-check-input" id="isReefSafe" />
-                                                                                                                                                                                                                                    <label class="form-check-label" for="isReefSafe">Reef Safe</label>
-                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                        `;
-                                                                                                                                                                                                            }
-                                                                                                                                                                                                            break;
-                                                                                                                                                                                                    }
-
-                                                                                                                                                                                                    html += '</div>';
-                                                                                                                                                                                                    return html;
-                                                                                                                                                                                                }
-
-                                                                                                                                                                                                // Handle schooling checkbox
-                                                                                                                                                                                                document.addEventListener('change', function (e) {
-                                                                                                                                                                                                    if (e.target.id === 'isSchooling') {
-                                                                                                                                                                                                        const schoolSizeField = document.getElementById('schoolSizeField');
-                                                                                                                                                                                                        if (schoolSizeField) {
-                                                                                                                                                                                                            schoolSizeField.style.display = e.target.checked ? 'block' : 'none';
-                                                                                                                                                                                                        }
-                                                                                                                                                                                                    }
-                                                                                                                                                                                                });
-                                                                                                                                                                                            });
+                                            // Image preview logic
+                                            const imageInput = document.querySelector('input[type="file"][name="imageFile"]');
+                                            const previewContainer = document.getElementById('imagePreviewContainer');
+                                            const previewCanvas = document.getElementById('imagePreviewCanvas');
+                                            const zoomInput = document.getElementById('imageZoom');
+                                            const xInput = document.getElementById('imageX');
+                                            const yInput = document.getElementById('imageY');
+                                            let img = null;
+                                            let imgLoaded = false;
+                                            imageInput.addEventListener('change', function (e) {
+                                                const file = e.target.files[0];
+                                                if (!file) return;
+                                                const reader = new FileReader();
+                                                reader.onload = function (ev) {
+                                                    img = new window.Image();
+                                                    img.onload = function () {
+                                                        imgLoaded = true;
+                                                        previewContainer.style.display = 'block';
+                                                        // Calculate fit-to-canvas zoom
+                                                        const canvasWidth = 300;
+                                                        const canvasHeight = 200;
+                                                        const imgRatio = img.width / img.height;
+                                                        const canvasRatio = canvasWidth / canvasHeight;
+                                                        let fitZoom = 1;
+                                                        if (imgRatio > canvasRatio) {
+                                                            fitZoom = canvasWidth / img.width;
+                                                        } else {
+                                                            fitZoom = canvasHeight / img.height;
+                                                        }
+                                                        zoomInput.value = fitZoom;
+                                                        xInput.value = 0;
+                                                        yInput.value = 0;
+                                                        drawImage();
+                                                    };
+                                                    img.src = ev.target.result;
+                                                };
+                                                reader.readAsDataURL(file);
+                                            });
+                                            function drawImage() {
+                                                if (!imgLoaded) return;
+                                                const ctx = previewCanvas.getContext('2d');
+                                                const zoom = parseFloat(zoomInput.value);
+                                                const x = parseInt(xInput.value);
+                                                const y = parseInt(yInput.value);
+                                                previewCanvas.width = 300;
+                                                previewCanvas.height = 200;
+                                                ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+                                                ctx.save();
+                                                ctx.translate(previewCanvas.width / 2 + x, previewCanvas.height / 2 + y);
+                                                ctx.scale(zoom, zoom);
+                                                ctx.drawImage(img, -img.width / 2, -img.height / 2);
+                                                ctx.restore();
+                                            }
+                                            zoomInput.addEventListener('input', drawImage);
+                                            xInput.addEventListener('input', drawImage);
+                                            yInput.addEventListener('input', drawImage);
+                                            // Livestock dynamic fields logic
+                                            document.addEventListener('DOMContentLoaded', function () {
+                                                const livestockType = document.getElementById('livestockType');
+                                                const dynamicFields = document.getElementById('dynamicFields');
+                                                const speciesSelect = document.getElementById('speciesSelect');
+                                                livestockType.addEventListener('change', function () {
+                                                    const selectedType = this.value;
+                                                    dynamicFields.innerHTML = '';
+                                                    updateSpeciesList(selectedType);
+                                                    if (!selectedType) return;
+                                                    const fieldsHTML = getFieldsForType(selectedType);
+                                                    dynamicFields.innerHTML = fieldsHTML;
+                                                });
+                                                function updateSpeciesList(type) {
+                                                    speciesSelect.innerHTML = '<option value="">-- Select Species --</option>';
+                                                    // Get species from ViewBag enums
+                                                    const speciesByType = {
+                                                        'FreshwaterFish': @Html.Raw(Json.Serialize(ViewBag.FreshwaterFishTypes)),
+                                                        'SaltwaterFish': @Html.Raw(Json.Serialize(ViewBag.SaltwaterFishTypes)),
+                                                        'Coral': @Html.Raw(Json.Serialize(ViewBag.CoralTypes)),
+                                                        'Plant': @Html.Raw(Json.Serialize(ViewBag.PlantTypes)),
+                                                        'FreshwaterInvertebrate': @Html.Raw(Json.Serialize(ViewBag.FreshwaterInvertebrateTypes)),
+                                                        'SaltwaterInvertebrate': @Html.Raw(Json.Serialize(ViewBag.InvertebrateTypes))
+                                                    };
+                                                    const species = speciesByType[type] || [];
+                                                    species.forEach(function (sp) {
+                                                        const option = document.createElement('option');
+                                                        option.value = sp;
+                                                        // Convert enum name to readable format (e.g., "SPS_Acropora" -> "SPS Acropora")
+                                                        option.textContent = sp.replace(/_/g, ' ');
+                                                        speciesSelect.appendChild(option);
+                                                    });
+                                                }
+                                                function getFieldsForType(type) {
+                                                    let html = '<div class="row g-3">';
+                                                    switch (type) {
+                                                        case 'FreshwaterFish':
+                                                        case 'SaltwaterFish':
+                                                            html += `
+                                                                <div class="col-12"><h5 class="text-primary mt-3"><i class="bi bi-fish"></i> Fish Details</h5></div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label fw-bold">Adult Size (inches)</label>
+                                                                    <input name="adultSize" type="number" step="0.1" class="form-control" placeholder="e.g., 3.5" />
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label fw-bold">Coloration</label>
+                                                                    <input name="coloration" type="text" class="form-control" placeholder="e.g., Orange and white" />
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label fw-bold">Temperament</label>
+                                                                    <select name="temperament" class="form-select">
+                                                                        <option value="">-- Select --</option>
+                                                                        <option value="Peaceful">Peaceful</option>
+                                                                        <option value="Semi-aggressive">Semi-aggressive</option>
+                                                                        <option value="Aggressive">Aggressive</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label fw-bold">Activity Level</label>
+                                                                    <select name="activityLevel" class="form-select">
+                                                                        <option value="">-- Select --</option>
+                                                                        <option value="Low">Low</option>
+                                                                        <option value="Moderate">Moderate</option>
+                                                                        <option value="High">High</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label fw-bold">Minimum Tank Size (gallons)</label>
+                                                                    <input name="minTankSize" type="number" class="form-control" placeholder="e.g., 20" />
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label fw-bold">Swimming Region</label>
+                                                                    <select name="swimmingRegion" class="form-select">
+                                                                        <option value="">-- Select --</option>
+                                                                        <option value="Top">Top</option>
+                                                                        <option value="Middle">Middle</option>
+                                                                        <option value="Bottom">Bottom</option>
+                                                                        <option value="All">All Levels</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-check mt-4">
+                                                                        <input name="isSchooling" type="checkbox" class="form-check-input" id="isSchooling" />
+                                                                        <label class="form-check-label" for="isSchooling">Schooling Fish</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6" id="schoolSizeField" style="display: none;">
+                                                                    <label class="form-label fw-bold">Recommended School Size</label>
+                                                                    <input name="recommendedSchoolSize" type="number" class="form-control" placeholder="e.g., 6" />
+                                                                </div>
+                                                            `;
+                                                            if (type === 'SaltwaterFish') {
+                                                                html += `
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-check mt-2">
+                                                                            <input name="isReefSafe" type="checkbox" class="form-check-input" id="isReefSafe" />
+                                                                            <label class="form-check-label" for="isReefSafe">Reef Safe</label>
+                                                                        </div>
+                                                                    </div>
+                                                                `;
+                                                            }
+                                                            break;
+                                                        case 'Coral':
+                                                            html += `
+                                                                <div class="col-12"><h5 class="text-primary mt-3"><i class="bi bi-flower3"></i> Coral Details</h5></div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label fw-bold">Colony Size (inches)</label>
+                                                                    <input name="colonySize" type="number" step="0.1" class="form-control" placeholder="e.g., 2.5" />
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label fw-bold">Coloration</label>
+                                                                    <input name="coloration" type="text" class="form-control" placeholder="e.g., Green/Purple" />
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label fw-bold">Lighting Needs</label>
+                                                                    <select name="lightingNeeds" class="form-select">
+                                                                        <option value="">-- Select --</option>
+                                                                        <option value="Low">Low</option>
+                                                                        <option value="Moderate">Moderate</option>
+                                                                        <option value="High">High</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label fw-bold">Flow Needs</label>
+                                                                    <select name="flowNeeds" class="form-select">
+                                                                        <option value="">-- Select --</option>
+                                                                        <option value="Low">Low</option>
+                                                                        <option value="Moderate">Moderate</option>
+                                                                        <option value="High">High</option>
+                                                                        <option value="Turbulent">Turbulent</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label fw-bold">Placement</label>
+                                                                    <select name="placement" class="form-select">
+                                                                        <option value="">-- Select --</option>
+                                                                        <option value="Bottom">Bottom</option>
+                                                                        <option value="Middle">Middle</option>
+                                                                        <option value="Top">Top</option>
+                                                                        <option value="Sand bed">Sand Bed</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label fw-bold">Growth Rate</label>
+                                                                    <input name="growthRate" type="text" class="form-control" placeholder="e.g., Slow, 1 inch/year" />
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label fw-bold">Care Level</label>
+                                                                    <select name="careLevel" class="form-select">
+                                                                        <option value="">-- Select --</option>
+                                                                        <option value="Easy">Easy</option>
+                                                                        <option value="Moderate">Moderate</option>
+                                                                        <option value="Difficult">Difficult</option>
+                                                                        <option value="Expert">Expert</option>
+                                                                    </select>
+                                                                </div>
+                                                            `;
+                                                            break;
+                                                        case 'Plant':
+                                                            html += `
+                                                                <div class="col-12"><h5 class="text-primary mt-3"><i class="bi bi-flower1"></i> Plant Details</h5></div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label fw-bold">Max Height (inches)</label>
+                                                                    <input name="maxHeight" type="number" step="0.1" class="form-control" placeholder="e.g., 12" />
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label fw-bold">Growth Rate</label>
+                                                                    <select name="growthRate" class="form-select">
+                                                                        <option value="">-- Select --</option>
+                                                                        <option value="Slow">Slow</option>
+                                                                        <option value="Moderate">Moderate</option>
+                                                                        <option value="Fast">Fast</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label fw-bold">Coloration</label>
+                                                                    <input name="coloration" type="text" class="form-control" placeholder="e.g., Deep Green" />
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label fw-bold">Placement</label>
+                                                                    <select name="placement" class="form-select">
+                                                                        <option value="">-- Select --</option>
+                                                                        <option value="Foreground">Foreground</option>
+                                                                        <option value="Midground">Midground</option>
+                                                                        <option value="Background">Background</option>
+                                                                        <option value="Floating">Floating</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label fw-bold">Lighting Requirement</label>
+                                                                    <select name="lightingRequirement" class="form-select">
+                                                                        <option value="">-- Select --</option>
+                                                                        <option value="Low">Low</option>
+                                                                        <option value="Medium">Medium</option>
+                                                                        <option value="High">High</option>
+                                                                        <option value="Very High">Very High</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label fw-bold">Care Level</label>
+                                                                    <select name="careLevel" class="form-select">
+                                                                        <option value="">-- Select --</option>
+                                                                        <option value="Easy">Easy</option>
+                                                                        <option value="Moderate">Moderate</option>
+                                                                        <option value="Difficult">Difficult</option>
+                                                                        <option value="Expert">Expert</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-check mt-4">
+                                                                        <input name="requiresCO2" type="checkbox" class="form-check-input" id="requiresCO2" />
+                                                                        <label class="form-check-label" for="requiresCO2">Requires CO2</label>
+                                                                    </div>
+                                                                </div>
+                                                            `;
+                                                            break;
+                                                        case 'FreshwaterInvertebrate':
+                                                        case 'SaltwaterInvertebrate':
+                                                            html += `
+                                                                <div class="col-12"><h5 class="text-primary mt-3"><i class="bi bi-bug"></i> Invertebrate Details</h5></div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label fw-bold">Adult Size (inches)</label>
+                                                                    <input name="adultSize" type="number" step="0.1" class="form-control" placeholder="e.g., 2.0" />
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label fw-bold">Coloration</label>
+                                                                    <input name="coloration" type="text" class="form-control" placeholder="e.g., Red with white dots" />
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label fw-bold">Behavior</label>
+                                                                    <input name="behavior" type="text" class="form-control" placeholder="e.g., Peaceful, Nocturnal" />
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label fw-bold">Minimum Tank Size (gallons)</label>
+                                                                    <input name="minTankSize" type="number" class="form-control" placeholder="e.g., 10" />
+                                                                </div>
+                                                            `;
+                                                            if (type === 'FreshwaterInvertebrate') {
+                                                                html += `
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-check mt-2">
+                                                                            <input name="isPlantSafe" type="checkbox" class="form-check-input" id="isPlantSafe" />
+                                                                            <label class="form-check-label" for="isPlantSafe">Plant Safe</label>
+                                                                        </div>
+                                                                    </div>
+                                                                `;
+                                                            }
+                                                            if (type === 'SaltwaterInvertebrate') {
+                                                                html += `
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-check mt-2">
+                                                                            <input name="isReefSafe" type="checkbox" class="form-check-input" id="isReefSafe" />
+                                                                            <label class="form-check-label" for="isReefSafe">Reef Safe</label>
+                                                                        </div>
+                                                                    </div>
+                                                                `;
+                                                            }
+                                                            break;
+                                                    }
+                                                    html += '</div>';
+                                                    return html;
+                                                }
+                                                // Handle schooling checkbox
+                                                document.addEventListener('change', function (e) {
+                                                    if (e.target.id === 'isSchooling') {
+                                                        const schoolSizeField = document.getElementById('schoolSizeField');
+                                                        if (schoolSizeField) {
+                                                            schoolSizeField.style.display = e.target.checked ? 'block' : 'none';
+                                                        }
+                                                    }
+                                                });
+                                            });
                     </script>
                 }

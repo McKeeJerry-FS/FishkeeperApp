@@ -56,65 +56,6 @@
                                                                value="0" style="width:100px;">
                                                     </div>
                                                 </div>
-                                                @section Scripts {
-                                                    <script>
-                                                                                                    const imageInput = document.querySelector('input[type="file"][name="ImageFile"]');
-                                                                                                    const previewContainer = document.getElementById('imagePreviewContainer');
-                                                                                                    const previewCanvas = document.getElementById('imagePreviewCanvas');
-                                                                                                    const zoomInput = document.getElementById('imageZoom');
-                                                                                                    const xInput = document.getElementById('imageX');
-                                                                                                    const yInput = document.getElementById('imageY');
-                                                                                                    let img = null;
-                                                                                                    let imgLoaded = false;
-                                                                                                    imageInput.addEventListener('change', function (e) {
-                                                                                                        const file = e.target.files[0];
-                                                                                                        if (!file) return;
-                                                                                                        const reader = new FileReader();
-                                                                                                        reader.onload = function (ev) {
-                                                                                                            img = new window.Image();
-                                                                                                            img.onload = function () {
-                                                                                                                imgLoaded = true;
-                                                                                                                previewContainer.style.display = 'block';
-                                                                                                                // Calculate fit-to-canvas zoom
-                                                                                                                const canvasWidth = 300;
-                                                                                                                const canvasHeight = 200;
-                                                                                                                const imgRatio = img.width / img.height;
-                                                                                                                const canvasRatio = canvasWidth / canvasHeight;
-                                                                                                                let fitZoom = 1;
-                                                                                                                if (imgRatio > canvasRatio) {
-                                                                                                                    fitZoom = canvasWidth / img.width;
-                                                                                                                } else {
-                                                                                                                    fitZoom = canvasHeight / img.height;
-                                                                                                                }
-                                                                                                                zoomInput.value = fitZoom;
-                                                                                                                xInput.value = 0;
-                                                                                                                yInput.value = 0;
-                                                                                                                drawImage();
-                                                                                                            };
-                                                                                                            img.src = ev.target.result;
-                                                                                                        };
-                                                                                                        reader.readAsDataURL(file);
-                                                                                                    });
-                                                                                                    function drawImage() {
-                                                                                                        if (!imgLoaded) return;
-                                                                                                        const ctx = previewCanvas.getContext('2d');
-                                                                                                        const zoom = parseFloat(zoomInput.value);
-                                                                                                        const x = parseInt(xInput.value);
-                                                                                                        const y = parseInt(yInput.value);
-                                                                                                        previewCanvas.width = 300;
-                                                                                                        previewCanvas.height = 200;
-                                                                                                        ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-                                                                                                        ctx.save();
-                                                                                                        ctx.translate(previewCanvas.width / 2 + x, previewCanvas.height / 2 + y);
-                                                                                                        ctx.scale(zoom, zoom);
-                                                                                                        ctx.drawImage(img, -img.width / 2, -img.height / 2);
-                                                                                                        ctx.restore();
-                                                                                                    }
-                                                                                                    zoomInput.addEventListener('input', drawImage);
-                                                                                                    xInput.addEventListener('input', drawImage);
-                                                                                                    yInput.addEventListener('input', drawImage);
-                                                    </script>
-                                                }
                                                 <small class="form-text text-muted">Upload a photo of the equipment
                                                     (optional)</small>
                                                 </div>
@@ -1004,4 +945,62 @@
             @{
                 await Html.RenderPartialAsync("_ValidationScriptsPartial");
             }
+            <script>
+                            // Image preview logic
+                            const imageInput = document.querySelector('input[type="file"][name="ImageFile"]');
+                            const previewContainer = document.getElementById('imagePreviewContainer');
+                            const previewCanvas = document.getElementById('imagePreviewCanvas');
+                            const zoomInput = document.getElementById('imageZoom');
+                            const xInput = document.getElementById('imageX');
+                            const yInput = document.getElementById('imageY');
+                            let img = null;
+                            let imgLoaded = false;
+                            imageInput.addEventListener('change', function (e) {
+                                const file = e.target.files[0];
+                                if (!file) return;
+                                const reader = new FileReader();
+                                reader.onload = function (ev) {
+                                    img = new window.Image();
+                                    img.onload = function () {
+                                        imgLoaded = true;
+                                        previewContainer.style.display = 'block';
+                                        // Calculate fit-to-canvas zoom
+                                        const canvasWidth = 300;
+                                        const canvasHeight = 200;
+                                        const imgRatio = img.width / img.height;
+                                        const canvasRatio = canvasWidth / canvasHeight;
+                                        let fitZoom = 1;
+                                        if (imgRatio > canvasRatio) {
+                                            fitZoom = canvasWidth / img.width;
+                                        } else {
+                                            fitZoom = canvasHeight / img.height;
+                                        }
+                                        zoomInput.value = fitZoom;
+                                        xInput.value = 0;
+                                        yInput.value = 0;
+                                        drawImage();
+                                    };
+                                    img.src = ev.target.result;
+                                };
+                                reader.readAsDataURL(file);
+                            });
+                            function drawImage() {
+                                if (!imgLoaded) return;
+                                const ctx = previewCanvas.getContext('2d');
+                                const zoom = parseFloat(zoomInput.value);
+                                const x = parseInt(xInput.value);
+                                const y = parseInt(yInput.value);
+                                previewCanvas.width = 300;
+                                previewCanvas.height = 200;
+                                ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+                                ctx.save();
+                                ctx.translate(previewCanvas.width / 2 + x, previewCanvas.height / 2 + y);
+                                ctx.scale(zoom, zoom);
+                                ctx.drawImage(img, -img.width / 2, -img.height / 2);
+                                ctx.restore();
+                            }
+                            zoomInput.addEventListener('input', drawImage);
+                            xInput.addEventListener('input', drawImage);
+                            yInput.addEventListener('input', drawImage);
+            </script>
         }

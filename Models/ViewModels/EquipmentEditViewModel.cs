@@ -24,5 +24,10 @@ namespace AquaHub.MVC.Models.ViewModels
         public double? MinTemperature { get; set; }
         public double? MaxTemperature { get; set; }
         // Add more fields for other types as needed
+
+        // Image upload support
+        public Microsoft.AspNetCore.Http.IFormFile? ImageFile { get; set; }
+        public byte[]? ImageData { get; set; }
+        public string? ImageType { get; set; }
     }
 }

@@ -10,6 +10,7 @@ namespace AquaHub.MVC.Controllers;
 [Authorize]
 public class EquipmentController : Controller
 {
+
     private readonly IEquipmentService _equipmentService;
     private readonly ITankService _tankService;
     private readonly UserManager<AppUser> _userManager;
@@ -28,6 +29,30 @@ public class EquipmentController : Controller
         _userManager = userManager;
         _logger = logger;
         _imageService = imageService;
+    }
+
+    // ADMIN: Diagnostic action to find equipment records with mismatched Tank/User ownership
+    [Authorize(Roles = "Admin")]
+    [HttpGet]
+    public async Task<IActionResult> FindOrphanedEquipment()
+    {
+        var orphaned = new List<Equipment>();
+        var allTanks = await _tankService.GetAllTanksAsync(null); // Get all tanks (admin only)
+        var tankUserMap = allTanks.ToDictionary(t => t.Id, t => t.UserId);
+
+        // Check all equipment types
+        var allEquipment = new List<Equipment>();
+        allEquipment.AddRange(await _equipmentService.GetAllEquipmentAsync(null)); // Admin: get all
+
+        foreach (var eq in allEquipment)
+        {
+            if (!tankUserMap.TryGetValue(eq.TankId, out var ownerId) || eq.Tank == null || eq.Tank.UserId != ownerId)
+            {
+                orphaned.Add(eq);
+            }
+        }
+
+        return View(orphaned);
     }
 
     // GET: Equipment
@@ -477,34 +502,70 @@ public class EquipmentController : Controller
 
             if (ModelState.IsValid)
             {
-                // Fetch the existing equipment and update its properties
-                var equipment = await _equipmentService.GetEquipmentByIdAsync(id, userId);
-                if (equipment == null)
+                try
                 {
-                    return NotFound();
-                }
-                equipment.Brand = vm.Brand;
-                equipment.Model = vm.Model;
-                equipment.InstalledOn = vm.InstalledOn;
-                // Update additional fields for each type
-                if (equipment is Filter filter)
-                {
-                    if (!string.IsNullOrEmpty(vm.FilterType) && Enum.TryParse<AquaHub.MVC.Models.Enums.FilterType>(vm.FilterType, out var parsedType))
-                        filter.Type = parsedType;
-                    filter.FlowRate = vm.FlowRate ?? 0;
-                    filter.Media = vm.Media ?? string.Empty;
-                    filter.LastMaintenanceDate = vm.LastMaintenanceDate ?? DateTime.MinValue;
-                }
-                if (equipment is Heater heater)
-                {
-                    heater.MinTemperature = (decimal)(vm.MinTemperature ?? 0);
-                    heater.MaxTemperature = (decimal)(vm.MaxTemperature ?? 0);
-                }
-                // Add more updates for other types as needed
+                    // Fetch the existing equipment and update its properties
+                    var equipment = await _equipmentService.GetEquipmentByIdAsync(id, userId);
+                    if (equipment == null)
+                    {
+                        TempData["Error"] = "Equipment not found.";
+                        await PopulateTanksDropdown(userId);
+                        return View(vm);
+                    }
+                    equipment.Brand = vm.Brand;
+                    equipment.Model = vm.Model;
+                    equipment.InstalledOn = vm.InstalledOn;
+                    // Update additional fields for each type
+                    if (equipment is Filter filter)
+                    {
+                        if (!string.IsNullOrEmpty(vm.FilterType) && Enum.TryParse<AquaHub.MVC.Models.Enums.FilterType>(vm.FilterType, out var parsedType))
+                            filter.Type = parsedType;
+                        filter.FlowRate = vm.FlowRate ?? 0;
+                        filter.Media = vm.Media ?? string.Empty;
+                        filter.LastMaintenanceDate = vm.LastMaintenanceDate ?? DateTime.MinValue;
+                    }
+                    if (equipment is Heater heater)
+                    {
+                        heater.MinTemperature = (decimal)(vm.MinTemperature ?? 0);
+                        heater.MaxTemperature = (decimal)(vm.MaxTemperature ?? 0);
+                    }
+                    // Add more updates for other types as needed
 
-                await _equipmentService.UpdateEquipmentAsync(equipment, userId);
-                TempData["Success"] = "Equipment updated successfully!";
-                return RedirectToAction(nameof(Details), new { id = equipment.Id });
+                    // Handle image upload
+                    if (vm.ImageFile != null && vm.ImageFile.Length > 0)
+                    {
+                        try
+                        {
+                            equipment.ImageData = await _imageService.ConvertFileToByteArrayAsync(vm.ImageFile);
+                            equipment.ImageType = vm.ImageFile.ContentType;
+                        }
+                        catch (Exception imgEx)
+                        {
+                            _logger.LogError(imgEx, "Image upload failed for equipment ID: {EquipmentId}", id);
+                            TempData["Error"] = "Image upload failed: " + imgEx.Message;
+                            await PopulateTanksDropdown(userId);
+                            return View(vm);
+                        }
+                    }
+
+                    await _equipmentService.UpdateEquipmentAsync(equipment, userId);
+                    TempData["Success"] = "Equipment updated successfully!";
+                    return RedirectToAction(nameof(Details), new { id = equipment.Id });
+                }
+                catch (UnauthorizedAccessException uaEx)
+                {
+                    _logger.LogError(uaEx, "Unauthorized access updating equipment ID: {EquipmentId}", id);
+                    TempData["Error"] = "You do not have permission to update this equipment.";
+                    await PopulateTanksDropdown(userId);
+                    return View(vm);
+                }
+                catch (Exception updateEx)
+                {
+                    _logger.LogError(updateEx, "General error updating equipment ID: {EquipmentId}", id);
+                    TempData["Error"] = "An error occurred while updating the equipment: " + updateEx.Message;
+                    await PopulateTanksDropdown(userId);
+                    return View(vm);
+                }
             }
 
             await PopulateTanksDropdown(userId);
@@ -513,7 +574,7 @@ public class EquipmentController : Controller
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating equipment ID: {EquipmentId}", id);
-            TempData["Error"] = "An error occurred while updating the equipment.";
+            TempData["Error"] = "A system error occurred while updating the equipment: " + ex.Message;
             await PopulateTanksDropdown(_userManager.GetUserId(User)!);
             return View(vm);
         }

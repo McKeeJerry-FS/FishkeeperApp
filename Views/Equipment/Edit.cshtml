@@ -50,6 +50,21 @@
 
                         <div class="row g-3">
                             <div class="col-12">
+                                <label asp-for="ImageFile" class="form-label fw-bold">Equipment Image</label>
+                                <input asp-for="ImageFile" class="form-control" type="file" accept="image/*" />
+                                <span asp-validation-for="ImageFile" class="text-danger small"></span>
+                            </div>
+                            @if (Model.ImageData != null && Model.ImageType != null)
+                            {
+                                <div class="col-12">
+                                    <label class="form-label">Current Image Preview:</label>
+                                    <div class="border rounded p-2 mb-2" style="max-width:300px;">
+                                        <img src="data:@Model.ImageType;base64,@Convert.ToBase64String(Model.ImageData)"
+                                             alt="Equipment Image" class="img-fluid" style="max-height:200px;" />
+                                    </div>
+                                </div>
+                            }
+                            <div class="col-12">
                                 <label asp-for="Brand" class="form-label fw-bold">Brand</label>
                                 <input asp-for="Brand" class="form-control" />
                                 <span asp-validation-for="Brand" class="text-danger small"></span>
