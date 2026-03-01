@@ -337,9 +337,14 @@ public class WaterTestService : IWaterTestService
             // Saltwater-specific parameters
             if (isSaltwater)
             {
+                double salinityMin = 1.020, salinityMax = 1.026;
+                if (tank.Type == AquariumType.NanoReef)
+                {
+                    salinityMin = 1.023; salinityMax = 1.026;
+                }
                 viewModel.ParameterTrends.Add(AnalyzeParameter(
                     waterTests, "Salinity", test => test.Salinity,
-                    1.023, 1.026, "ppt"));
+                    salinityMin, salinityMax, "SG"));
 
                 viewModel.ParameterTrends.Add(AnalyzeParameter(
                     waterTests, "Alkalinity", test => test.Alkalinity,
