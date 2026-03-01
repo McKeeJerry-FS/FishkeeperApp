@@ -46,223 +46,89 @@
 
     <div class="row g-4">
         <!-- Stock Status Card -->
-        <div class="col-lg-4">
-            <div class="card shadow-sm mb-4">
+        <div class="col-lg-4 d-flex align-items-stretch">
+            <div class="card shadow-sm mb-4 w-100 h-100 border-0">
                 <div
-                    class="card-header @(Model.Status == StockStatus.InStock ? "bg-success" : Model.Status == StockStatus.LowStock ? "bg-warning" : "bg-danger") text-white">
-                    <h5 class="mb-0">
-                        <i class="bi bi-box"></i> Stock Status
+                    class="card-header @(Model.Status == StockStatus.InStock ? "bg-success" : Model.Status == StockStatus.LowStock ? "bg-warning" : "bg-danger") text-white rounded-top">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <i class="bi bi-box me-2"></i> Stock Status
                     </h5>
                 </div>
-                <div class="card-body text-center">
-                    <h2 class="display-4 mb-3">@Model.CurrentQuantity.ToString("N2")</h2>
-                    <p class="text-muted mb-3">@Model.Unit</p>
-
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <div class="mb-2">
+                        <span class="display-4 fw-bold">@Model.CurrentQuantity.ToString("N2")</span>
+                        <span class="fs-5 text-muted">@Model.Unit</span>
+                    </div>
+                    <p class="text-muted mb-2">Remaining</p>
                     @{
                         var stockPercentage = Model.MinimumQuantity > 0
-                        ? (Model.CurrentQuantity / Model.MinimumQuantity) * 100
-                        : 100;
+                            ? (Model.CurrentQuantity / Model.MinimumQuantity) * 100
+                            : 100;
                         var progressColor = stockPercentage > 100 ? "success" : stockPercentage > 0 ? "warning" : "danger";
                     }
-
-                    <div class="progress mb-3" style="height: 25px;">
+                    <div class="progress mb-3" style="height: 20px;">
                         <div class="progress-bar bg-@progressColor" role="progressbar"
                              style="width: @Math.Min(stockPercentage, 100)%" aria-valuenow="@Model.CurrentQuantity"
                              aria-valuemin="0" aria-valuemax="@Model.OptimalQuantity">
                             @stockPercentage.ToString("N0")%
                         </div>
                     </div>
-
-                    <div class="mb-3">
-                        <small class="text-muted">
-                            Minimum: @Model.MinimumQuantity @Model.Unit
-                        </small>
+                    <div class="mb-2">
+                        <small class="text-muted">Minimum: @Model.MinimumQuantity @Model.Unit</small>
                         @if (Model.OptimalQuantity.HasValue)
                         {
                             <br />
-                            <small class="text-muted">
-                                Optimal: @Model.OptimalQuantity.Value @Model.Unit
-                            </small>
+                            <small class="text-muted">Optimal: @Model.OptimalQuantity.Value @Model.Unit</small>
                         }
                     </div>
-
                     @if (Model.EstimatedDaysRemaining.HasValue)
                     {
-                        <div
-                            class="alert @(Model.EstimatedDaysRemaining < 7 ? "alert-danger" : Model.EstimatedDaysRemaining < 14 ? "alert-warning" : "alert-info") mb-3">
-                            <i class="bi bi-clock"></i> Estimated <strong>@Model.EstimatedDaysRemaining days</strong>
-                            remaining
+                        <div class="alert @(Model.EstimatedDaysRemaining < 7 ? "alert-danger" : Model.EstimatedDaysRemaining < 14 ? "alert-warning" : "alert-info") mb-2 py-2 px-3 rounded-pill d-inline-block">
+                            <i class="bi bi-clock"></i> <strong>@Model.EstimatedDaysRemaining</strong> days left
                         </div>
                     }
-
                     <!-- Quick Actions -->
-                    <div class="d-grid gap-2">
-                        <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                    <div class="d-flex gap-2 mt-auto justify-content-center">
+                        <button type="button" class="btn btn-success px-3" data-bs-toggle="modal"
                                 data-bs-target="#addStockModal">
-                            <i class="bi bi-plus-circle"></i> Add Stock
+                            <i class="bi bi-plus-circle"></i> Add
                         </button>
-                        <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                        <button type="button" class="btn btn-warning px-3" data-bs-toggle="modal"
                                 data-bs-target="#removeStockModal">
-                            <i class="bi bi-dash-circle"></i> Use Supply
+                            <i class="bi bi-dash-circle"></i> Use
                         </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Purchase Info Card -->
-            @if (!string.IsNullOrEmpty(Model.PreferredVendor) || Model.LastPurchasePrice.HasValue)
-            {
-                <div class="card shadow-sm">
-                    <div class="card-header bg-info text-white">
-                        <h5 class="mb-0"><i class="bi bi-cart"></i> Purchase Info</h5>
-                    </div>
-                    <div class="card-body">
-                        @if (!string.IsNullOrEmpty(Model.PreferredVendor))
-                        {
-                            <p><strong>Preferred Vendor:</strong><br />@Model.PreferredVendor</p>
-                        }
-                        @if (Model.LastPurchasePrice.HasValue)
-                        {
-                            <p><strong>Last Price:</strong><br />$@Model.LastPurchasePrice.Value.ToString("N2")</p>
-                            <p><strong>Current Value:</strong><br />$@((Model.CurrentQuantity *
-                                                                                        (double)Model.LastPurchasePrice.Value).ToString("N2"))</p>
-                            }
-                            @if (Model.LastPurchaseDate.HasValue)
-                            {
-                                <p><strong>Last Purchase:</strong><br />@Model.LastPurchaseDate.Value.ToString("MMM dd, yyyy")</p>
-                            }
-                            @if (!string.IsNullOrEmpty(Model.ProductUrl))
-                            {
-                                <a href="@Model.ProductUrl" target="_blank" class="btn btn-sm btn-outline-primary w-100">
-                                    <i class="bi bi-link-45deg"></i> View Product
-                                </a>
-                            }
-                        </div>
-                    </div>
-                }
-            </div>
-
-            <!-- Supply Image Display -->
-            <div class="col-lg-8">
-                @if (Model.ImageData != null && Model.ImageData.Length > 0 && !string.IsNullOrEmpty(Model.ImageType))
-                {
-                    <div class="text-center mb-4">
-                        <img src="@($"data:{Model.ImageType};base64,{Convert.ToBase64String(Model.ImageData)}")"
-                             alt="@Model.Name Image"
-                             style="max-width: 400px; max-height: 400px; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                    </div>
-                }
-                <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="bi bi-info-circle"></i> Supply Details</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="text-muted">Category</label>
-                                <p><span class="badge bg-secondary fs-6">@Model.Category</span></p>
-                            </div>
-                            @if (!string.IsNullOrEmpty(Model.Brand))
-                            {
-                                <div class="col-md-6">
-                                    <label class="text-muted">Brand</label>
-                                    <p>@Model.Brand</p>
-                                </div>
-                            }
-                            @if (Model.Tank != null)
-                            {
-                                <div class="col-md-6">
-                                    <label class="text-muted">Associated Tank</label>
-                                    <p>
-                                        <a asp-controller="Tank" asp-action="Details" asp-route-id="@Model.TankId">
-                                            @Model.Tank.Name
-                                        </a>
-                                    </p>
-                                </div>
-                            }
-                            @if (!string.IsNullOrEmpty(Model.StorageLocation))
-                            {
-                                <div class="col-md-6">
-                                    <label class="text-muted">Storage Location</label>
-                                    <p>@Model.StorageLocation</p>
-                                </div>
-                            }
-                            @if (Model.ExpirationDate.HasValue)
-                            {
-                                <div class="col-md-6">
-                                    <label class="text-muted">Expiration Date</label>
-                                    <p class="@(Model.ExpirationDate.Value < DateTime.UtcNow.AddDays(30) ? "text-danger" : "")">
-                                        @Model.ExpirationDate.Value.ToString("MMM dd, yyyy")
-                                        @if (Model.ExpirationDate.Value < DateTime.UtcNow)
-                                        {
-                                            <span class="badge bg-danger">EXPIRED</span>
-                                        }
-                                        else if (Model.ExpirationDate.Value < DateTime.UtcNow.AddDays(30))
-                                        {
-                                            <span class="badge bg-warning">Expires Soon</span>
-                                        }
-                                    </p>
-                                </div>
-                            }
-                            @if (Model.AverageUsagePerWeek.HasValue)
-                            {
-                                <div class="col-md-6">
-                                    <label class="text-muted">Average Usage</label>
-                                    <p>@Model.AverageUsagePerWeek.Value.ToString("N2") @Model.Unit / week</p>
-                                </div>
-                            }
-                            @if (Model.LastUsedDate.HasValue)
-                            {
-                                <div class="col-md-6">
-                                    <label class="text-muted">Last Used</label>
-                                    <p>@Model.LastUsedDate.Value.ToString("MMM dd, yyyy")</p>
-                                </div>
-                            }
-                            <div class="col-md-6">
-                                <label class="text-muted">Low Stock Alerts</label>
-                                <p>
-                                    @if (Model.EnableLowStockAlert)
-                                    {
-                                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Enabled</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-secondary"><i class="bi bi-x-circle"></i> Disabled</span>
-                                    }
-                                </p>
-                            </div>
-                            @if (!string.IsNullOrEmpty(Model.Description))
-                            {
-                                <div class="col-12">
-                                    <label class="text-muted">Description</label>
-                                    <p>@Model.Description</p>
-                                </div>
-                            }
-                            @if (!string.IsNullOrEmpty(Model.Notes))
-                            {
-                                <div class="col-12">
-                                    <label class="text-muted">Notes</label>
-                                    <div class="alert alert-light">
-                                        @Html.Raw(Model.Notes.Replace("\n", "<br />"))
-                                    </div>
-                                </div>
-                            }
-                            <div class="col-12">
-                                <hr />
-                                <small class="text-muted">
-                                    Created: @Model.CreatedAt.ToString("MMM dd, yyyy HH:mm")
-                                    @if (Model.UpdatedAt.HasValue)
-                                    {
-                                        <br />
-                                        <text>Last Updated: @Model.UpdatedAt.Value.ToString("MMM dd, yyyy HH:mm")</text>
-                                    }
-                                </small>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        @if (!string.IsNullOrEmpty(Model.PreferredVendor) || Model.LastPurchasePrice.HasValue)
+        {
+            <div class="card shadow-sm mt-4 w-100 border-0">
+                <div class="card-header bg-info text-white rounded-top">
+                    <h5 class="mb-0 d-flex align-items-center"><i class="bi bi-cart me-2"></i> Purchase Info</h5>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.PreferredVendor))
+                    {
+                        <p><strong>Preferred Vendor:</strong><br />@Model.PreferredVendor</p>
+                    }
+                    @if (Model.LastPurchasePrice.HasValue)
+                    {
+                        <p><strong>Last Price Paid:</strong><br />$@Model.LastPurchasePrice.Value.ToString("N2")</p>
+                    }
+                    @if (Model.LastPurchaseDate.HasValue)
+                    {
+                        <p><strong>Last Purchase:</strong><br />@Model.LastPurchaseDate.Value.ToString("MMM dd, yyyy")</p>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.ProductUrl))
+                    {
+                        <a href="@Model.ProductUrl" target="_blank" class="btn btn-sm btn-outline-primary w-100">
+                            <i class="bi bi-link-45deg"></i> View Product
+                        </a>
+                    }
+                </div>
+            </div>
+        }
     </div>
 
     <!-- Add Stock Modal -->
@@ -324,3 +190,115 @@
             </div>
         </div>
     </div>
+
+    <!-- Supply Details Card -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-info-circle"></i> Supply Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="text-muted">Category</label>
+                    <p><span class="badge bg-secondary fs-6">@Model.Category</span></p>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.Brand))
+                {
+                    <div class="col-md-6">
+                        <label class="text-muted">Brand</label>
+                        <p>@Model.Brand</p>
+                    </div>
+                }
+                @if (Model.Tank != null)
+                {
+                    <div class="col-md-6">
+                        <label class="text-muted">Associated Tank</label>
+                        <p>
+                            <a asp-controller="Tank" asp-action="Details" asp-route-id="@Model.TankId">
+                                @Model.Tank.Name
+                            </a>
+                        </p>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(Model.StorageLocation))
+                {
+                    <div class="col-md-6">
+                        <label class="text-muted">Storage Location</label>
+                        <p>@Model.StorageLocation</p>
+                    </div>
+                }
+                @if (Model.ExpirationDate.HasValue)
+                {
+                    <div class="col-md-6">
+                        <label class="text-muted">Expiration Date</label>
+                        <p class="@(Model.ExpirationDate.Value < DateTime.UtcNow.AddDays(30) ? "text-danger" : "")">
+                            @Model.ExpirationDate.Value.ToString("MMM dd, yyyy")
+                            @if (Model.ExpirationDate.Value < DateTime.UtcNow)
+                            {
+                                <span class="badge bg-danger">EXPIRED</span>
+                            }
+                            else if (Model.ExpirationDate.Value < DateTime.UtcNow.AddDays(30))
+                            {
+                                <span class="badge bg-warning">Expires Soon</span>
+                            }
+                        </p>
+                    </div>
+                }
+                @if (Model.AverageUsagePerWeek.HasValue)
+                {
+                    <div class="col-md-6">
+                        <label class="text-muted">Average Usage</label>
+                        <p>@Model.AverageUsagePerWeek.Value.ToString("N2") @Model.Unit / week</p>
+                    </div>
+                }
+                @if (Model.LastUsedDate.HasValue)
+                {
+                    <div class="col-md-6">
+                        <label class="text-muted">Last Used</label>
+                        <p>@Model.LastUsedDate.Value.ToString("MMM dd, yyyy")</p>
+                    </div>
+                }
+                <div class="col-md-6">
+                    <label class="text-muted">Low Stock Alerts</label>
+                    <p>
+                        @if (Model.EnableLowStockAlert)
+                        {
+                            <span class="badge bg-success"><i class="bi bi-check-circle"></i> Enabled</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary"><i class="bi bi-x-circle"></i> Disabled</span>
+                        }
+                    </p>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <div class="col-12">
+                        <label class="text-muted">Description</label>
+                        <p>@Model.Description</p>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(Model.Notes))
+                {
+                    <div class="col-12">
+                        <label class="text-muted">Notes</label>
+                        <div class="alert alert-light">
+                            @Html.Raw(Model.Notes.Replace("\n", "<br />"))
+                        </div>
+                    </div>
+                }
+                <div class="col-12">
+                    <hr />
+                    <small class="text-muted">
+                        Created: @Model.CreatedAt.ToString("MMM dd, yyyy HH:mm")
+                        @if (Model.UpdatedAt.HasValue)
+                        {
+                            <br />
+                            <text>Last Updated: @Model.UpdatedAt.Value.ToString("MMM dd, yyyy HH:mm")</text>
+                        }
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
