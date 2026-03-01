@@ -1,0 +1,105 @@
+@model AquaHub.MVC.Models.ViewModels.ParameterPredictionDetailViewModel
+@{
+    ViewData["Title"] = $"Prediction Details - {ViewBag.ParameterName}";
+}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2 class="mb-3">
+                <i class="bi bi-graph-up-arrow text-info"></i> Prediction Details: <span class="fw-bold">@ViewBag.ParameterName</span>
+            </h2>
+            <h5 class="text-muted">Tank: @ViewBag.TankName</h5>
+        </div>
+    </div>
+    @if (Model == null)
+    {
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle"></i> Insufficient data to predict <strong>@ViewBag.ParameterName</strong>. Record more water tests!
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="bi bi-bar-chart-line"></i> Historical & Predicted Trend</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-info-circle"></i> Prediction Statistics</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><strong>Current Value:</strong> @Model.CurrentValue?.ToString("F2")</li>
+                            <li class="list-group-item"><strong>Predicted Value (@Model.DaysAhead days):</strong> @Model.PredictedValue?.ToString("F2")</li>
+                            <li class="list-group-item"><strong>Confidence:</strong> @Model.Confidence?.ToString("P0")</li>
+                            <li class="list-group-item"><strong>Ideal Range:</strong> @Model.IdealMin?.ToString("F2") - @Model.IdealMax?.ToString("F2") @Model.Unit</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-lightbulb"></i> Recommended Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            @foreach (var action in Model.RecommendedActions ?? new List<string>())
+                            {
+                                <li>@action</li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    @if (Model != null)
+    {
+        <script>
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(Model.TrendDates)),
+                    datasets: [
+                        {
+                            label: 'Historical',
+                            data: @Html.Raw(Json.Serialize(Model.HistoricalValues)),
+                            borderColor: 'rgb(75, 192, 192)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                            fill: true,
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Predicted',
+                            data: @Html.Raw(Json.Serialize(Model.PredictedValues)),
+                            borderColor: 'rgb(255, 99, 132)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                            fill: true,
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true }
+                    },
+                    scales: {
+                        y: { beginAtZero: false }
+                    }
+                }
+            });
+        </script>
+    }
+}
