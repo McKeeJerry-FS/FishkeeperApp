@@ -29,6 +29,7 @@ public class WaterTest
     // Planted Tank Specific
     public double? Iron { get; set; }
     public double? CO2 { get; set; }
+    public double? Potassium { get; set; }
 
     // Reef 
     public double? Salinity { get; set; }

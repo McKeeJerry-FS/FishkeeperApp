@@ -281,14 +281,37 @@ public class WaterTestService : IWaterTestService
             }
 
             // Get ideal ranges based on tank type
-            var isSaltwater = tank.Type == AquariumType.Saltwater || tank.Type == AquariumType.Reef;
+
+            var isSaltwater = tank.Type == AquariumType.Saltwater || tank.Type == AquariumType.Reef || tank.Type == AquariumType.NanoReef;
             var isReef = tank.Type == AquariumType.Reef;
 
             // pH Trend
+            double phMin, phMax;
+            switch (tank.Type)
+            {
+                case AquariumType.Saltwater:
+                case AquariumType.NanoReef:
+                    phMin = 8.1; phMax = 8.6; break;
+                case AquariumType.Reef:
+                    phMin = 8.1; phMax = 8.6; break;
+                case AquariumType.Planted:
+                    phMin = 6.5; phMax = 7.5; break;
+                case AquariumType.Cichlid:
+                    phMin = 7.8; phMax = 8.6; break;
+                case AquariumType.Betta:
+                    phMin = 6.5; phMax = 7.5; break;
+                case AquariumType.Goldfish:
+                    phMin = 7.0; phMax = 8.0; break;
+                case AquariumType.Shrimp:
+                    phMin = 6.2; phMax = 7.4; break;
+                case AquariumType.Brackish:
+                    phMin = 7.5; phMax = 8.5; break;
+                default:
+                    phMin = 6.5; phMax = 7.5; break;
+            }
             viewModel.ParameterTrends.Add(AnalyzeParameter(
                 waterTests, "pH", test => test.PH,
-                isSaltwater ? 8.0 : 6.5,
-                isSaltwater ? 8.4 : 8.0));
+                phMin, phMax));
 
             // Temperature Trend
             viewModel.ParameterTrends.Add(AnalyzeParameter(
