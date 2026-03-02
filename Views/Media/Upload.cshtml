@@ -1,0 +1,64 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Upload Media";
+}
+
+@using AquaHub.MVC.Models
+@using AquaHub.MVC.Models.Enums
+
+<div class="container mt-4">
+    <h2><i class="bi bi-cloud-upload"></i> Upload Media</h2>
+
+    <form asp-action="Upload" method="post" enctype="multipart/form-data" class="mt-4">
+        <div class="mb-3">
+            <label for="file" class="form-label">Select File</label>
+            <input type="file" class="form-control" id="file" name="file" accept="image/*,video/*" required>
+            <div class="form-text">Supported formats: Images (JPG, PNG, GIF) and Videos (MP4, MOV, AVI)</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" name="title" required maxlength="200">
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3" maxlength="1000"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="category" class="form-label">Category</label>
+            <select class="form-select" id="category" name="category">
+                @foreach (var cat in ViewBag.Categories)
+                {
+                    <option value="@cat.Value">@cat.Text</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="tankId" class="form-label">Associate with Tank (Optional)</label>
+            <select class="form-select" id="tankId" name="tankId">
+                <option value="">-- Select Tank --</option>
+                @foreach (var tank in ViewBag.TankId)
+                {
+                    <option value="@tank.Value">@tank.Text</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="tags" class="form-label">Tags (comma-separated)</label>
+            <input type="text" class="form-control" id="tags" name="tags" placeholder="coral, growth, milestone">
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-upload"></i> Upload
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>

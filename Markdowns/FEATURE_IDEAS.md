@@ -32,7 +32,7 @@
 ## 📱 Mobile & Sharing
 
 - [ ] **Mobile App** - Native iOS/Android companion app
-- [ ] **Tank Journal** - Blog-style entries with photos and observations
+- [X] **Tank Journal** - Blog-style entries with photos and observations
 - [ ] **Community Features** - Share tank photos, get advice from other aquarists
 - [ ] **Public Tank Profiles** - Optional sharing of your setup with others
 

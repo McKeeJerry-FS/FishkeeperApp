@@ -59,6 +59,7 @@ public class ApplicationDbContext : IdentityDbContext<AppUser>
     public DbSet<ShoppingListItem> ShoppingListItems { get; set; }
 
     public DbSet<TankMilestone> TankMilestones { get; set; }
+    public DbSet<MediaItem> MediaItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

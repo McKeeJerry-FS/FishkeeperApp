@@ -82,6 +82,9 @@ public class Tank : NewBaseType
     public ICollection<Light> Lights { get; set; } = new List<Light>();
     public ICollection<Heater> Heaters { get; set; } = new List<Heater>();
     public ICollection<ProteinSkimmer> ProteinSkimmers { get; set; } = new List<ProteinSkimmer>();
+    
+    // Media archive navigation property
+    public ICollection<MediaItem> MediaItems { get; set; } = new List<MediaItem>();
 
     // Image Properties
     [NotMapped]

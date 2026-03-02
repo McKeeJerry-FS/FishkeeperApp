@@ -88,6 +88,7 @@ builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Emai
 builder.Services.AddScoped<IEmailSender, EmailService>();
 builder.Services.AddScoped<IEmailNotifiactionService, EmailNotificationService>();
 builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<IMediaService, MediaService>();
 
 // Core Services
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();

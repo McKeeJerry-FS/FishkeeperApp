@@ -31,6 +31,9 @@ public int Id { get; set; }
     // Navigation properties for linked records
     public ICollection<JournalMaintenanceLink> MaintenanceLinks { get; set; } = new List<JournalMaintenanceLink>();
     public ICollection<JournalWaterTestLink> WaterTestLinks { get; set; } = new List<JournalWaterTestLink>();
+    
+    // Media archive navigation property
+    public ICollection<MediaItem> MediaItems { get; set; } = new List<MediaItem>();
 }
 
 // Junction table for linking journal entries to maintenance logs

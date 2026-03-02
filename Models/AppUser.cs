@@ -81,4 +81,7 @@ public class AppUser : IdentityUser
 
     public bool CanAccessProFeatures => IsDeveloperMode || IsProTierActive || IsInGracePeriod;
 
+    // Media archive navigation property
+    public ICollection<MediaItem> MediaItems { get; set; } = new List<MediaItem>();
+
 }

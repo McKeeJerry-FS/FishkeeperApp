@@ -1,0 +1,82 @@
+﻿@model List<MediaItem>
+@using AquaHub.MVC.Models
+@using AquaHub.MVC.Models.Enums
+
+@{
+    ViewData["Title"] = "Media Archive";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="bi bi-images"></i> Media Archive</h2>
+            @if (!string.IsNullOrEmpty(ViewBag.TankName))
+            {
+                <p class="text-muted">Showing media for tank: <strong>@ViewBag.TankName</strong></p>
+            }
+        </div>
+        <div class="col-md-4 text-end">
+            <a asp-action="Upload" class="btn btn-primary">
+                <i class="bi bi-cloud-upload"></i> Upload Media
+            </a>
+            <a asp-action="Gallery" class="btn btn-outline-secondary">
+                <i class="bi bi-grid-3x3"></i> Gallery View
+            </a>
+        </div>
+    </div>
+
+    @if (ViewBag.TotalStorage != null)
+    {
+        <div class="alert alert-info">
+            <strong>Storage Used:</strong> @(((long)ViewBag.TotalStorage / 1024.0 / 1024.0).ToString("F2")) MB
+        </div>
+    }
+
+    @if (Model.Any())
+    {
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100">
+                        @if (item.MediaType == MediaType.Image)
+                        {
+                            <img src="@item.FilePath" class="card-img-top" alt="@item.Title"
+                                 style="height: 200px; object-fit: cover;">
+                        }
+                        else
+                        {
+                            <video src="@item.FilePath" class="card-img-top" style="height: 200px; object-fit: cover;"
+                                   controls></video>
+                        }
+                        <div class="card-body">
+                            <h5 class="card-title">@item.Title</h5>
+                            <p class="card-text small text-muted">
+                                @if (item.Tank != null)
+                                {
+                                    <span><i class="bi bi-droplet"></i> @item.Tank.Name</span>
+                                
+                                    <br />
+                                }
+                                <span><i class="bi bi-calendar"></i> @item.UploadedAt.ToShortDateString()</span><br />
+                                <span class="badge bg-secondary">@item.Category</span>
+                            </p>
+                            <div class="btn-group btn-group-sm w-100">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary">View</a>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-secondary">Edit</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            <h4><i class="bi bi-inbox"></i> No media found</h4>
+            <p>Start building your archive by uploading photos and videos!</p>
+            <a asp-action="Upload" class="btn btn-primary">Upload Your First Media</a>
+        </div>
+    }
+</div>
