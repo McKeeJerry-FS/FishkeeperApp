@@ -25,12 +25,6 @@ public class FeedingRecord
     [ForeignKey(nameof(FeedingScheduleId))]
     public FeedingSchedule? FeedingSchedule { get; set; }
 
-    [Display(Name = "Supply Item")]
-    public int? SupplyItemId { get; set; }
-
-    [ForeignKey(nameof(SupplyItemId))]
-    public SupplyItem? SupplyItem { get; set; }
-
     [Required(ErrorMessage = "Feed type is required")]
     [Display(Name = "Feed Type")]
     public FeedType FeedType { get; set; }

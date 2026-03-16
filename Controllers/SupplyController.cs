@@ -565,4 +565,25 @@ public class SupplyController : Controller
             "tablets", "capsules", "doses", "gallons", "test strips"
         };
     }
+
+    // API endpoint to get supply details for auto-fill
+    [HttpGet]
+    public async Task<IActionResult> GetSupplyDetails(int id)
+    {
+        var userId = _userManager.GetUserId(User);
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        var supply = await _supplyService.GetSupplyByIdAsync(id, userId);
+        if (supply == null)
+            return NotFound();
+
+        return Json(new 
+        {
+            id = supply.Id,
+            name = supply.Name,
+            brand = supply.Brand,
+            category = supply.Category.ToString()
+        });
+    }
 }

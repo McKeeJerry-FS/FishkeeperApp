@@ -15,19 +15,16 @@ public class FeedingController : Controller
     private readonly IFeedingService _feedingService;
     private readonly ITankService _tankService;
     private readonly UserManager<AppUser> _userManager;
-    private readonly ISupplyService _supplyService;
     private readonly ILogger<FeedingController> _logger;
 
     public FeedingController(
         IFeedingService feedingService,
         ITankService tankService,
-        ISupplyService supplyService,
         UserManager<AppUser> userManager,
         ILogger<FeedingController> logger)
     {
         _feedingService = feedingService;
         _tankService = tankService;
-        _supplyService = supplyService;
         _userManager = userManager;
         _logger = logger;
     }
@@ -265,7 +262,6 @@ public class FeedingController : Controller
         }
 
         await PopulateTanksDropdown(userId, model.TankId);
-        await PopulateFoodSuppliesDropdown(userId, model.SupplyItemId);
 
         return View(model);
     }
@@ -293,7 +289,6 @@ public class FeedingController : Controller
         }
 
         await PopulateTanksDropdown(userId, record.TankId);
-        await PopulateFoodSuppliesDropdown(userId, record.SupplyItemId);
         return View(record);
     }
 
@@ -327,7 +322,6 @@ public class FeedingController : Controller
 
         await PopulateTanksDropdown(userId, record.TankId);
 
-        await PopulateFoodSuppliesDropdown(userId, record.SupplyItemId);
         return View(record);
     }
 
@@ -357,7 +351,6 @@ public class FeedingController : Controller
         }
 
         await PopulateTanksDropdown(userId, record.TankId);
-        await PopulateFoodSuppliesDropdown(userId, record.SupplyItemId);
         return View(record);
     }
 
@@ -442,16 +435,5 @@ public class FeedingController : Controller
         ViewBag.Tanks = new SelectList(tanks, "Id", "Name", selectedTankId);
     }
 
-
-    private async Task PopulateFoodSuppliesDropdown(string userId, int? selectedSupplyId = null)
-    {
-        var allSupplies = await _supplyService.GetSuppliesByUserAsync(userId);
-        var foodSupplies = allSupplies
-            .Where(s => s.Category == SupplyCategory.Food || s.Category == SupplyCategory.Supplements)
-            .OrderBy(s => s.Name)
-            .ToList();
-
-        ViewBag.FoodSupplies = new SelectList(foodSupplies, "Id", "Name", selectedSupplyId);
-    }
     #endregion
 }
