@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using AquaHub.MVC.Models;
 using AquaHub.MVC.Services.Interfaces;
+using AquaHub.MVC.Utilities;
 
 namespace AquaHub.MVC.Controllers;
 
@@ -14,19 +15,22 @@ public class GrowthRecordController : Controller
     private readonly ITankService _tankService;
     private readonly UserManager<AppUser> _userManager;
     private readonly ILogger<GrowthRecordController> _logger;
+    private readonly IWebHostEnvironment _environment;
 
     public GrowthRecordController(
         IGrowthRecordService growthRecordService,
         ILivestockService livestockService,
         ITankService tankService,
         UserManager<AppUser> userManager,
-        ILogger<GrowthRecordController> logger)
+        ILogger<GrowthRecordController> logger,
+        IWebHostEnvironment environment)
     {
         _growthRecordService = growthRecordService;
         _livestockService = livestockService;
         _tankService = tankService;
         _userManager = userManager;
         _logger = logger;
+        _environment = environment;
     }
 
     // GET: GrowthRecord
@@ -168,7 +172,10 @@ public class GrowthRecordController : Controller
     // POST: GrowthRecord/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("LivestockId,MeasurementDate,LengthInches,WeightGrams,DiameterInches,HeightInches,HealthCondition,ColorVibrancy,Notes")] GrowthRecord growthRecord)
+    public async Task<IActionResult> Create(
+        [Bind("LivestockId,MeasurementDate,LengthInches,WeightGrams,DiameterInches,HeightInches,HealthCondition,ColorVibrancy,Notes")] GrowthRecord growthRecord,
+        IFormFile? ImageFile,
+        IFormFile? CameraImageFile)
     {
         try
         {
@@ -180,6 +187,22 @@ public class GrowthRecordController : Controller
 
             if (ModelState.IsValid)
             {
+                var selectedImage = ImageFile ?? CameraImageFile;
+                if (selectedImage != null)
+                {
+                    growthRecord.PhotoPath = await ImageStorageHelper.SaveImageAsync(
+                        _environment,
+                        selectedImage,
+                        "images",
+                        "growth-records");
+
+                    if (string.IsNullOrWhiteSpace(growthRecord.PhotoPath))
+                    {
+                        ModelState.AddModelError(string.Empty, "The image could not be uploaded.");
+                        throw new InvalidOperationException("Image upload failed for growth record creation.");
+                    }
+                }
+
                 var createdGrowthRecord = await _growthRecordService.AddGrowthRecordAsync(growthRecord, userId);
                 TempData["Success"] = "Growth record added successfully!";
                 return RedirectToAction(nameof(Index), new { livestockId = growthRecord.LivestockId });
@@ -234,7 +257,11 @@ public class GrowthRecordController : Controller
     // POST: GrowthRecord/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, [Bind("Id,LivestockId,MeasurementDate,LengthInches,WeightGrams,DiameterInches,HeightInches,HealthCondition,ColorVibrancy,Notes")] GrowthRecord growthRecord)
+    public async Task<IActionResult> Edit(
+        int id,
+        [Bind("Id,LivestockId,MeasurementDate,LengthInches,WeightGrams,DiameterInches,HeightInches,HealthCondition,ColorVibrancy,Notes")] GrowthRecord growthRecord,
+        IFormFile? ImageFile,
+        IFormFile? CameraImageFile)
     {
         if (id != growthRecord.Id)
         {
@@ -249,12 +276,44 @@ public class GrowthRecordController : Controller
                 return Unauthorized();
             }
 
+            var existingGrowthRecord = await _growthRecordService.GetGrowthRecordByIdAsync(id, userId);
+            if (existingGrowthRecord == null)
+            {
+                return NotFound();
+            }
+
             if (ModelState.IsValid)
             {
+                growthRecord.PhotoPath = existingGrowthRecord.PhotoPath;
+
+                var selectedImage = ImageFile ?? CameraImageFile;
+                if (selectedImage != null)
+                {
+                    var previousPhotoPath = existingGrowthRecord.PhotoPath;
+                    growthRecord.PhotoPath = await ImageStorageHelper.SaveImageAsync(
+                        _environment,
+                        selectedImage,
+                        "images",
+                        "growth-records");
+
+                    if (string.IsNullOrWhiteSpace(growthRecord.PhotoPath))
+                    {
+                        ModelState.AddModelError(string.Empty, "The image could not be uploaded.");
+                        throw new InvalidOperationException("Image upload failed for growth record update.");
+                    }
+
+                    if (!string.Equals(previousPhotoPath, growthRecord.PhotoPath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        ImageStorageHelper.DeleteImageIfExists(_environment, previousPhotoPath);
+                    }
+                }
+
                 await _growthRecordService.UpdateGrowthRecordAsync(growthRecord, userId);
                 TempData["Success"] = "Growth record updated successfully!";
                 return RedirectToAction(nameof(Index), new { livestockId = growthRecord.LivestockId });
             }
+
+            growthRecord.PhotoPath = existingGrowthRecord.PhotoPath;
 
             var livestock = await _livestockService.GetLivestockByIdAsync(growthRecord.LivestockId, userId);
             ViewBag.LivestockName = livestock?.Name;

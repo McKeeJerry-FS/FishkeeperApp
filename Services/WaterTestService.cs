@@ -146,7 +146,8 @@ public class WaterTestService : IWaterTestService
             return;
 
         // Define safe ranges based on tank type
-        var isSaltwater = tank.Type == AquariumType.Saltwater || tank.Type == AquariumType.Reef;
+        var isSaltwater = tank.Type == AquariumType.Saltwater || tank.Type == AquariumType.Reef || tank.Type == AquariumType.NanoReef;
+        var isReefTank = tank.Type == AquariumType.Reef || tank.Type == AquariumType.NanoReef;
 
         // Check pH
         if (waterTest.PH.HasValue)
@@ -209,8 +210,18 @@ public class WaterTestService : IWaterTestService
             }
         }
 
-        // Check Calcium (for reef tanks)
-        if (tank.Type == AquariumType.Reef && waterTest.Calcium.HasValue)
+        // Check Alkalinity (for reef/nanoreef tanks)
+        if (isReefTank && waterTest.Alkalinity.HasValue)
+        {
+            if (waterTest.Alkalinity.Value < 8 || waterTest.Alkalinity.Value > 12)
+            {
+                await _notificationService.CreateWaterParameterAlertAsync(
+                    waterTest, "Alkalinity", waterTest.Alkalinity.Value, 8, 12);
+            }
+        }
+
+        // Check Calcium (for reef/nanoreef tanks)
+        if (isReefTank && waterTest.Calcium.HasValue)
         {
             if (waterTest.Calcium.Value < 380 || waterTest.Calcium.Value > 450)
             {
@@ -219,8 +230,8 @@ public class WaterTestService : IWaterTestService
             }
         }
 
-        // Check Magnesium (for reef tanks)
-        if (tank.Type == AquariumType.Reef && waterTest.Magnesium.HasValue)
+        // Check Magnesium (for reef/nanoreef tanks)
+        if (isReefTank && waterTest.Magnesium.HasValue)
         {
             if (waterTest.Magnesium.Value < 1250 || waterTest.Magnesium.Value > 1350)
             {
@@ -283,7 +294,7 @@ public class WaterTestService : IWaterTestService
             // Get ideal ranges based on tank type
 
             var isSaltwater = tank.Type == AquariumType.Saltwater || tank.Type == AquariumType.Reef || tank.Type == AquariumType.NanoReef;
-            var isReef = tank.Type == AquariumType.Reef;
+            var isReef = tank.Type == AquariumType.Reef || tank.Type == AquariumType.NanoReef;
 
             // pH Trend
             double phMin, phMax;

@@ -14,7 +14,7 @@
                     </h2>
                 </div>
                 <div class="card-body p-4">
-                    <form asp-action="Edit" enctype="multipart/form-data">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
                         <input type="hidden" asp-for="Id" />
 
@@ -30,7 +30,7 @@
 
                         <div class="mb-4">
                             <label asp-for="Timestamp" class="form-label fw-bold">
-                                <i class="bi bi-calendar3 text-primary"></i> Date & Time
+                                <i class="bi bi-calendar3 text-primary"></i> Date &amp; Time
                             </label>
                             <input asp-for="Timestamp" type="datetime-local" class="form-control" />
                             <span asp-validation-for="Timestamp" class="text-danger"></span>
@@ -59,99 +59,68 @@
                             </label>
                             @if (!string.IsNullOrEmpty(Model.ImagePath))
                             {
-                                <div class="mb-2">
-                                    <img src="@Model.ImagePath" alt="Journal Image" class="img-fluid rounded shadow-sm"
-                                         style="max-height:200px;" />
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <label class="form-label">Current image</label>
+                                        <img src="@Model.ImagePath" alt="Journal Image" class="img-fluid rounded shadow-sm"
+                                             style="max-height: 240px;" />
+                                    </div>
                                 </div>
                             }
-                            <input type="file" name="ImageFile" id="imageInput" accept="image/*" capture="environment"
-                                   class="form-control" />
-                            <small class="form-text text-muted">Upload or take a new photo to replace the current image.
-                                On mobile, you can use your camera.</small>
-                                <div id="imagePreviewContainer" class="mt-3" style="display:none;">
-                                    <label class="form-label">Preview &amp; Adjust:</label>
-                                    <div style="max-width:300px;">
-                                        <canvas id="imagePreviewCanvas"
-                                                style="width:100%;border:1px solid #ccc;border-radius:8px;"></canvas>
-                                    </div>
-                                    <div class="mt-2">
-                                        <label>Zoom:</label>
-                                        <input type="range" id="imageZoom" min="1" max="3" step="0.01" value="1"
-                                               style="width:150px;">
-                                        <label>Position:</label>
-                                        <input type="range" id="imageX" min="-150" max="150" step="1" value="0"
-                                               style="width:100px;">
-                                        <input type="range" id="imageY" min="-150" max="150" step="1" value="0"
-                                               style="width:100px;">
-                                    </div>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="imageFile" class="form-label">Choose replacement image</label>
+                                    <input type="file" name="ImageFile" id="imageFile" accept="image/*"
+                                           class="form-control" />
+                                    <div class="form-text">Select a new image from your device.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="cameraImageFile" class="form-label">Take replacement photo</label>
+                                    <input type="file" name="CameraImageFile" id="cameraImageFile" accept="image/*"
+                                           capture="environment" class="form-control" />
+                                    <div class="form-text">Uses the device camera when available.</div>
                                 </div>
                             </div>
-
-                            <hr class="my-4">
-
-                            <div class="d-flex justify-content-between">
-                                <a asp-action="Index" class="btn btn-secondary btn-lg">
-                                    <i class="bi bi-arrow-left"></i> Cancel
-                                </a>
-                                <button type="submit" class="btn btn-warning btn-lg">
-                                    <i class="bi bi-save"></i> Update Entry
-                                </button>
+                            <div id="imagePreviewContainer" class="card mt-3 d-none">
+                                <div class="card-body">
+                                    <label class="form-label">New image preview</label>
+                                    <img id="imagePreview" alt="New image preview" class="img-fluid rounded shadow-sm"
+                                         style="max-height: 280px;" />
+                                    <div id="imagePreviewText" class="form-text mt-2"></div>
+                                </div>
                             </div>
-                        </form>
-                    </div>
+                            <div class="form-text mt-2">Leave both inputs empty to keep the current image.</div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="bi bi-arrow-left"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-warning btn-lg">
+                                <i class="bi bi-save"></i> Update Entry
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    @section Scripts {
-        @{
-            await Html.RenderPartialAsync("_ValidationScriptsPartial");
-        }
-        <script>
-                            const imageInput = document.getElementById('imageInput');
-                            const previewContainer = document.getElementById('imagePreviewContainer');
-                            const previewCanvas = document.getElementById('imagePreviewCanvas');
-                            const zoomInput = document.getElementById('imageZoom');
-                            const xInput = document.getElementById('imageX');
-                            const yInput = document.getElementById('imageY');
-                            let img = null;
-                            let imgLoaded = false;
-                            imageInput.addEventListener('change', function (e) {
-                                const file = e.target.files[0];
-                                if (!file) return;
-                                const reader = new FileReader();
-                                reader.onload = function (ev) {
-                                    img = new window.Image();
-                                    img.onload = function () {
-                                        imgLoaded = true;
-                                        previewContainer.style.display = 'block';
-                                        zoomInput.value = 1; // Reset zoom to 1 (no zoom)
-                                        xInput.value = 0; // Reset position
-                                        yInput.value = 0;
-                                        drawImage();
-                                    };
-                                    img.src = ev.target.result;
-                                };
-                                reader.readAsDataURL(file);
-                            });
-                            function drawImage() {
-                                if (!imgLoaded) return;
-                                const ctx = previewCanvas.getContext('2d');
-                                const zoom = parseFloat(zoomInput.value);
-                                const x = parseInt(xInput.value);
-                                const y = parseInt(yInput.value);
-                                previewCanvas.width = 300;
-                                previewCanvas.height = 200;
-                                ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-                                ctx.save();
-                                ctx.translate(150 + x, 100 + y);
-                                ctx.scale(zoom, zoom);
-                                ctx.drawImage(img, -img.width / 2, -img.height / 2);
-                                ctx.restore();
-                            }
-                            zoomInput.addEventListener('input', drawImage);
-                            xInput.addEventListener('input', drawImage);
-                            yInput.addEventListener('input', drawImage);
-        </script>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script src="~/js/image-input-preview.js" asp-append-version="true"></script>
+    <script>
+            initializeImageInputPreview({
+                uploadInputId: 'imageFile',
+                cameraInputId: 'cameraImageFile',
+                previewContainerId: 'imagePreviewContainer',
+                previewImageId: 'imagePreview',
+                previewTextId: 'imagePreviewText'
+            });
+    </script>
+}

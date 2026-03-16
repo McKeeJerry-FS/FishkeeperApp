@@ -1,38 +1,39 @@
 @model GrowthRecord
 
 @{
-    ViewData["Title"] = "Add Growth Record";
+    ViewData["Title"] = "Edit Growth Record";
 }
 
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="display-6">
-            <i class="bi bi-plus-circle text-primary"></i> Add Growth Record
+            <i class="bi bi-pencil-square text-warning"></i> Edit Growth Record
         </h1>
-        <a asp-action="Index" class="btn btn-outline-secondary">
+        <a asp-action="Index" asp-route-livestockId="@Model.LivestockId" class="btn btn-outline-secondary">
             <i class="bi bi-x-circle"></i> Cancel
         </a>
     </div>
 
-    <div class="row">
-        <div class="col-md-8">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
             <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Growth Record Information</h5>
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Update Growth Record</h5>
                 </div>
                 <div class="card-body">
-                    <form asp-action="Create" method="post" enctype="multipart/form-data">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
                         @Html.AntiForgeryToken()
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="LivestockId" />
 
                         <div class="mb-3">
-                            <label asp-for="LivestockId" class="form-label">
-                                <i class="bi bi-fish"></i> Livestock <span class="text-danger">*</span>
+                            <label class="form-label">
+                                <i class="bi bi-fish"></i> Livestock
                             </label>
-                            <select asp-for="LivestockId" class="form-select" asp-items="ViewBag.LivestockList">
-                                <option value="">-- Select Livestock --</option>
-                            </select>
-                            <span asp-validation-for="LivestockId" class="text-danger small"></span>
+                            <input type="text" class="form-control"
+                                   value="@(ViewBag.LivestockName ?? Model.Livestock?.Name ?? "Selected Livestock")"
+                                   readonly />
                         </div>
 
                         <div class="mb-3">
@@ -129,7 +130,7 @@
                             <label asp-for="Notes" class="form-label">
                                 <i class="bi bi-chat-left-text"></i> Notes
                             </label>
-                            <textarea asp-for="Notes" class="form-control" rows="3"
+                            <textarea asp-for="Notes" class="form-control" rows="4"
                                       placeholder="Observations, behavior, feeding, etc..."></textarea>
                             <span asp-validation-for="Notes" class="text-danger small"></span>
                         </div>
@@ -138,69 +139,50 @@
                             <label class="form-label">
                                 <i class="bi bi-image"></i> Progress Image
                             </label>
+                            @if (!string.IsNullOrEmpty(Model.PhotoPath))
+                            {
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <label class="form-label">Current image</label>
+                                        <img src="@Model.PhotoPath" alt="Current growth record image"
+                                             class="img-fluid rounded shadow-sm" style="max-height: 260px;" />
+                                    </div>
+                                </div>
+                            }
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label for="imageFile" class="form-label">Choose image</label>
+                                    <label for="imageFile" class="form-label">Choose replacement image</label>
                                     <input type="file" name="ImageFile" id="imageFile" accept="image/*"
                                            class="form-control" />
-                                    <div class="form-text">Pick a photo from your device or gallery.</div>
+                                    <div class="form-text">Select a new image from your device.</div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="cameraImageFile" class="form-label">Take photo</label>
+                                    <label for="cameraImageFile" class="form-label">Take replacement photo</label>
                                     <input type="file" name="CameraImageFile" id="cameraImageFile" accept="image/*"
                                            capture="environment" class="form-control" />
-                                    <div class="form-text">Uses the device camera when supported by the browser.</div>
+                                    <div class="form-text">Uses the device camera when available.</div>
                                 </div>
                             </div>
                             <div id="imagePreviewContainer" class="card mt-3 d-none">
                                 <div class="card-body">
-                                    <label class="form-label">Selected image preview</label>
-                                    <img id="imagePreview" alt="Selected image preview"
-                                         class="img-fluid rounded shadow-sm" style="max-height: 280px;" />
+                                    <label class="form-label">New image preview</label>
+                                    <img id="imagePreview" alt="New image preview" class="img-fluid rounded shadow-sm"
+                                         style="max-height: 280px;" />
                                     <div id="imagePreviewText" class="form-text mt-2"></div>
                                 </div>
                             </div>
+                            <div class="form-text mt-2">Leave both inputs empty to keep the current image.</div>
                         </div>
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a asp-action="Index" class="btn btn-secondary">
-                                <i class="bi bi-x-circle"></i> Cancel
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">
+                                <i class="bi bi-eye"></i> Details
                             </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-save"></i> Save Record
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-save"></i> Update Record
                             </button>
                         </div>
                     </form>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow-sm bg-light">
-                <div class="card-header bg-info text-white">
-                    <i class="bi bi-info-circle"></i> Tracking Tips
-                </div>
-                <div class="card-body">
-                    <h6>Measurement Guidelines</h6>
-                    <p class="small mb-3">
-                        Measure length from nose to tail tip. Weigh using a digital scale for accuracy.
-                    </p>
-
-                    <h6>Health Assessment</h6>
-                    <p class="small mb-3">
-                        <strong>Excellent:</strong> Active, vibrant colors, good appetite<br />
-                        <strong>Good:</strong> Normal behavior, eating well<br />
-                        <strong>Fair:</strong> Slightly lethargic, some fading<br />
-                        <strong>Poor:</strong> Inactive, pale, not eating
-                    </p>
-
-                    <h6>Color Quality</h6>
-                    <p class="small mb-0">
-                        <strong>Vibrant:</strong> Bright, rich coloration<br />
-                        <strong>Normal:</strong> Standard coloration<br />
-                        <strong>Faded:</strong> Less intense colors<br />
-                        <strong>Dull:</strong> Washed out, pale
-                    </p>
                 </div>
             </div>
         </div>
@@ -213,12 +195,12 @@
     }
     <script src="~/js/image-input-preview.js" asp-append-version="true"></script>
     <script>
-            initializeImageInputPreview({
-                uploadInputId: 'imageFile',
-                cameraInputId: 'cameraImageFile',
-                previewContainerId: 'imagePreviewContainer',
-                previewImageId: 'imagePreview',
-                previewTextId: 'imagePreviewText'
-            });
+        initializeImageInputPreview({
+        uploadInputId: 'imageFile',
+        cameraInputId: 'cameraImageFile',
+        previewContainerId: 'imagePreviewContainer',
+        previewImageId: 'imagePreview',
+        previewTextId: 'imagePreviewText'
+        });
     </script>
 }

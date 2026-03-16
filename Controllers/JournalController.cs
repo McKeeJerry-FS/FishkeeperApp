@@ -14,15 +14,18 @@ public class JournalController : Controller
     private readonly ApplicationDbContext _context;
     private readonly UserManager<AppUser> _userManager;
     private readonly ILogger<JournalController> _logger;
+    private readonly IWebHostEnvironment _environment;
 
     public JournalController(
         ApplicationDbContext context,
         UserManager<AppUser> userManager,
-        ILogger<JournalController> logger)
+        ILogger<JournalController> logger,
+        IWebHostEnvironment environment)
     {
         _context = context;
         _userManager = userManager;
         _logger = logger;
+        _environment = environment;
     }
 
     // GET: Journal
@@ -106,7 +109,10 @@ public class JournalController : Controller
     // POST: Journal/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("TankId,Title,Content,Timestamp,ImagePath")] JournalEntry journalEntry, IFormFile? ImageFile)
+    public async Task<IActionResult> Create(
+        [Bind("TankId,Title,Content,Timestamp")] JournalEntry journalEntry,
+        IFormFile? ImageFile,
+        IFormFile? CameraImageFile)
     {
         var userId = _userManager.GetUserId(User);
         if (string.IsNullOrEmpty(userId))
@@ -127,21 +133,16 @@ public class JournalController : Controller
         {
             try
             {
-                // Handle image upload
-                if (ImageFile != null && ImageFile.Length > 0)
+                var selectedImage = ImageFile ?? CameraImageFile;
+                if (selectedImage != null)
                 {
-                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/journal");
-                    if (!Directory.Exists(uploadsFolder))
-                        Directory.CreateDirectory(uploadsFolder);
+                    journalEntry.ImagePath = await SaveJournalImageAsync(selectedImage);
 
-                    var uniqueFileName = $"journal_{Guid.NewGuid()}{Path.GetExtension(ImageFile.FileName)}";
-                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    if (string.IsNullOrWhiteSpace(journalEntry.ImagePath))
                     {
-                        await ImageFile.CopyToAsync(stream);
+                        ModelState.AddModelError(string.Empty, "The image could not be uploaded.");
+                        throw new InvalidOperationException("Image upload failed for journal entry creation.");
                     }
-                    // Save relative path for web access
-                    journalEntry.ImagePath = $"/images/journal/{uniqueFileName}";
                 }
 
                 _context.Add(journalEntry);
@@ -201,7 +202,11 @@ public class JournalController : Controller
     // POST: Journal/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, [Bind("Id,TankId,Title,Content,Timestamp,ImagePath")] JournalEntry journalEntry, IFormFile? ImageFile)
+    public async Task<IActionResult> Edit(
+        int id,
+        [Bind("Id,TankId,Title,Content,Timestamp")] JournalEntry journalEntry,
+        IFormFile? ImageFile,
+        IFormFile? CameraImageFile)
     {
         if (id != journalEntry.Id)
         {
@@ -212,6 +217,15 @@ public class JournalController : Controller
         if (string.IsNullOrEmpty(userId))
         {
             return Unauthorized();
+        }
+
+        var existingJournalEntry = await _context.JournalEntries
+            .Include(j => j.Tank)
+            .FirstOrDefaultAsync(j => j.Id == id && j.Tank!.UserId == userId);
+
+        if (existingJournalEntry == null)
+        {
+            return NotFound();
         }
 
         // Verify the tank belongs to the user
@@ -227,24 +241,29 @@ public class JournalController : Controller
         {
             try
             {
-                // Handle image upload
-                if (ImageFile != null && ImageFile.Length > 0)
-                {
-                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/journal");
-                    if (!Directory.Exists(uploadsFolder))
-                        Directory.CreateDirectory(uploadsFolder);
+                existingJournalEntry.TankId = journalEntry.TankId;
+                existingJournalEntry.Title = journalEntry.Title;
+                existingJournalEntry.Content = journalEntry.Content;
+                existingJournalEntry.Timestamp = journalEntry.Timestamp;
 
-                    var uniqueFileName = $"journal_{Guid.NewGuid()}{Path.GetExtension(ImageFile.FileName)}";
-                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-                    using (var stream = new FileStream(filePath, FileMode.Create))
+                var selectedImage = ImageFile ?? CameraImageFile;
+                if (selectedImage != null)
+                {
+                    var previousImagePath = existingJournalEntry.ImagePath;
+                    existingJournalEntry.ImagePath = await SaveJournalImageAsync(selectedImage);
+
+                    if (string.IsNullOrWhiteSpace(existingJournalEntry.ImagePath))
                     {
-                        await ImageFile.CopyToAsync(stream);
+                        ModelState.AddModelError(string.Empty, "The image could not be uploaded.");
+                        throw new InvalidOperationException("Image upload failed for journal entry update.");
                     }
-                    // Save relative path for web access
-                    journalEntry.ImagePath = $"/images/journal/{uniqueFileName}";
+
+                    if (!string.Equals(previousImagePath, existingJournalEntry.ImagePath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        DeleteImageIfExists(previousImagePath);
+                    }
                 }
 
-                _context.Update(journalEntry);
                 await _context.SaveChangesAsync();
 
                 TempData["SuccessMessage"] = "Journal entry updated successfully!";
@@ -267,6 +286,8 @@ public class JournalController : Controller
                 ModelState.AddModelError("", "An error occurred while updating the journal entry.");
             }
         }
+
+        journalEntry.ImagePath = existingJournalEntry.ImagePath;
 
         var tanks = await _context.Tanks
             .Where(t => t.UserId == userId)
@@ -331,5 +352,46 @@ public class JournalController : Controller
     private bool JournalEntryExists(int id)
     {
         return _context.JournalEntries.Any(e => e.Id == id);
+    }
+
+    private async Task<string?> SaveJournalImageAsync(IFormFile? imageFile)
+    {
+        if (imageFile == null || imageFile.Length == 0)
+        {
+            return null;
+        }
+
+        var uploadsFolder = Path.Combine(_environment.WebRootPath, "images", "journal");
+        Directory.CreateDirectory(uploadsFolder);
+
+        var extension = Path.GetExtension(imageFile.FileName);
+        if (string.IsNullOrWhiteSpace(extension))
+        {
+            extension = ".jpg";
+        }
+
+        var uniqueFileName = $"{Guid.NewGuid():N}{extension}";
+        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+        await using var stream = new FileStream(filePath, FileMode.Create);
+        await imageFile.CopyToAsync(stream);
+
+        return $"/images/journal/{uniqueFileName}";
+    }
+
+    private void DeleteImageIfExists(string? imagePath)
+    {
+        if (string.IsNullOrWhiteSpace(imagePath))
+        {
+            return;
+        }
+
+        var relativePath = imagePath.TrimStart('/').Replace('/', Path.DirectorySeparatorChar);
+        var fullPath = Path.Combine(_environment.WebRootPath, relativePath);
+
+        if (System.IO.File.Exists(fullPath))
+        {
+            System.IO.File.Delete(fullPath);
+        }
     }
 }
