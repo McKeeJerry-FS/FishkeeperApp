@@ -375,7 +375,7 @@ public class WaterTestService : IWaterTestService
 
                 viewModel.ParameterTrends.Add(AnalyzeParameter(
                     waterTests, "Magnesium", test => test.Magnesium,
-                    1250, 1350, "ppm"));
+                    1250, 1500, "ppm"));
             }
 
             // Freshwater-specific parameters

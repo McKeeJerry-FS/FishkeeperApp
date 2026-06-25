@@ -27,12 +27,16 @@ builder.Services.AddHttpLogging(options =>
     options.ResponseBodyLogLimit = 4096;
 });
 
-// Configure Railway port binding
-var port = Environment.GetEnvironmentVariable("PORT") ?? "5001"; // Changed from 5000 to 5001
-builder.WebHost.ConfigureKestrel(options =>
+// Configure Railway port binding only when PORT is provided.
+// Local runs should keep the launch profile URLs from launchSettings.json.
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrWhiteSpace(port) && int.TryParse(port, out var parsedPort))
 {
-    options.ListenAnyIP(int.Parse(port));
-});
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        options.ListenAnyIP(parsedPort);
+    });
+}
 
 // Add services to the container.
 
